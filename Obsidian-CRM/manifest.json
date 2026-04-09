@@ -1,0 +1,15 @@
+{
+  "name": "Pawfect CRM",
+  "short_name": "Pawfect",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#131313",
+  "theme_color": "#4edea3",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2111/2111463.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
