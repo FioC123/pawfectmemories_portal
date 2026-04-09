@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@800&display=swap" rel="stylesheet">
+  <style> body { background: #131313; color: white; font-family: 'Manrope', sans-serif; } </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-6">
+  <div class="w-full max-w-sm bg-[#1c1b1b] p-8 rounded-3xl border border-white/10 text-center shadow-2xl">
+    <div class="w-16 h-16 bg-[#2a2a2a] rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/5">
+      <span class="text-[#4edea3] text-3xl">🔒</span>
+    </div>
+    <h1 class="text-2xl font-bold text-[#4edea3] mb-2">Pawfect Admin</h1>
+    <p class="text-xs text-gray-500 mb-6">請輸入管理員 PIN 碼</p>
+    
+    <input type="password" id="pin" placeholder="****" class="w-full bg-[#2a2a2a] border-none rounded-xl px-4 py-4 text-center font-bold text-2xl outline-none focus:ring-2 focus:ring-[#4edea3] mb-4 tracking-widest">
+    <button onclick="checkLogin()" class="w-full bg-[#4edea3] text-[#003824] font-black py-4 rounded-xl active:scale-95 transition-transform">登入系統</button>
+    <p id="err" class="text-xs mt-4 text-red-400 hidden">❌ PIN 碼錯誤，請重試</p>
+  </div>
+  <script>
+    function checkLogin() {
+      const pin = document.getElementById('pin').value;
+      if (pin === '0124') { // 👈 預設密碼，你可以自己改
+        sessionStorage.setItem('pm_admin_logged', 'true');
+        window.location.href = 'index.html';
+      } else {
+        document.getElementById('err').classList.remove('hidden');
+      }
+    }
+    document.getElementById('pin').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') checkLogin();
+    });
+  </script>
+</body>
+</html>
