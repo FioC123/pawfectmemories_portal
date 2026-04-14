@@ -274,12 +274,17 @@
         document.getElementById('lightbox').style.display = 'flex'; 
     };
 
+    // 🚨 一鍵複製修正 🚨 自動獲取動態根目錄路徑
     window.copyTrackerLink = () => {
-      const trackerUrl = window.location.origin + "/tracker.html";
+      const baseUrl = window.location.href.split('?')[0];
+      const dirUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/'));
+      const trackerUrl = dirUrl + "/tracker.html";
+      
       navigator.clipboard.writeText(trackerUrl).then(() => {
-        alert("已成功複製查詢頁面連結！\n你可以貼給客人：" + trackerUrl);
+        alert("✅ 成功複製客人查詢連結！\n你可以直接貼畀客喇。\n\n網址為：\n" + trackerUrl);
       }).catch(err => {
-        alert("複製失敗，請手動複製網址。");
+        console.error("Copy failed", err);
+        alert("複製失敗，請手動複製。");
       });
     };
 
@@ -398,7 +403,6 @@
             dDate.innerText = `入數日: ${data.depositDate}`; 
             dDate.classList.remove('hidden'); 
         }
-        // 🚨 入數紙顯示邏輯 🚨
         if (data.depositReceiptUrl) {
             document.getElementById('thumb-deposit').innerHTML = `<img src="${data.depositReceiptUrl}" class="w-full h-full object-cover receipt-thumb" onclick="window.openLightbox('${data.depositReceiptUrl}')">`;
         }
@@ -471,7 +475,6 @@
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     });
 
-    // --- PDF 精準反推拆單邏輯 ---
     document.getElementById('btn-generate-pdf').addEventListener('click', () => {
       document.getElementById('pdf-client-name').innerText = loadedClientName;
       document.getElementById('pdf-invoice-id').innerText = orderId;
@@ -483,7 +486,7 @@
       const extraPaxCost = Number(rawData.extraPaxCount || 0) * 300;
       const manualOtherFee = Number(rawData.manualOtherFee || 0);
       const totalOtherFee = Number(rawData.otherFee || 0);
-      const studioTopUp = totalOtherFee - extraPaxCost - manualOtherFee; // 純數學反推，100% 精準
+      const studioTopUp = totalOtherFee - extraPaxCost - manualOtherFee;
       const discount = Number(rawData.discount || 0);
       
       const basePrice = grandTotal - totalOtherFee + discount; 
