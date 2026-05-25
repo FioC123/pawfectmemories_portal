@@ -24,7 +24,7 @@
   
   <header class="bg-[#131313] fixed top-0 w-full z-50 h-20 flex justify-between items-center px-6 border-b border-white/5">
     <div class="flex items-center gap-4">
-      <button onclick="if(document.referrer) { window.history.back(); } else { window.location.href='index.html'; }" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors cursor-pointer">
+      <button type="button" onclick="if(document.referrer) { window.history.back(); } else { window.location.href='index.html'; }" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors cursor-pointer">
         <span class="material-symbols-outlined text-primary">close</span>
       </button>
       <div class="flex flex-col cursor-pointer select-none" onclick="if(document.referrer) { window.history.back(); } else { window.location.href='index.html'; }">
@@ -93,8 +93,8 @@
             <select id="order-package" onchange="handlePackageChange()"><option value="">載入中...</option></select>
           </div>
           
-          <div class="md:col-span-2 p-4 bg-[#2a2a2a] rounded-lg border border-white/5 space-y-4">
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-white/10 pb-2 mb-2">額外收費計算器</p>
+          <div class="md:col-span-2 p-4 bg-[#2a2a2a] rounded-lg border border border-white/5 space-y-4">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-white/10 pb-2 mb-2">額外收費與折扣計算器</p>
             <div class="flex items-center justify-between">
               <label class="text-sm text-gray-300">實際 Studio 租金 (HK$)</label>
               <input type="number" id="order-studio-cost" placeholder="0" oninput="calculateTotals()" class="w-24 text-right h-8 text-sm">
@@ -113,6 +113,14 @@
             <div class="flex items-center justify-between">
               <label class="text-sm text-gray-300">手動附加費 (化妝/加相/車馬費 HK$)</label>
               <input type="number" id="manual-other-fee" value="0" placeholder="0" oninput="calculateTotals()" class="w-24 text-right h-8 text-sm">
+            </div>
+            
+            <div class="flex items-center justify-between pt-2 border-t border-white/5">
+              <div>
+                <label class="text-sm text-[#ffb95f] font-bold">手動折扣優惠 (-HK$)</label>
+                <p class="text-[10px] text-gray-500">適用於熟客友情價、特別減價折讓</p>
+              </div>
+              <input type="number" id="manual-discount-fee" value="0" min="0" placeholder="0" oninput="calculateTotals()" class="w-24 text-right h-8 text-sm border-[#ffb95f]/40 text-[#ffb95f]">
             </div>
           </div>
 
@@ -216,6 +224,9 @@
         const manualOtherFee = Number(document.getElementById('manual-other-fee').value || 0);
         const depositAmount = Number(document.getElementById('deposit-amount').value || 0);
         const applyDiscount = document.getElementById('weekday-discount').checked;
+        
+        // 🚨 抓取手動折扣金額 🚨
+        const manualDiscountFee = Number(document.getElementById('manual-discount-fee').value || 0);
 
         let topUp = 0;
         if (actualStudioCost > studioLimit && studioLimit > 0) topUp = actualStudioCost - studioLimit;
@@ -223,12 +234,13 @@
 
         const extraPaxCost = extraPaxCount * 300;
         const totalOtherFee = topUp + extraPaxCost + manualOtherFee;
-        const discountAmt = applyDiscount ? 300 : 0;
+        const weekdayDiscountAmt = applyDiscount ? 300 : 0;
         
-        const total = basePrice + totalOtherFee - discountAmt;
+        // 🚨 總金額 = 套餐原價 + 附加費總額 - 平日優惠 - 手動折扣 🚨
+        const total = basePrice + totalOtherFee - weekdayDiscountAmt - manualDiscountFee;
         const balance = total - depositAmount;
 
-        document.getElementById('order-price').value = total;
+        document.getElementById('order-price').value = total > 0 ? total : 0;
         document.getElementById('other-fee').value = totalOtherFee;
         
         const balEl = document.getElementById('calculated-balance');
@@ -308,7 +320,7 @@
               <option value="狗" ${petData?.type==='狗'?'selected':''}>狗</option>
               <option value="貓" ${petData?.type==='貓'?'selected':''}>貓</option>
               <option value="兔" ${petData?.type==='兔'?'selected':''}>兔</option>
-              <option value="其他" ${petData?.type==='其他'?'selected':''}>其他</option>
+              <option value="其他" ${petData?.type==='野生'?'selected':''}>其他</option>
             </select>
           </div>
           <div class="md:col-span-2"><label class="block text-sm mb-1 text-gray-400">品種 (例如：柴犬)</label><input type="text" class="pet-breed-input" value="${petData?.breed || ''}"></div>
@@ -358,6 +370,10 @@
           document.getElementById('extra-pax-count').value = d.extraPaxCount || 0; 
           document.getElementById('kids-count').value = d.kidsCount || 0;
           document.getElementById('manual-other-fee').value = d.manualOtherFee || 0;
+          
+          // 🚨 讀取編輯模式時的手動折扣金額 🚨
+          document.getElementById('manual-discount-fee').value = d.manualDiscountFee || 0;
+
           document.getElementById('order-price').value = d.price || ""; 
           document.getElementById('deposit-amount').value = d.depositAmount || "";
           document.getElementById('other-fee').value = d.otherFee || ""; 
@@ -370,7 +386,6 @@
           document.getElementById('submission-date').value = d.submissionDate || "";
           document.getElementById('weekday-discount').checked = (d.discount === 300);
 
-          // 顯示已上傳的收據預覽
           if (d.depositReceiptUrl) {
             document.getElementById('existing-deposit-url').value = d.depositReceiptUrl;
             document.getElementById('preview-deposit-link').href = d.depositReceiptUrl;
@@ -402,7 +417,7 @@
     }
     init();
 
-    // --- 儲存表單與檔案上傳 ---
+    // --- 儲長表單與檔案上傳 ---
     const submitBtn = document.getElementById('btn-submit');
     document.getElementById('order-form').addEventListener('submit', async (e) => {
       e.preventDefault(); submitBtn.innerText = "上傳資料中..."; submitBtn.disabled = true;
@@ -420,7 +435,6 @@
         let depositReceiptUrl = document.getElementById('existing-deposit-url').value; 
         let balanceReceiptUrl = document.getElementById('existing-balance-url').value;
         
-        // 🚨 檔案上傳加上檔名，修復瀏覽器無法顯示 Bug 🚨
         const depFile = document.getElementById('deposit-receipt-file').files[0]; 
         if (depFile) { 
             const depRef = ref(storage, `receipts/${Date.now()}_dep_${depFile.name}`); 
@@ -447,6 +461,10 @@
           extraPaxCount: Number(document.getElementById('extra-pax-count').value || 0), 
           kidsCount: Number(document.getElementById('kids-count').value || 0), 
           manualOtherFee: Number(document.getElementById('manual-other-fee').value || 0),
+          
+          // 🚨 將手動折扣欄位儲存至 Firebase 🚨
+          manualDiscountFee: Number(document.getElementById('manual-discount-fee').value || 0),
+
           price: Number(document.getElementById('order-price').value || 0), 
           depositAmount: Number(document.getElementById('deposit-amount').value || 0), 
           otherFee: Number(document.getElementById('other-fee').value || 0), 
