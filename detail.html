@@ -274,14 +274,14 @@
         document.getElementById('lightbox').style.display = 'flex'; 
     };
 
-    // 🚨 一鍵複製修正 🚨 自動獲取動態根目錄路徑
+    // 🚨 一鍵複製修正：將網址指向 Portal 大堂 🚨
     window.copyTrackerLink = () => {
       const baseUrl = window.location.href.split('?')[0];
       const dirUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/'));
-      const trackerUrl = dirUrl + "/tracker.html";
+      const portalUrl = dirUrl + "/portal.html";
       
-      navigator.clipboard.writeText(trackerUrl).then(() => {
-        alert("✅ 成功複製客人查詢連結！\n你可以直接貼畀客喇。\n\n網址為：\n" + trackerUrl);
+      navigator.clipboard.writeText(portalUrl).then(() => {
+        alert("✅ 成功複製客戶大堂連結！\n你可以直接貼畀客喇。\n\n網址為：\n" + portalUrl);
       }).catch(err => {
         console.error("Copy failed", err);
         alert("複製失敗，請手動複製。");
