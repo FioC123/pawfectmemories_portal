@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>我的預約紀錄 | Pawfect Memories</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@400;500;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  
+  <script id="tailwind-config">
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { "surface-container-high": "#2a2a2a", "surface": "#131313", "primary": "#4edea3", "surface-container-low": "#1c1b1b", "outline": "#86948a", "on-surface-variant": "#bbcabf", "on-surface": "#e5e2e1" }, fontFamily: { headline: ['Manrope'], body: ['Inter'], cursive: ['Dancing Script'] } } } }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    body { min-height: 100dvh; }
+    input[type="tel"] { width: 100%; border-radius: 0.5rem; border: 1px solid #3c4a42; background-color: #2a2a2a; color: #e5e2e1; padding: 1rem; outline: none; transition: border-color 0.2s; font-size: 1.125rem; letter-spacing: 2px; text-align: center;}
+    input[type="tel"]:focus { border-color: #4edea3; box-shadow: 0 0 0 1px #4edea3; }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 flex flex-col items-center">
+
+  <header class="w-full h-20 flex justify-center items-center px-6 mt-8 mb-4">
+    <div class="flex flex-col items-center select-none">
+      <h1 class="font-cursive text-3xl text-on-surface leading-none">Pawfect Memories</h1>
+      <span class="text-[10px] text-primary font-bold tracking-[0.3em] uppercase mt-1">Client Portal</span>
+    </div>
+  </header>
+
+  <main class="w-full max-w-lg px-6 flex-1 flex flex-col">
+    
+    <!-- 登入區塊 (輸入電話) -->
+    <div id="login-section" class="flex-1 flex flex-col justify-center pb-32">
+      <div class="bg-surface-container-low p-8 rounded-2xl border border-white/5 shadow-2xl text-center space-y-6">
+        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2 text-primary">
+          <span class="material-symbols-outlined text-3xl">badge</span>
+        </div>
+        <div>
+          <h2 class="text-2xl font-headline font-bold text-on-surface mb-2">查詢預約紀錄</h2>
+          <p class="text-sm text-on-surface-variant">請輸入您預約時登記的聯絡電話號碼</p>
+        </div>
+        <form id="login-form" class="space-y-6 pt-4">
+          <div>
+            <input type="tel" id="phone-input" placeholder="例如: 98765432" required autocomplete="tel">
+          </div>
+          <button type="submit" id="btn-submit" class="w-full bg-primary text-[#003824] font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all text-lg flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined">search</span> 搜尋我的預約
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 列表區塊 (顯示所有單) -->
+    <div id="list-section" class="hidden w-full pb-20 space-y-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-headline font-bold text-on-surface">歡迎回來，<span id="display-client-name" class="text-primary"></span>！</h2>
+          <p class="text-sm text-on-surface-variant mt-1">您共有 <span id="display-order-count" class="font-bold text-white">0</span> 筆預約紀錄</p>
+        </div>
+        <button onclick="location.reload()" class="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center text-on-surface-variant hover:text-white transition-colors">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
+      </div>
+      
+      <div id="orders-container" class="space-y-4">
+        <!-- 單據卡片會生成喺度 -->
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const statusMap = {
+      "col-new": { text: "🆕 新預約", color: "text-on-surface" },
+      "col-basic-edit": { text: "🎨 基本修輯中", color: "text-[#ffb95f]" },
+      "col-pick-photos": { text: "📸 等待揀相", color: "text-[#ffb95f]" },
+      "col-final-retouch": { text: "✨ 精修中", color: "text-primary" },
+      "col-completed": { text: "✅ 已完成", color: "text-primary" }
+    };
+
+    const form = document.getElementById('login-form');
+    const submitBtn = document.getElementById('btn-submit');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const phoneInput = document.getElementById('phone-input').value.trim();
+      
+      if(!phoneInput) return;
+      
+      submitBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> 搜尋中...`;
+      submitBtn.disabled = true;
+
+      try {
+        // 1. 先用電話號碼搵 Client ID
+        const qClient = query(collection(db, "Clients"), where("phone", "==", phoneInput));
+        const clientSnap = await getDocs(qClient);
+
+        if (clientSnap.empty) {
+          alert("❌ 找不到此電話號碼的紀錄！請確認是否輸入正確，或聯絡攝影師。");
+          resetButton();
+          return;
+        }
+
+        const clientDoc = clientSnap.docs[0];
+        const clientId = clientDoc.id;
+        const clientName = clientDoc.data().name;
+
+        // 2. 用 Client ID 搵佢名下所有單
+        const qOrders = query(collection(db, "Orders"), where("clientId", "==", clientId));
+        const ordersSnap = await getDocs(qOrders);
+
+        if (ordersSnap.empty) {
+          alert("⚠️ 此電話號碼目前沒有任何預約單。");
+          resetButton();
+          return;
+        }
+
+        // 3. 將搵到嘅單按日期排序 (最新嘅喺最頂)
+        let orders = [];
+        ordersSnap.forEach(doc => {
+            orders.push({ id: doc.id, ...doc.data() });
+        });
+        orders.sort((a, b) => {
+            const dateA = new Date(a.shootDate || '1970-01-01').getTime();
+            const dateB = new Date(b.shootDate || '1970-01-01').getTime();
+            return dateB - dateA;
+        });
+
+        // 4. 更新畫面
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('list-section').classList.remove('hidden');
+        document.getElementById('display-client-name').innerText = clientName;
+        document.getElementById('display-order-count').innerText = orders.length;
+
+        const container = document.getElementById('orders-container');
+        container.innerHTML = orders.map(order => {
+            let petsStr = order.pets ? order.pets.map(p => p.name).join(' & ') : (order.petName || '未知寵物');
+            let statusInfo = statusMap[order.status] || { text: "處理中", color: "text-gray-400" };
+            
+            return `
+            <div class="bg-surface-container-low p-5 rounded-xl border border-white/5 hover:border-primary/50 transition-all cursor-pointer relative overflow-hidden group" onclick="window.location.href='tracker.html?id=${order.id}'">
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-primary text-3xl">chevron_right</span>
+              </div>
+              
+              <div class="flex items-center justify-between mb-3 pr-8">
+                <span class="text-[10px] font-bold tracking-wider uppercase bg-surface-container-high px-2 py-1 rounded text-outline">單號 #${order.id}</span>
+                <span class="text-sm font-bold ${statusInfo.color}">${statusInfo.text}</span>
+              </div>
+              
+              <h3 class="text-xl font-headline font-bold text-white mb-1 pr-8">${petsStr} 的拍攝</h3>
+              <p class="text-sm text-on-surface-variant mb-4 flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">calendar_month</span> ${order.shootDate || '日期未定'} ${order.shootTime || ''}</p>
+              
+              <div class="grid grid-cols-2 gap-2 pt-3 border-t border-white/5 pr-8">
+                <div>
+                  <p class="text-[10px] text-outline uppercase font-bold">套餐</p>
+                  <p class="text-sm text-white truncate">${order.package || '-'}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] text-outline uppercase font-bold">地點</p>
+                  <p class="text-sm text-white truncate">${order.shootLocation || '-'}</p>
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+
+      } catch (error) {
+        console.error(error);
+        alert("系統發生錯誤，請稍後再試。");
+        resetButton();
+      }
+    });
+
+    function resetButton() {
+        submitBtn.innerHTML = `<span class="material-symbols-outlined">search</span> 搜尋我的預約`;
+        submitBtn.disabled = false;
+    }
+  </script>
+</body>
+</html>
