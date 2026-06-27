@@ -35,20 +35,16 @@
         <h2 id="res-pet" class="text-xl font-black text-white leading-tight">載入中...</h2>
         <span id="res-order-id" class="text-[10px] font-bold tracking-wider uppercase bg-[#2a2a2a] px-2.5 py-1 rounded-md text-gray-400 shrink-0">單號 #------</span>
       </div>
-      
-      <div id="res-avatars-container" class="flex flex-wrap gap-4">
-        </div>
-      
-      <div id="res-breed" class="flex flex-wrap gap-1.5 pt-2 border-t border-white/5">
-        </div>
+      <div id="res-avatars-container" class="flex flex-wrap gap-4"></div>
+      <div id="res-breed" class="flex flex-wrap gap-1.5 pt-2 border-t border-white/5"></div>
     </div>
 
     <div class="bg-[#1c1b1b] rounded-3xl p-6 border border-white/10 shadow-2xl space-y-4">
       <h3 class="text-xs font-bold uppercase tracking-widest text-[#4edea3] border-b border-white/5 pb-2 flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-[16px]">info</span> 拍攝與項目資訊
+        <span class="material-symbols-outlined text-[16px]">info</span> 拍攝與項目詳細資訊
       </h3>
       
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-4 text-sm">
         <div class="space-y-0.5">
           <p class="text-[10px] text-gray-500 font-bold uppercase">選擇套餐</p>
           <p id="res-package" class="font-bold text-white">-</p>
@@ -62,9 +58,25 @@
           <p id="res-location" class="font-bold text-white">-</p>
           <p id="res-studio" class="text-xs text-gray-400 hidden mt-0.5"></p>
         </div>
+        
+        <div id="res-pax-block" class="space-y-0.5 sm:col-span-2 border-t border-white/5 pt-3 hidden">
+          <p class="text-[10px] text-gray-500 font-bold uppercase">額外拍攝人數及寵物</p>
+          <p id="res-pax-info" class="text-sm text-gray-300">-</p>
+        </div>
+
+        <div id="res-submission-block" class="space-y-0.5 sm:col-span-2 border-t border-white/5 pt-3 hidden">
+          <p class="text-[10px] text-[#ffb95f] font-bold uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">event_available</span> 預計交付日期</p>
+          <p id="res-submission-date" class="font-bold text-white">-</p>
+        </div>
+
         <div id="res-product-block" class="space-y-0.5 sm:col-span-2 border-t border-white/5 pt-3 hidden">
           <p class="text-[10px] text-gray-500 font-bold uppercase">包含實體產品</p>
           <p id="res-product" class="font-bold text-[#ffb95f] flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">auto_stories</span> -</p>
+        </div>
+
+        <div id="res-notes-block" class="space-y-1.5 sm:col-span-2 border-t border-white/5 pt-3 hidden">
+          <p class="text-[10px] text-gray-500 font-bold uppercase">備註 / 特殊要求</p>
+          <div id="res-notes" class="text-sm text-gray-300 bg-[#2a2a2a] p-3 rounded-lg whitespace-pre-wrap leading-relaxed">-</div>
         </div>
       </div>
     </div>
@@ -115,12 +127,28 @@
       </div>
     </div>
 
-    <div id="finance-card" class="rounded-2xl p-5 flex justify-between items-center shadow-lg">
-      <div>
-        <p id="finance-title" class="text-[10px] uppercase font-bold tracking-widest"></p>
-        <p id="res-finance" class="text-sm font-bold mt-1 text-white"></p>
+    <div id="finance-card" class="rounded-2xl p-5 shadow-lg relative overflow-hidden">
+      <div class="flex justify-between items-start mb-4 relative z-10">
+        <div>
+          <p id="finance-title" class="text-[10px] uppercase font-bold tracking-widest"></p>
+          <p id="res-finance" class="text-sm font-bold mt-0.5 text-white"></p>
+        </div>
+        <div class="text-right">
+          <p id="res-balance-label" class="text-[10px] uppercase font-bold tracking-widest text-gray-500 hidden">尚欠尾數</p>
+          <p id="res-balance" class="text-xl font-black leading-none"></p>
+        </div>
       </div>
-      <p id="res-balance" class="text-lg font-black"></p>
+      
+      <div id="finance-breakdown" class="hidden relative z-10 pt-3 border-t border-current/20">
+        <div class="flex justify-between text-xs mb-1 text-gray-400">
+          <span>總收費 (Total)</span>
+          <span id="breakdown-total" class="font-bold text-white"></span>
+        </div>
+        <div class="flex justify-between text-xs text-gray-400">
+          <span>已付訂金 (Deposit)</span>
+          <span id="breakdown-deposit" class="font-bold"></span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -140,13 +168,8 @@
     const urlParams = new URLSearchParams(window.location.search);
     const targetOrderId = urlParams.get('id');
 
-    if (!targetOrderId) {
-        window.location.href = 'portal.html';
-    } else {
-        loadOrderData(targetOrderId);
-    }
+    if (!targetOrderId) { window.location.href = 'portal.html'; } else { loadOrderData(targetOrderId); }
 
-    // 舊版備用跳轉
     document.getElementById('btn-track').onclick = () => {
       const phone = document.getElementById('phone').value.trim(); 
       if(phone.length < 8) return alert("請輸入正確號碼");
@@ -156,108 +179,80 @@
     async function loadOrderData(orderId) {
       try {
         const snap = await getDoc(doc(db, "Orders", orderId));
-        if(!snap.exists()) {
-            alert("找不到此單據！");
-            window.location.href = 'portal.html';
-            return;
-        }
+        if(!snap.exists()) { alert("找不到此單據！"); window.location.href = 'portal.html'; return; }
         
         const d = snap.data();
         
-        // 🚨 1. 處理寵物資料與大頭相 (完全拆開顯示) 🚨
+        // 1. 寵物頭像與標題
         let pets = d.pets || [];
-        if (pets.length === 0 && d.petName) {
-            pets = [{ name: d.petName, breed: d.petBreed || '', photoUrl: d.photoUrl }];
-        }
+        if (pets.length === 0 && d.petName) { pets = [{ name: d.petName, breed: d.petBreed || '', photoUrl: d.photoUrl }]; }
         
         document.getElementById('res-order-id').innerText = `單號 #${orderId}`;
-        
-        // 標題
         let petNames = pets.length > 0 ? pets.map(p=>p.name).join(' & ') : '未知寵物';
         document.getElementById('res-pet').innerText = `${petNames} 的專屬拍攝`;
         
-        // 拆開頭像與名字
         let avatarsHTML = '';
         if (pets.length === 0) {
-            avatarsHTML = `
-              <div class="flex flex-col items-center gap-1.5 w-16">
-                <img class="w-16 h-16 rounded-full object-cover border-2 border-white/10 shrink-0 bg-[#2a2a2a]" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop">
-              </div>`;
+            avatarsHTML = `<div class="flex flex-col items-center gap-1.5 w-16"><img class="w-16 h-16 rounded-full object-cover border-2 border-white/10 shrink-0 bg-[#2a2a2a]" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop"></div>`;
         } else {
             pets.forEach((p) => {
                 const imgSrc = p.photoUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
-                avatarsHTML += `
-                  <div class="flex flex-col items-center gap-1.5 w-16">
-                    <img class="w-16 h-16 rounded-full object-cover border-2 border-white/10 shrink-0 bg-[#2a2a2a] shadow-md" src="${imgSrc}">
-                    <span class="text-[10px] text-gray-300 font-bold truncate w-full text-center">${p.name}</span>
-                  </div>
-                `;
+                avatarsHTML += `<div class="flex flex-col items-center gap-1.5 w-16"><img class="w-16 h-16 rounded-full object-cover border-2 border-white/10 shrink-0 bg-[#2a2a2a] shadow-md" src="${imgSrc}"><span class="text-[10px] text-gray-300 font-bold truncate w-full text-center">${p.name}</span></div>`;
             });
         }
         document.getElementById('res-avatars-container').innerHTML = avatarsHTML;
 
-        // 拆開品種變作精緻 Tag 標籤
-        let breedsHTML = pets.length > 0 ? pets.map(p => {
-            const b = p.breed || '未填寫品種';
-            return `<span class="bg-[#2a2a2a] text-gray-400 text-[10px] px-2 py-1 rounded-md font-bold">${b}</span>`;
-        }).join('') : '-';
+        let breedsHTML = pets.length > 0 ? pets.map(p => { const b = p.breed || '未填寫品種'; return `<span class="bg-[#2a2a2a] text-gray-400 text-[10px] px-2 py-1 rounded-md font-bold">${b}</span>`; }).join('') : '-';
         document.getElementById('res-breed').innerHTML = breedsHTML;
 
 
-        // 🚨 2. 填寫預約與項目詳細資訊 🚨
+        // 2. 豐富版項目資訊
         document.getElementById('res-package').innerText = d.package || '-';
         document.getElementById('res-date').innerText = (d.shootDate || '-') + ' ' + (d.shootTime || '');
         document.getElementById('res-location').innerText = d.shootLocation || '-';
         
-        const studioEl = document.getElementById('res-studio');
-        if(d.studio) {
-            studioEl.innerText = `Studio: ${d.studio}`;
-            studioEl.classList.remove('hidden');
-        } else {
-            studioEl.classList.add('hidden');
+        if(d.studio) { document.getElementById('res-studio').innerText = `Studio: ${d.studio}`; document.getElementById('res-studio').classList.remove('hidden'); }
+        
+        if(d.extraPaxCount > 0 || d.kidsCount > 0) {
+            const extraStr = d.extraPaxCount > 0 ? `額外 ${d.extraPaxCount} 位` : '';
+            const kidsStr = d.kidsCount > 0 ? `小童 ${d.kidsCount} 位` : '';
+            document.getElementById('res-pax-info').innerText = [extraStr, kidsStr].filter(Boolean).join(' ｜ ');
+            document.getElementById('res-pax-block').classList.remove('hidden');
         }
 
-        const productBlock = document.getElementById('res-product-block');
+        if(d.submissionDate) {
+            document.getElementById('res-submission-date').innerText = d.submissionDate;
+            document.getElementById('res-submission-block').classList.remove('hidden');
+        }
+
         if(d.product) {
             document.getElementById('res-product').innerHTML = `<span class="material-symbols-outlined text-[16px]">auto_stories</span> ${d.product}`;
-            productBlock.classList.remove('hidden');
-        } else {
-            productBlock.classList.add('hidden');
+            document.getElementById('res-product-block').classList.remove('hidden');
+        }
+
+        if(d.notes && d.notes.trim() !== "") {
+            document.getElementById('res-notes').innerText = d.notes;
+            document.getElementById('res-notes-block').classList.remove('hidden');
         }
         
-        // 🚨 3. 更新 Stepper 進度 🚨
+        // 3. Stepper
         const cLv = stepMap[d.status] || 1;
-        
         ['s-1','s-2','s-3','s-4','s-5'].forEach(sId => {
-            const el = document.getElementById(sId);
-            el.classList.remove('step-active');
-            const icon = el.querySelector('.s-icon');
-            icon.classList.replace('bg-[#4edea3]', 'bg-[#2a2a2a]');
-            icon.classList.remove('text-[#003824]');
+            const el = document.getElementById(sId); el.classList.remove('step-active');
+            const icon = el.querySelector('.s-icon'); icon.classList.replace('bg-[#4edea3]', 'bg-[#2a2a2a]'); icon.classList.remove('text-[#003824]');
             el.querySelector('p').classList.replace('text-white', 'text-gray-500');
         });
 
         ['s-1','s-2','s-3','s-4','s-5'].forEach((sId, i) => {
-          const el = document.getElementById(sId); 
-          const icon = el.querySelector('.s-icon');
-          if(i < cLv) { 
-              el.classList.add('step-active'); 
-              icon.classList.replace('bg-[#2a2a2a]','bg-[#4edea3]'); 
-              icon.classList.add('text-[#003824]'); 
-              el.querySelector('p').classList.replace('text-gray-500','text-white'); 
-          }
+          const el = document.getElementById(sId); const icon = el.querySelector('.s-icon');
+          if(i < cLv) { el.classList.add('step-active'); icon.classList.replace('bg-[#2a2a2a]','bg-[#4edea3]'); icon.classList.add('text-[#003824]'); el.querySelector('p').classList.replace('text-gray-500','text-white'); }
         });
 
-        // 🚨 4. 處理交相雲端 Link 🚨
         if(cLv >= 3 && d.galleryUrl) { 
-            document.getElementById('gallery-box').classList.remove('hidden'); 
-            document.getElementById('gallery-link').href = d.galleryUrl;
-            document.getElementById('gallery-url-text').value = d.galleryUrl;
-        } else {
-            document.getElementById('gallery-box').classList.add('hidden'); 
+            document.getElementById('gallery-box').classList.remove('hidden'); document.getElementById('gallery-link').href = d.galleryUrl; document.getElementById('gallery-url-text').value = d.galleryUrl;
         }
         
-        // 🚨 5. 處理變色財務卡片 🚨
+        // 4. 明細版財務卡片
         const pStat = d.paymentStatus || 'unpaid';
         const price = Number(d.price || 0);
         const dep = Number(d.depositAmount || 0);
@@ -267,33 +262,34 @@
         const fTitle = document.getElementById('finance-title');
         const fStat = document.getElementById('res-finance');
         const fBal = document.getElementById('res-balance');
+        const fBalLabel = document.getElementById('res-balance-label');
+        const fBreakdown = document.getElementById('finance-breakdown');
 
         if (pStat === 'full' || bal <= 0) {
-            fCard.className = "bg-[#4edea3]/5 rounded-2xl p-5 border border-[#4edea3]/20 flex justify-between items-center shadow-lg";
-            fTitle.className = "text-[10px] text-[#4edea3] uppercase font-bold tracking-widest";
-            fTitle.innerText = "財務狀態";
-            fStat.innerText = "全數已付 ✅";
-            fBal.innerText = "";
+            fCard.className = "bg-[#4edea3]/5 rounded-2xl p-5 border border-[#4edea3]/20 text-[#4edea3] shadow-lg";
+            fTitle.innerText = "財務狀態"; fStat.innerText = "全數已付 ✅";
+            fBal.innerText = ""; fBalLabel.classList.add('hidden'); fBreakdown.classList.add('hidden');
         } else if (pStat === 'deposit') {
-            fCard.className = "bg-[#ffb95f]/5 rounded-2xl p-5 border border-[#ffb95f]/20 flex justify-between items-center shadow-lg";
-            fTitle.className = "text-[10px] text-[#ffb95f] uppercase font-bold tracking-widest";
-            fTitle.innerText = "財務狀態";
-            fStat.innerText = "已付訂金，尚欠尾數";
-            fBal.className = "text-xl font-black text-[#ffb95f]";
+            fCard.className = "bg-[#ffb95f]/5 rounded-2xl p-5 border border-[#ffb95f]/20 text-[#ffb95f] shadow-lg";
+            fTitle.innerText = "財務狀態"; fStat.innerText = "已付訂金";
             fBal.innerText = bal > 0 ? `HK$ ${bal}` : "";
+            fBalLabel.classList.remove('hidden');
+            
+            // 顯示明細
+            document.getElementById('breakdown-total').innerText = `HK$ ${price}`;
+            document.getElementById('breakdown-deposit').innerText = `- HK$ ${dep}`;
+            fBreakdown.classList.remove('hidden');
         } else {
-            fCard.className = "bg-[#ffb4ab]/5 rounded-2xl p-5 border border-[#ffb4ab]/20 flex justify-between items-center shadow-lg";
-            fTitle.className = "text-[10px] text-[#ffb4ab] uppercase font-bold tracking-widest";
-            fTitle.innerText = "財務狀態";
-            fStat.innerText = "尚未付款 ❌";
-            fBal.className = "text-xl font-black text-[#ffb4ab]";
+            fCard.className = "bg-[#ffb4ab]/5 rounded-2xl p-5 border border-[#ffb4ab]/20 text-[#ffb4ab] shadow-lg";
+            fTitle.innerText = "財務狀態"; fStat.innerText = "尚未付款 ❌";
             fBal.innerText = `HK$ ${price}`;
+            fBalLabel.classList.remove('hidden'); fBalLabel.innerText = "總收費";
+            fBreakdown.classList.add('hidden');
         }
         
         document.getElementById('result').classList.remove('hidden');
       } catch (err) {
-          console.error(err);
-          alert("讀取資料失敗，請稍後再試！");
+          console.error(err); alert("讀取資料失敗，請稍後再試！");
       }
     }
   </script>
