@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   
   <script id="tailwind-config">
-    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { "surface-container-high": "#2a2a2a", "surface": "#131313", "primary": "#4edea3", "surface-container-low": "#1c1b1b", "outline": "#86948a", "on-surface-variant": "#bbcabf", "on-surface": "#e5e2e1" }, fontFamily: { headline: ['Manrope'], body: ['Inter'], cursive: ['Dancing Script'] } } } }
+    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { "surface-container-high": "#2a2a2a", "surface": "#131313", "primary": "#4edea3", "surface-container-low": "#1c1b1b", "outline": "#86948a", "on-surface-variant": "#bbcabf", "on-surface": "#e5e2e1", "error": "#ffb4ab" }, fontFamily: { headline: ['Manrope'], body: ['Inter'], cursive: ['Dancing Script'] } } } }
   </script>
   <style>
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
@@ -38,33 +38,11 @@
           <h2 class="text-2xl font-headline font-bold text-on-surface mb-2">查詢預約紀錄</h2>
           <p class="text-sm text-on-surface-variant">請輸入您預約時登記的聯絡電話號碼</p>
         </div>
+        
+        <div id="debug-msg" class="hidden bg-error/10 text-error text-xs p-3 rounded-lg text-left font-bold border border-error/20"></div>
+
         <form id="login-form" class="space-y-6 pt-4">
           <div>
             <input type="tel" id="phone-input" placeholder="例如: 98765432" required autocomplete="tel">
           </div>
-          <button type="submit" id="btn-submit" class="w-full bg-primary text-[#003824] font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all text-lg flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined">search</span> 搜尋我的預約
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <div id="list-section" class="hidden w-full pb-20 space-y-6">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="text-2xl font-headline font-bold text-on-surface">歡迎回來，<span id="display-client-name" class="text-primary"></span>！</h2>
-          <p class="text-sm text-on-surface-variant mt-1">您共有 <span id="display-order-count" class="font-bold text-white">0</span> 筆預約紀錄</p>
-        </div>
-        <button onclick="logout()" class="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center text-on-surface-variant hover:text-white transition-colors" title="登出並轉換號碼">
-          <span class="material-symbols-outlined">logout</span>
-        </button>
-      </div>
-      
-      <div id="orders-container" class="space-y-4"></div>
-    </div>
-
-  </main>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs } from "
+          <button type="submit" id="btn-submit" class="w-full bg-primary text-[#003824] font-bold py-4 rounded-
