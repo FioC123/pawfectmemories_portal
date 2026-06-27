@@ -41,8 +41,164 @@
         
         <div id="debug-msg" class="hidden bg-error/10 text-error text-xs p-3 rounded-lg text-left font-bold border border-error/20"></div>
 
-        <form id="login-form" class="space-y-6 pt-4">
+        <div class="space-y-6 pt-4">
           <div>
-            <input type="tel" id="phone-input" placeholder="例如: 98765432" required autocomplete="tel">
+            <input type="tel" id="phone-input" placeholder="例如: 98765432" autocomplete="tel" onkeypress="if(event.key === 'Enter') document.getElementById('btn-submit').click();">
           </div>
-          <button type="submit" id="btn-submit" class="w-full bg-primary text-[#003824] font-bold py-4 rounded-
+          <button type="button" id="btn-submit" class="w-full bg-primary text-[#003824] font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all text-lg flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined">search</span> 搜尋我的預約
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="list-section" class="hidden w-full pb-20 space-y-6">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-headline font-bold text-on-surface">歡迎回來，<span id="display-client-name" class="text-primary"></span>！</h2>
+          <p class="text-sm text-on-surface-variant mt-1">您共有 <span id="display-order-count" class="font-bold text-white">0</span> 筆預約紀錄</p>
+        </div>
+        <button onclick="logout()" class="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center text-on-surface-variant hover:text-white transition-colors">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
+      </div>
+      <div id="orders-container" class="space-y-4"></div>
+    </div>
+
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const statusMap = {
+      "col-new": { text: "🆕 新預約", color: "text-on-surface" },
+      "col-basic-edit": { text: "🎨 基本修輯中", color: "text-[#ffb95f]" },
+      "col-pick-photos": { text: "📸 等待揀相", color: "text-[#ffb95f]" },
+      "col-final-retouch": { text: "✨ 精修中", color: "text-primary" },
+      "col-completed": { text: "✅ 已完成", color: "text-primary" }
+    };
+
+    const submitBtn = document.getElementById('btn-submit');
+    const phoneInput = document.getElementById('phone-input');
+    const debugMsg = document.getElementById('debug-msg');
+
+    function showError(msg) {
+        debugMsg.innerHTML = `<span class="material-symbols-outlined text-[16px] align-middle">error</span> ${msg}`;
+        debugMsg.classList.remove('hidden');
+        resetButton();
+    }
+
+    // 自動登入
+    const savedPhone = sessionStorage.getItem('client_phone');
+    if(savedPhone) {
+        phoneInput.value = savedPhone;
+        setTimeout(() => { submitBtn.click(); }, 300);
+    }
+
+    // 🚨 終極物理防禦：改用 Click Event 🚨
+    submitBtn.addEventListener('click', async () => {
+      debugMsg.classList.add('hidden');
+      
+      const phoneVal = phoneInput.value.replace(/[\s-]/g, '');
+      if(!phoneVal) { showError("請輸入電話號碼"); return; }
+      
+      submitBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> 搜尋中...`;
+      submitBtn.disabled = true;
+
+      try {
+        const qClient = query(collection(db, "Clients"), where("phone", "==", phoneVal));
+        const clientSnap = await getDocs(qClient);
+
+        if (clientSnap.empty) {
+          showError(`找不到號碼 "${phoneVal}"。請確認是否輸入正確，或聯絡攝影師。`);
+          return;
+        }
+
+        sessionStorage.setItem('client_phone', phoneVal);
+
+        let orders = [];
+        let clientName = clientSnap.docs[0].data().name;
+
+        for (let cDoc of clientSnap.docs) {
+            const qOrders = query(collection(db, "Orders"), where("clientId", "==", cDoc.id));
+            const oSnap = await getDocs(qOrders);
+            oSnap.forEach(doc => { orders.push({ id: doc.id, ...doc.data() }); });
+        }
+
+        if (orders.length === 0) {
+          showError("搵到你嘅檔案，但目前冇任何預約單！");
+          return;
+        }
+
+        orders.sort((a, b) => {
+            const dateA = new Date(a.shootDate || '1970-01-01').getTime() || 0;
+            const dateB = new Date(b.shootDate || '1970-01-01').getTime() || 0;
+            return dateB - dateA;
+        });
+
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('list-section').classList.remove('hidden');
+        document.getElementById('display-client-name').innerText = clientName;
+        document.getElementById('display-order-count').innerText = orders.length;
+
+        const container = document.getElementById('orders-container');
+        container.innerHTML = orders.map(order => {
+            let pets = order.pets || [];
+            if (pets.length === 0 && order.petName) pets = [{ name: order.petName, photoUrl: order.photoUrl }];
+            let petsStr = pets.length > 0 ? pets.map(p => p.name).join(' & ') : '未知寵物';
+            let statusInfo = statusMap[order.status] || { text: "處理中", color: "text-gray-400" };
+            
+            let avatarsHTML = '';
+            if (pets.length === 0) {
+                avatarsHTML = `<img class="w-14 h-14 rounded-full object-cover border-2 border-[#1c1b1b] shrink-0 bg-surface-container-high" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop">`;
+            } else {
+                pets.slice(0, 3).forEach((p, j) => {
+                    const zIndex = 30 - (j * 10);
+                    const marginClass = j > 0 ? '-ml-5' : '';
+                    const imgSrc = p.photoUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
+                    avatarsHTML += `<img class="w-14 h-14 rounded-full object-cover border-2 border-[#1c1b1b] relative shrink-0 bg-surface-container-high shadow-md ${marginClass}" style="z-index:${zIndex};" src="${imgSrc}">`;
+                });
+            }
+            
+            return `
+            <div class="bg-surface-container-low p-5 rounded-xl border border-white/5 hover:border-primary/50 transition-all cursor-pointer relative overflow-hidden group" onclick="window.location.href='tracker.html?id=${order.id}'">
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-primary text-3xl">chevron_right</span>
+              </div>
+              <div class="flex items-center justify-between mb-4 pr-8">
+                <span class="text-[10px] font-bold tracking-wider uppercase bg-surface-container-high px-2 py-1 rounded text-outline">單號 #${order.id}</span>
+                <span class="text-sm font-bold ${statusInfo.color}">${statusInfo.text}</span>
+              </div>
+              <div class="flex items-center gap-4 mb-4 pr-8">
+                <div class="flex items-center shrink-0 pl-1">${avatarsHTML}</div>
+                <div class="overflow-hidden">
+                  <h3 class="text-xl font-headline font-bold text-white mb-1 truncate">${petsStr}</h3>
+                  <p class="text-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">calendar_month</span> ${order.shootDate || '日期未定'} ${order.shootTime || ''}</p>
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+
+      } catch (error) {
+        console.error(error);
+        showError("系統發生錯誤，請截圖聯絡我們。(Error: " + error.message + ")");
+      }
+    });
+
+    function resetButton() {
+        submitBtn.innerHTML = `<span class="material-symbols-outlined">search</span> 搜尋我的預約`;
+        submitBtn.disabled = false;
+    }
+
+    window.logout = function() {
+        sessionStorage.removeItem('client_phone');
+        window.location.reload();
+    };
+  </script>
+</body>
+</html>
