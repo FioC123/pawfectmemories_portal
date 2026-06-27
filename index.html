@@ -1,394 +1,151 @@
 <!DOCTYPE html>
-<html class="dark" lang="zh-Hant">
+<html lang="zh-HK">
 <head>
-  <meta charset="utf-8">
-  <script>if(!sessionStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@400;500;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-  <script id="tailwind-config">
-    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { "surface-container-high": "#2a2a2a", "surface": "#131313", "primary": "#4edea3", "surface-container-low": "#1c1b1b", "surface-bright": "#393939", "secondary": "#ffb95f", "error": "#ffb4ab", "on-surface-variant": "#bbcabf", "on-surface": "#e5e2e1", "whatsapp": "#25D366" }, fontFamily: { headline: ['Manrope'], body: ['Inter'], cursive: ['Dancing Script'] } } } }
-  </script>
-  <style>
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    body { min-height: 100dvh; overflow: hidden; }
-    .sortable-ghost { opacity: 0.4; background-color: #393939; border: 2px dashed #4edea3; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pawfect Memories | Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+HK:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pm-green': '#2D4F1E',
+                        'pm-oak': '#D4A373',
+                        'pm-cream': '#FDFBF7',
+                        'pm-accent': '#E8B4B8',
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans HK"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-surface text-on-surface font-body h-[100dvh] flex flex-col">
-  <header class="bg-[#131313] text-emerald-400 shrink-0 w-full z-50 h-16 md:h-20 flex justify-between items-center px-4 md:px-6 bg-gradient-to-b from-[#1C1B1B] to-transparent">
-    <div class="flex items-center gap-2">
-      <div class="flex flex-col cursor-pointer select-none" onclick="window.location.href='index.html';">
-        <h1 class="font-cursive text-2xl md:text-3xl text-on-surface leading-none tracking-tight">Pawfect Memories</h1>
-        <span class="text-[9px] md:text-[10px] text-primary font-bold tracking-[0.3em] uppercase mt-0.5 ml-0.5">Admin Desk</span>
-      </div>
-      <button onclick="window.open('tracker.html', '_blank');" class="ml-2 w-8 h-8 flex items-center justify-center rounded-lg bg-surface-container-high text-outline hover:text-primary transition-colors" title="前往客人查詢頁">
-        <span class="material-symbols-outlined text-[18px]">open_in_new</span>
-      </button>
-    </div>
-    
-    <div class="hidden md:flex relative w-64 mx-4">
-      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-      <input type="text" id="global-search" placeholder="搜尋客人、寵物、標籤..." class="w-full bg-surface-container-high border border-outline/20 text-on-surface text-sm rounded-full pl-9 pr-4 py-2 focus:outline-none focus:border-primary transition-colors">
-    </div>
+<body class="bg-pm-cream text-gray-800 font-sans flex h-screen overflow-hidden">
 
-    <div class="flex items-center gap-2 md:gap-4 shrink-0">
-      <button onclick="window.location.href='dashboard.html';" class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors">
-        <span class="material-symbols-outlined text-xl md:text-2xl">bar_chart</span>
-      </button>
-      <button onclick="window.location.href='settings.html';" class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors">
-        <span class="material-symbols-outlined text-xl md:text-2xl">settings</span>
-      </button>
-      <button onclick="window.location.href='add.html';" class="bg-primary text-[#003824] w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(78,222,163,0.3)] active:scale-95 transition-all">
-        <span class="material-symbols-outlined font-bold text-xl">add</span>
-      </button>
-    </div>
-  </header>
-
-  <main class="flex-1 px-4 md:px-6 flex flex-col max-w-7xl mx-auto w-full overflow-hidden pb-4 md:pb-8 pt-2">
-    <div class="py-2 md:py-6 flex flex-col md:flex-row md:items-end justify-between gap-4 shrink-0">
-      <div class="w-full md:w-auto">
-        <h2 class="font-headline text-2xl md:text-4xl font-bold tracking-tight text-on-surface mb-3">訂單進度</h2>
-        <div class="flex gap-4 items-center bg-surface-container-low px-4 py-2.5 rounded-lg border border-outline/20 w-full md:w-fit">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-[18px]">calendar_today</span>
-            <span class="text-xs md:text-sm text-on-surface-variant">本月預約: <strong id="stat-count" class="text-on-surface">0</strong></span>
-          </div>
-          <div class="w-[1px] h-4 bg-outline/30"></div>
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-[18px]">payments</span>
-            <span class="text-xs md:text-sm text-on-surface-variant">總營業額: <strong id="stat-revenue" class="text-primary font-bold">HK$ 0</strong></span>
-          </div>
+    <aside class="w-64 bg-white shadow-lg flex flex-col">
+        <div class="p-6 border-b border-gray-100 text-center">
+            <h1 class="font-serif text-2xl text-pm-green font-bold">Pawfect<br>Memories</h1>
+            <p class="text-xs text-pm-oak mt-1 tracking-widest uppercase">Portal</p>
         </div>
-      </div>
-      <div class="flex bg-surface-container-high rounded-lg p-1 border border-outline/20 shrink-0 w-fit">
-        <button id="btn-view-kanban" class="px-4 py-2 rounded-md text-sm font-bold bg-primary text-on-primary flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">view_column</span> 看板</button>
-        <button id="btn-view-calendar" class="px-4 py-2 rounded-md text-sm font-bold text-on-surface-variant hover:text-on-surface flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">calendar_month</span> 月曆</button>
-      </div>
-    </div>
-
-    <div class="flex-1 min-h-0 relative">
-      <div id="view-kanban" class="w-full h-full overflow-x-auto no-scrollbar block">
-        <div class="flex gap-4 h-full min-w-max pb-2">
-          <section class="w-[280px] flex flex-col bg-surface-container-low rounded-xl p-4 h-full shrink-0">
-            <h3 class="font-bold text-sm text-outline flex items-center gap-2 mb-4">🆕 新預約</h3>
-            <div id="col-new" class="flex-1 overflow-y-auto no-scrollbar space-y-3"></div>
-          </section>
-          <section class="w-[280px] flex flex-col bg-surface-container-low rounded-xl p-4 h-full shrink-0">
-            <h3 class="font-bold text-sm text-yellow-400 flex items-center gap-2 mb-4">🎨 基本修輯</h3>
-            <div id="col-basic-edit" class="flex-1 overflow-y-auto no-scrollbar space-y-3"></div>
-          </section>
-          <section class="w-[280px] flex flex-col bg-surface-container-low rounded-xl p-4 h-full shrink-0">
-            <h3 class="font-bold text-sm text-blue-400 flex items-center gap-2 mb-4">📸 揀相</h3>
-            <div id="col-pick-photos" class="flex-1 overflow-y-auto no-scrollbar space-y-3"></div>
-          </section>
-          <section class="w-[280px] flex flex-col bg-surface-container-low rounded-xl p-4 h-full shrink-0">
-            <h3 class="font-bold text-sm text-purple-400 flex items-center gap-2 mb-4">✨ 精修</h3>
-            <div id="col-final-retouch" class="flex-1 overflow-y-auto no-scrollbar space-y-3"></div>
-          </section>
-          <section class="w-[280px] flex flex-col bg-surface-container-low rounded-xl p-4 h-full shrink-0">
-            <h3 class="font-bold text-sm text-primary flex items-center gap-2 mb-4">✅ 完成</h3>
-            <div id="col-completed" class="flex-1 overflow-y-auto no-scrollbar space-y-3"></div>
-          </section>
+        <nav class="flex-1 p-4 space-y-2">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-pm-green text-white rounded-xl shadow-md transition">
+                <i class="fa-solid fa-house"></i> 首頁總覽
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-green-50 hover:text-pm-green rounded-xl transition">
+                <i class="fa-solid fa-calendar-days"></i> 預約日曆
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-green-50 hover:text-pm-green rounded-xl transition">
+                <i class="fa-solid fa-file-invoice-dollar"></i> 款項驗證
+            </a>
+        </nav>
+        <div class="p-4 border-t border-gray-100">
+            <button id="logoutBtn" class="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-500 hover:bg-red-50 rounded-xl transition">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> 登出
+            </button>
         </div>
-      </div>
+    </aside>
 
-      <div id="view-calendar" class="w-full h-full bg-[#131313] hidden flex-col overflow-hidden">
-        <div class="w-full shrink-0 px-2 py-4">
-          <div class="flex justify-between items-center mb-4">
-            <button id="prev-month-btn" class="p-2 bg-surface-container-low rounded-full text-primary hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined">chevron_left</span></button>
-            <div class="flex flex-col items-center">
-              <h3 id="custom-month-title" class="font-headline text-xl font-bold text-on-surface leading-tight"></h3>
-              <span id="custom-month-revenue" class="text-[10px] text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full mt-1">HK$ 0</span>
-            </div>
-            <button id="next-month-btn" class="p-2 bg-surface-container-low rounded-full text-primary hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
-          </div>
-          <div class="grid grid-cols-7 text-center text-[10px] font-bold text-outline uppercase mb-2">
-            <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
-          </div>
-          <div id="custom-calendar-grid" class="grid grid-cols-7 gap-y-2"></div>
-        </div>
-        <div class="flex-1 border-t border-outline/20 bg-[#131313] overflow-y-auto no-scrollbar p-4">
-            <h4 id="list-date-header" class="text-primary font-bold text-sm mb-4 hidden"></h4>
-            <div id="agenda-list" class="flex flex-col gap-3"></div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, updateDoc, collection, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-    const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    window.deleteOrder = async function(orderId) {
-      if (!confirm("⚠️ 警告：確定要刪除這筆預約單嗎？\n刪除後將無法復原！")) return;
-      try { await deleteDoc(doc(db, "Orders", orderId)); window.location.reload(); } 
-      catch (e) { alert("刪除失敗，請檢查網路！"); }
-    };
-
-    let eventsByDate = {};
-    let currentCalYear = new Date().getFullYear();
-    let currentCalMonth = new Date().getMonth();
-    let selectedDateStr = "";
-
-    function getFormattedDateStr(dateObj) {
-      const y = dateObj.getFullYear();
-      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const d = String(dateObj.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    }
-
-    async function loadOrders() {
-      try {
-        const ordersSnap = await getDocs(collection(db, "Orders"));
-        let monthCount = 0; 
-        let totalRev = 0; 
-        const now = new Date();
-        const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    <main class="flex-1 overflow-y-auto p-8">
         
-        document.getElementById('col-new').innerHTML = '';
-        document.getElementById('col-basic-edit').innerHTML = '';
-        document.getElementById('col-pick-photos').innerHTML = '';
-        document.getElementById('col-final-retouch').innerHTML = '';
-        document.getElementById('col-completed').innerHTML = '';
-        eventsByDate = {};
+        <header class="mb-8 flex justify-between items-end">
+            <div>
+                <h2 class="font-serif text-4xl text-pm-green mb-2">早晨，攝影師</h2>
+                <p class="text-gray-500">今日係準備好捕捉美好回憶嘅一日。</p>
+            </div>
+            <div class="text-pm-oak font-medium">
+                <i class="fa-regular fa-clock mr-1"></i> <span id="currentDate">2024年...</span>
+            </div>
+        </header>
 
-        for (let docSnap of ordersSnap.docs) {
-          const data = docSnap.data();
-          const orderId = docSnap.id;
-
-          totalRev += Number(data.price || 0);
-
-          let clientName = "未知客戶";
-          let clientPhone = "";
-          if (data.clientId) {
-            const cSnap = await getDoc(doc(db, "Clients", data.clientId));
-            if (cSnap.exists()) {
-              clientName = cSnap.data().name;
-              clientPhone = cSnap.data().phone || "";
-            }
-          }
-
-          let pets = data.pets || [];
-          if (pets.length === 0 && data.petName) pets = [{ name: data.petName, photoUrl: data.photoUrl }];
-          let displayName = pets.length > 0 ? pets.map(p => p.name).join(' & ') : "未知寵物";
-          
-          let avatarsHTML = '';
-          if (pets.length === 0) {
-            avatarsHTML = `<img class="w-12 h-12 rounded-full object-cover border-2 border-surface shrink-0" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop">`;
-          } else {
-            pets.slice(0, 3).forEach((p, j) => {
-              const zIndex = 30 - (j * 10);
-              const marginClass = j > 0 ? '-ml-5' : '';
-              const imgSrc = p.photoUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
-              if (j === 2 && pets.length > 3) {
-                avatarsHTML += `<div class="w-12 h-12 rounded-full border-2 border-surface relative flex items-center justify-center bg-surface-bright text-[10px] font-bold shrink-0 ${marginClass}" style="z-index:${zIndex};">+${pets.length - 2}</div>`;
-              } else {
-                avatarsHTML += `<img class="w-12 h-12 rounded-full object-cover border-2 border-surface relative shrink-0 bg-surface-container-high ${marginClass}" style="z-index:${zIndex};" src="${imgSrc}">`;
-              }
-            });
-          }
-
-          if (data.shootDate) {
-            if (data.shootDate.startsWith(currentMonthPrefix)) monthCount++;
-            const eventColor = data.status === 'col-completed' ? '#393939' : '#4edea3';
-            const eventObj = { 
-                id: orderId, title: `${clientName} - ${displayName}`, time: data.shootTime || "全日", 
-                color: eventColor, package: data.package || "預約", url: `detail.html?id=${orderId}`, 
-                location: data.shootLocation || "", price: Number(data.price || 0) 
-            };
-            if (!eventsByDate[data.shootDate]) eventsByDate[data.shootDate] = [];
-            eventsByDate[data.shootDate].push(eventObj);
-          }
-
-          let rawStatus = data.paymentStatus ? String(data.paymentStatus).toLowerCase() : '';
-          let paymentBadge = '';
-          if (rawStatus === 'full' || rawStatus === 'paid') {
-            paymentBadge = `<span class="bg-primary/20 text-primary px-1.5 py-0.5 rounded text-[10px] font-bold whitespace-nowrap">全數已付</span>`;
-          } else if (rawStatus === 'deposit' || data.depositPaid === true) {
-            paymentBadge = `<span class="bg-secondary/20 text-secondary px-1.5 py-0.5 rounded text-[10px] font-bold whitespace-nowrap">已付訂</span>`;
-          } else {
-            paymentBadge = `<span class="bg-error/20 text-error px-1.5 py-0.5 rounded text-[10px] font-bold whitespace-nowrap">未付訂</span>`;
-          }
-
-          let tagsHTML = '';
-          let tagsSearchString = ''; 
-          if (data.tags && Array.isArray(data.tags)) {
-            tagsHTML = data.tags.map(tag => {
-              tagsSearchString += ` ${tag.name}`;
-              return `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold whitespace-nowrap ${tag.color}">${tag.name}</span>`;
-            }).join('');
-          }
-
-          let waBtn = '';
-          if (clientPhone) {
-            const cleanPhone = clientPhone.replace(/\D/g, '');
-            const msg = encodeURIComponent(`Hi ${clientName}，這裡是 Pawfect Memories！想同你確認一下預約詳情 📸`);
-            waBtn = `
-              <a href="https://wa.me/852${cleanPhone}?text=${msg}" target="_blank" onclick="event.stopPropagation();" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-whatsapp/20 text-on-surface-variant hover:text-whatsapp transition-colors cursor-pointer" title="WhatsApp 聯絡">
-                <span class="material-symbols-outlined text-[18px]">chat</span>
-              </a>
-            `;
-          }
-
-          const colId = data.status || 'col-new';
-          const container = document.getElementById(colId) || document.getElementById('col-new');
-          const searchStr = `${clientName} ${displayName} ${data.package || ''} ${tagsSearchString}`.toLowerCase();
-
-          container.insertAdjacentHTML('beforeend', `
-            <div data-order-id="${orderId}" data-search="${searchStr}" class="kanban-card bg-surface-container-high p-3 md:p-4 rounded-lg flex items-center justify-between cursor-pointer border-l-4 border-primary hover:bg-surface-bright transition-colors mb-3 shadow-lg">
-              <div onclick="window.location.href='detail.html?id=${orderId}'" class="flex items-center gap-3 md:gap-4 flex-1 overflow-hidden">
-                <div class="flex items-center shrink-0 pl-1">${avatarsHTML}</div>
-                <div class="overflow-hidden flex flex-col justify-center w-full pr-2">
-                  <h4 class="font-bold text-sm md:text-base text-on-surface truncate">${displayName}</h4>
-                  <p class="text-[10px] md:text-xs text-on-surface-variant uppercase truncate">${clientName}</p>
-                  <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                    <span class="text-[10px] text-primary whitespace-nowrap font-bold bg-primary/10 px-1.5 py-0.5 rounded">${data.shootDate || '未定日期'}</span>
-                    ${paymentBadge}
-                    ${tagsHTML}
-                  </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-2xl shadow-[0_10px_30px_rgba(45,79,30,0.05)] border border-gray-50 border-b-4 border-b-pm-green">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-green-50 text-pm-green rounded-lg"><i class="fa-solid fa-camera fa-lg"></i></div>
                 </div>
-              </div>
-              <div class="flex flex-col gap-1 shrink-0 ml-1 z-20 relative">
-                ${waBtn}
-                <button onclick="event.stopPropagation(); window.location.href='add.html?editId=${orderId}';" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-colors cursor-pointer" title="編輯訂單">
-                  <span class="material-symbols-outlined text-[18px]">edit</span>
-                </button>
-                <button onclick="event.stopPropagation(); window.deleteOrder('${orderId}');" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-error/20 text-on-surface-variant hover:text-error transition-colors cursor-pointer" title="刪除訂單">
-                  <span class="material-symbols-outlined text-[18px]">delete</span>
-                </button>
-              </div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-1" id="stat-today-bookings">--</h3>
+                <p class="text-gray-500 text-sm">今日預約拍攝</p>
             </div>
-          `);
-        }
 
-        document.getElementById('stat-count').innerText = monthCount;
-        document.getElementById('stat-revenue').innerText = "HK$ " + totalRev; 
-        
-        const searchInput = document.getElementById('global-search');
-        if (searchInput) {
-          searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            document.querySelectorAll('.kanban-card').forEach(card => {
-              const text = card.getAttribute('data-search');
-              card.style.display = (text && text.includes(term)) ? 'flex' : 'none';
-            });
-          });
-        }
-      } catch (err) { console.error("載入失敗:", err); }
-    }
-
-    window.renderCustomCalendar = function() {
-      const grid = document.getElementById('custom-calendar-grid');
-      const title = document.getElementById('custom-month-title');
-      const revenueLabel = document.getElementById('custom-month-revenue');
-      
-      const monthNames = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
-      title.innerText = `${currentCalYear}年 ${monthNames[currentCalMonth]}`;
-      grid.innerHTML = '';
-
-      let currentMonthRevenue = 0;
-
-      const firstDay = new Date(currentCalYear, currentCalMonth, 1).getDay();
-      const days = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
-      for (let i = 0; i < firstDay; i++) grid.innerHTML += '<div></div>';
-
-      for (let d = 1; d <= days; d++) {
-        const dStr = getFormattedDateStr(new Date(currentCalYear, currentCalMonth, d));
-        const hasEvent = eventsByDate[dStr];
-        
-        if (hasEvent) {
-          hasEvent.forEach(ev => { currentMonthRevenue += ev.price; });
-        }
-
-        const isSelected = dStr === selectedDateStr;
-        grid.innerHTML += `
-          <div onclick="window.handleDaySelection('${dStr}')" class="flex flex-col items-center p-1 cursor-pointer ${isSelected ? 'bg-primary/20 rounded-lg' : ''}">
-            <div class="w-8 h-8 flex items-center justify-center rounded-full ${isSelected ? 'bg-primary text-surface font-bold' : 'text-on-surface'}">${d}</div>
-            <div class="flex gap-1 h-1 mt-1">${hasEvent ? '<div class="w-1 h-1 bg-primary rounded-full"></div>' : ''}</div>
-          </div>`;
-      }
-      
-      revenueLabel.innerText = `當月營業額: HK$ ${currentMonthRevenue}`;
-    };
-
-    window.handleDaySelection = function(dateStr) {
-      selectedDateStr = dateStr;
-      window.renderCustomCalendar();
-      const list = document.getElementById('agenda-list');
-      const header = document.getElementById('list-date-header');
-      const events = eventsByDate[dateStr] || [];
-      header.innerText = dateStr; header.classList.remove('hidden');
-      
-      if (events.length === 0) {
-        list.innerHTML = '<p class="text-center text-outline text-sm py-4">無預約行程</p>';
-      } else {
-        list.innerHTML = events.map(ev => `
-          <div onclick="window.location.href='${ev.url}'" class="bg-surface-container-low p-4 rounded-lg flex justify-between items-center cursor-pointer border-l-4" style="border-color:${ev.color}">
-            <div class="pr-2">
-                <p class="font-bold text-on-surface leading-snug">${ev.title}</p>
-                <div class="flex items-center gap-2 mt-1">
-                  <span class="text-xs text-on-surface-variant bg-surface-container-high px-1.5 py-0.5 rounded">${ev.package}</span>
-                  ${ev.location ? `<span class="text-[10px] text-outline flex items-center"><span class="material-symbols-outlined text-[12px]">location_on</span>${ev.location}</span>` : ''}
+            <div class="bg-white p-6 rounded-2xl shadow-[0_10px_30px_rgba(45,79,30,0.05)] border border-gray-50 border-b-4 border-b-pm-oak">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-orange-50 text-pm-oak rounded-lg"><i class="fa-solid fa-money-check-dollar fa-lg"></i></div>
                 </div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-1" id="stat-pending-payments">--</h3>
+                <p class="text-gray-500 text-sm">待驗證線下款項</p>
             </div>
-            <p class="text-sm font-bold text-primary shrink-0">${ev.time}</p>
-          </div>
-        `).join('');
-      }
-    };
 
-    async function startApp() {
-      await loadOrders();
-      if (!selectedDateStr) selectedDateStr = getFormattedDateStr(new Date());
-      window.renderCustomCalendar();
-      window.handleDaySelection(selectedDateStr);
-      
-      ['col-new', 'col-basic-edit', 'col-pick-photos', 'col-final-retouch', 'col-completed'].forEach(colId => {
-        const el = document.getElementById(colId);
-        if (el && typeof Sortable !== 'undefined') {
-          new Sortable(el, {
-            group: 'kanban',
-            animation: 150,
-            delay: window.innerWidth < 768 ? 200 : 0,
-            delayOnTouchOnly: true,
-            onEnd: async function(evt) {
-              const itemEl = evt.item;
-              const targetColId = evt.to.id;
-              const orderId = itemEl.getAttribute('data-order-id');
-              if (orderId && evt.from.id !== evt.to.id) {
-                try { await updateDoc(doc(db, "Orders", orderId), { status: targetColId }); } 
-                catch(e) { evt.from.appendChild(itemEl); }
-              }
-            }
-          });
-        }
-      });
-    }
-    
-    startApp();
+            <div class="bg-white p-6 rounded-2xl shadow-[0_10px_30px_rgba(45,79,30,0.05)] border border-gray-50 border-b-4 border-b-pm-accent">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-pink-50 text-pm-accent rounded-lg"><i class="fa-solid fa-wand-magic-sparkles fa-lg"></i></div>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-1" id="stat-pending-edits">--</h3>
+                <p class="text-gray-500 text-sm">待處理修圖訂單</p>
+            </div>
+        </div>
 
-    document.getElementById('prev-month-btn').onclick = () => { currentCalMonth--; if(currentCalMonth<0){currentCalMonth=11;currentCalYear--;} window.renderCustomCalendar(); };
-    document.getElementById('next-month-btn').onclick = () => { currentCalMonth++; if(currentCalMonth>11){currentCalMonth=0;currentCalYear++;} window.renderCustomCalendar(); };
+        <div class="bg-white rounded-2xl shadow-[0_10px_30px_rgba(45,79,30,0.05)] overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-serif text-2xl text-pm-green">近期預約狀態</h3>
+                <button class="text-pm-oak hover:text-pm-green transition text-sm font-medium">查看全部 <i class="fa-solid fa-chevron-right text-xs"></i></button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 text-sm">
+                            <th class="p-4 font-medium">客戶資料</th>
+                            <th class="p-4 font-medium">拍攝日期</th>
+                            <th class="p-4 font-medium">方案</th>
+                            <th class="p-4 font-medium">款項狀態</th>
+                            <th class="p-4 font-medium">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="booking-table-body" class="divide-y divide-gray-100">
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="p-4">
+                                <div class="font-medium text-gray-800">李生 (金毛尋回犬)</div>
+                                <div class="text-xs text-gray-500">9876 5432</div>
+                            </td>
+                            <td class="p-4 text-gray-600">2024-07-05 14:00</td>
+                            <td class="p-4"><span class="px-3 py-1 bg-green-50 text-pm-green text-xs rounded-full">戶外寫生</span></td>
+                            <td class="p-4">
+                                <span class="px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100">待驗證 (HSBC)</span>
+                            </td>
+                            <td class="p-4">
+                                <button class="text-pm-oak hover:text-pm-green transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    document.getElementById('btn-view-kanban').onclick = function() {
-      this.className = "px-4 py-2 rounded-md text-sm font-bold bg-primary text-on-primary flex items-center gap-1";
-      document.getElementById('btn-view-calendar').className = "px-4 py-2 rounded-md text-sm font-bold text-on-surface-variant hover:text-on-surface flex items-center gap-1";
-      document.getElementById('view-kanban').classList.remove('hidden'); document.getElementById('view-calendar').classList.add('hidden');
-    };
-    
-    document.getElementById('btn-view-calendar').onclick = function() {
-      this.className = "px-4 py-2 rounded-md text-sm font-bold bg-primary text-on-primary flex items-center gap-1";
-      document.getElementById('btn-view-kanban').className = "px-4 py-2 rounded-md text-sm font-bold text-on-surface-variant hover:text-on-surface flex items-center gap-1";
-      document.getElementById('view-kanban').classList.add('hidden'); document.getElementById('view-calendar').classList.remove('hidden');
-    };
-  </script>
+    </main>
+
+    <script>
+        // 簡單嘅日期顯示腳本
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('zh-HK', options);
+        
+        /* * 你嘅 Firebase 邏輯可以放喺度：
+         * * firebase.firestore().collection('bookings').onSnapshot((snapshot) => {
+         * // 1. 更新上方數字
+         * document.getElementById('stat-today-bookings').innerText = snapshot.size;
+         * * // 2. 清空並重新渲染 Table
+         * const tbody = document.getElementById('booking-table-body');
+         * tbody.innerHTML = '';
+         * snapshot.forEach(doc => {
+         * const data = doc.data();
+         * // 生成 <tr> 加入 tbody...
+         * });
+         * });
+         */
+    </script>
 </body>
 </html>
