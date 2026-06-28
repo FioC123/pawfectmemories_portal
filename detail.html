@@ -1,206 +1,279 @@
 <!DOCTYPE html>
-<html class="dark" lang="zh-Hant">
+<html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
   <script>if(!sessionStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <script>
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@400;500;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   
   <script id="tailwind-config">
-    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { "surface-container-high": "#2a2a2a", "surface": "#131313", "primary": "#4edea3", "primary-container": "#10b981", "on-primary": "#003824", "surface-container-low": "#1c1b1b", "outline": "#86948a", "on-surface-variant": "#bbcabf", "on-surface": "#e5e2e1", "secondary": "#ffb95f", "error": "#ffb4ab" }, fontFamily: { headline: ['Manrope'], body: ['Inter'], cursive: ['Dancing Script'] } } } }
+    tailwind.config = { 
+      darkMode: 'class', 
+      theme: { 
+        extend: { 
+          colors: { 
+            "pm-green": "#244018",       
+            "pm-oak": "#C4905E",         
+            "pm-cream": "#FAFAFA",       
+            "pm-dark-bg": "#0B0E0C",       
+            "pm-dark-surface": "#121714",  
+            "pm-dark-border": "#1E2621",
+            "error": "#EF4444"
+          }, 
+          fontFamily: { 
+            serif: ['"Playfair Display"', 'serif'], 
+            sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] 
+          },
+          boxShadow: {
+            'taste': '0 4px 24px -8px rgba(0, 0, 0, 0.05)',
+            'taste-dark': '0 4px 24px -8px rgba(0, 0, 0, 0.4)'
+          }
+        } 
+      } 
+    }
   </script>
   <style>
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    body { min-height: 100dvh; }
-    .receipt-thumb { cursor: zoom-in; transition: transform 0.2s; }
-    .receipt-thumb:hover { transform: scale(1.03); }
-    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; padding: 20px; cursor: pointer; }
-    #lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+    body { min-height: 100dvh; transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease; font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    
+    .receipt-thumb { cursor: zoom-in; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .receipt-thumb:hover { transform: scale(1.02); }
+    
+    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; cursor: zoom-out; transition: opacity 0.3s ease; }
+    #lightbox img { max-width: 90%; max-height: 90%; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); object-fit: contain; }
+    
     #pdf-container { position: absolute; left: -9999px; top: -9999px; }
-    #invoice-template { width: 800px; background: white; color: black; padding: 50px; font-family: Arial, sans-serif; box-sizing: border-box; }
+    #invoice-template { width: 800px; background: white; color: black; padding: 50px; font-family: 'Inter', sans-serif; box-sizing: border-box; }
+    
+    i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
+
+    /* Custom form select styling for Dark Mode compatibility */
+    select.status-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
   </style>
 </head>
-<body class="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen pb-32">
+<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white pb-32">
 
   <div id="lightbox" onclick="this.style.display='none'">
     <img id="lightbox-img" src="">
-    <p class="absolute bottom-10 text-white/50 text-sm font-bold">點擊任何地方關閉</p>
+    <p class="absolute bottom-10 text-white/70 text-sm font-medium tracking-wide">Click anywhere to close</p>
   </div>
 
-  <header class="fixed top-0 w-full z-50 bg-[#131313] bg-gradient-to-b from-[#1C1B1B] to-transparent h-20 flex justify-between items-center px-6">
+  <header class="bg-white/80 dark:bg-pm-dark-bg/80 backdrop-blur-md border-b border-gray-200/60 dark:border-pm-dark-border fixed top-0 w-full z-50 h-16 md:h-20 flex justify-between items-center px-4 md:px-8 transition-colors duration-400">
     <div class="flex items-center gap-4">
-      <button onclick="window.location.href='index.html';" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
-        <span class="material-symbols-outlined text-primary">arrow_back</span>
+      <button type="button" onclick="window.location.href='index.html';" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-pm-dark-surface text-gray-500 dark:text-gray-400 transition-colors cursor-pointer">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
       </button>
       <div class="flex flex-col cursor-pointer select-none" onclick="window.location.href='index.html';">
-        <h1 class="font-cursive text-xl text-on-surface leading-none">Pawfect Memories</h1>
-        <span class="text-[8px] text-primary font-bold tracking-[0.3em] uppercase mt-0.5">Photography</span>
+        <h1 class="font-serif text-xl md:text-2xl text-pm-green dark:text-[#D1E2C7] font-bold leading-none tracking-tight">Pawfect Memories</h1>
+        <span class="text-[9px] text-pm-oak font-bold tracking-[0.3em] uppercase mt-1 ml-0.5">Details</span>
       </div>
+    </div>
+    
+    <div class="flex items-center gap-2 shrink-0">
+      <button onclick="toggleDarkMode()" class="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-pm-dark-surface transition-colors" title="Theme">
+        <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+      </button>
     </div>
   </header>
 
-  <main class="pt-24 px-6 max-w-4xl mx-auto space-y-8">
-    <section class="relative flex flex-col md:flex-row items-center md:items-end gap-6 mb-8">
-      <div id="detail-avatars" class="flex items-center justify-center shrink-0"></div>
+  <main class="pt-24 md:pt-32 px-4 md:px-8 max-w-5xl mx-auto space-y-8">
+    
+    <section class="relative flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8 mb-10">
+      <div id="detail-avatars" class="flex items-center justify-center shrink-0 min-h-[128px]"></div>
       <div class="flex-1 text-center md:text-left mt-4 md:mt-0">
-        <p class="text-xs uppercase tracking-[0.2em] text-outline mb-1 font-bold">攝影訂單 <span id="detail-id">載入中</span></p>
-        <h2 id="detail-pet-name" class="font-headline font-extrabold text-4xl md:text-5xl tracking-tighter text-on-surface">載入中...</h2>
+        <p class="text-[10px] uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-1.5 font-bold">Booking <span id="detail-id" class="text-gray-500 dark:text-gray-400">Loading</span></p>
+        <h2 id="detail-pet-name" class="font-serif font-bold text-4xl md:text-5xl text-gray-900 dark:text-white leading-tight">Loading...</h2>
         <div id="detail-tags" class="flex flex-wrap justify-center md:justify-start gap-2 mt-4 min-h-[28px]"></div>
       </div>
     </section>
 
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-      <div class="md:col-span-7 space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <div class="lg:col-span-7 space-y-8">
         
-        <div class="bg-surface-container-low rounded-xl p-6 border border-white/5 space-y-6">
-          <h3 class="font-headline font-bold text-lg flex items-center gap-2 text-primary">
-            <span class="material-symbols-outlined">info</span> 預約資訊
-          </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 md:p-8 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
+          <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-8 flex items-center gap-2 border-b border-gray-100 dark:border-pm-dark-border pb-4"><i data-lucide="info" class="w-5 h-5 text-pm-oak"></i> Booking Details</h3>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-6">
             <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0"><span class="material-symbols-outlined">person</span></div>
+              <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="user" class="w-4 h-4"></i></div>
               <div>
-                <p class="text-xs text-outline font-bold uppercase mb-1">客戶</p>
-                <p id="detail-client-name" class="font-bold">-</p>
-                <p id="detail-client-phone" class="text-sm text-on-surface-variant mt-0.5">-</p>
-                <div id="detail-client-ig" class="hidden mt-1"></div>
-                <p id="detail-client-email" class="text-sm text-outline mt-0.5 hidden"></p>
-                <p id="detail-client-address" class="text-sm text-outline mt-0.5 hidden"></p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Client</p>
+                <p id="detail-client-name" class="font-semibold text-gray-900 dark:text-white text-base">-</p>
+                <p id="detail-client-phone" class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">-</p>
+                <div id="detail-client-ig" class="hidden mt-2"></div>
+                <p id="detail-client-email" class="text-xs text-gray-400 mt-1 hidden"></p>
+                <p id="detail-client-address" class="text-xs text-gray-400 mt-0.5 hidden"></p>
               </div>
-            </div>
-            <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0"><span class="material-symbols-outlined">calendar_month</span></div>
-              <div><p class="text-xs text-outline font-bold uppercase mb-1">拍攝時間</p><p id="detail-date" class="font-bold">-</p></div>
-            </div>
-            <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0"><span class="material-symbols-outlined">location_on</span></div>
-              <div>
-                <p class="text-xs text-outline font-bold uppercase mb-1">拍攝地點 & Studio</p>
-                <p id="detail-location" class="font-bold">-</p>
-                <p id="detail-studio" class="text-sm text-on-surface-variant mt-0.5 hidden"></p>
-              </div>
-            </div>
-            <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0"><span class="material-symbols-outlined">public</span></div>
-              <div><p class="text-xs text-outline font-bold uppercase mb-1">來源平台</p><p id="detail-platform" class="font-bold">-</p></div>
             </div>
             
-            <div class="sm:col-span-2 border-t border-white/5 pt-4">
-              <p class="text-xs text-outline font-bold uppercase mb-2">額外人數與詳情</p>
-              <p id="detail-pax-info" class="text-sm text-on-surface-variant">-</p>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="calendar-clock" class="w-4 h-4"></i></div>
+              <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Date & Time</p>
+                <p id="detail-date" class="font-semibold text-gray-900 dark:text-white text-base">-</p>
+              </div>
             </div>
 
-            <div id="pets-list-container" class="contents"></div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
+              <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Location / Studio</p>
+                <p id="detail-location" class="font-semibold text-gray-900 dark:text-white text-base">-</p>
+                <p id="detail-studio" class="text-xs text-pm-oak font-medium mt-1 hidden"></p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="globe" class="w-4 h-4"></i></div>
+              <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Source Platform</p>
+                <p id="detail-platform" class="font-semibold text-gray-900 dark:text-white text-base">-</p>
+              </div>
+            </div>
+            
+            <div class="sm:col-span-2 bg-gray-50 dark:bg-[#1A211D] p-4 rounded-xl border border-gray-100 dark:border-pm-dark-border">
+              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5"><i data-lucide="users" class="w-3 h-3"></i> Extra Pax Details</p>
+              <p id="detail-pax-info" class="text-sm text-gray-600 dark:text-gray-300 font-medium">-</p>
+            </div>
+
+            <div id="pets-list-container" class="sm:col-span-2 contents space-y-4"></div>
           </div>
         </div>
 
-        <div class="bg-surface-container-low rounded-xl p-6 border border-white/5 space-y-6">
-          <h3 class="font-headline font-bold text-lg flex items-center gap-2 text-primary">
-            <span class="material-symbols-outlined">payments</span> 收費與營運細節
-          </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 md:p-8 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
+          <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-8 flex items-center gap-2 border-b border-gray-100 dark:border-pm-dark-border pb-4"><i data-lucide="banknote" class="w-5 h-5 text-pm-oak"></i> Payment & Operations</h3>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-6">
+            
             <div class="flex items-start gap-4 sm:col-span-2">
-              <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0"><span class="material-symbols-outlined">shopping_bag</span></div>
-              <div><p class="text-xs text-outline font-bold uppercase mb-1">選擇套餐</p><p id="detail-package" class="font-bold">-</p></div>
+              <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="package" class="w-4 h-4"></i></div>
+              <div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Package</p><p id="detail-package" class="font-semibold text-gray-900 dark:text-white text-base">-</p></div>
             </div>
+
             <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0"><span class="material-symbols-outlined">attach_money</span></div>
+              <div class="w-10 h-10 rounded-full bg-pm-green/10 dark:bg-[#8DBA76]/10 flex items-center justify-center text-pm-green dark:text-[#8DBA76] shrink-0 border border-pm-green/20 dark:border-[#8DBA76]/20"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
               <div>
-                <p class="text-xs text-outline font-bold uppercase mb-1">總收費</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Total Fee</p>
                 <div class="flex items-end gap-2">
-                  <p id="detail-price" class="font-bold text-lg text-primary">-</p>
-                  <p id="detail-discount" class="text-xs font-bold text-[#ffb95f] mb-1 hidden"></p>
+                  <p id="detail-price" class="font-bold text-xl text-pm-green dark:text-[#8DBA76] leading-none">-</p>
                 </div>
-                <p id="detail-other-fee" class="text-xs text-outline mt-1 hidden"></p>
+                <p id="detail-discount" class="text-xs font-bold text-pm-oak mt-1.5 hidden"></p>
+                <p id="detail-other-fee" class="text-xs text-gray-500 mt-1 hidden"></p>
               </div>
             </div>
+
             <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0"><span class="material-symbols-outlined">account_balance_wallet</span></div>
+              <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="wallet" class="w-4 h-4"></i></div>
               <div>
-                <p class="text-xs text-outline font-bold uppercase mb-1">付款狀態</p>
-                <div id="detail-deposit" class="mt-0.5"></div>
-                <p id="detail-balance" class="text-error font-bold text-sm mt-0.5 hidden"></p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1.5">Payment Status</p>
+                <div id="detail-deposit"></div>
+                <p id="detail-balance" class="text-red-500 dark:text-red-400 font-bold text-sm mt-1.5 hidden"></p>
               </div>
             </div>
 
-            <div class="space-y-2 border-t border-white/5 pt-4">
-                <p class="text-xs text-outline font-bold uppercase">訂金證明</p>
-                <p id="detail-deposit-date" class="text-[10px] text-on-surface-variant mb-1 hidden"></p>
-                <div id="thumb-deposit" class="w-full aspect-video bg-surface-container-high rounded-lg overflow-hidden border border-white/5 flex items-center justify-center text-xs text-outline">未上傳</div>
+            <div class="space-y-2 pt-2">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Deposit Proof</p>
+                <div id="thumb-deposit" class="w-full aspect-video bg-gray-50 dark:bg-[#1A211D] rounded-xl overflow-hidden border border-gray-100 dark:border-pm-dark-border flex items-center justify-center text-xs text-gray-400">Not Uploaded</div>
+                <p id="detail-deposit-date" class="text-[10px] text-gray-500 mt-1 hidden"></p>
             </div>
-            <div class="space-y-2 border-t border-white/5 pt-4">
-                <p class="text-xs text-outline font-bold uppercase">尾數證明</p>
-                <p id="detail-balance-date" class="text-[10px] text-on-surface-variant mb-1 hidden"></p>
-                <div id="thumb-balance" class="w-full aspect-video bg-surface-container-high rounded-lg overflow-hidden border border-white/5 flex items-center justify-center text-xs text-outline">未上傳</div>
+            
+            <div class="space-y-2 pt-2">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Balance Proof</p>
+                <div id="thumb-balance" class="w-full aspect-video bg-gray-50 dark:bg-[#1A211D] rounded-xl overflow-hidden border border-gray-100 dark:border-pm-dark-border flex items-center justify-center text-xs text-gray-400">Not Uploaded</div>
+                <p id="detail-balance-date" class="text-[10px] text-gray-500 mt-1 hidden"></p>
             </div>
 
-            <div class="sm:col-span-2 border-t border-white/5 pt-4">
-              <div class="grid grid-cols-2 gap-4 mb-4">
-                <div><p class="text-xs text-outline font-bold uppercase mb-1">實體產品</p><p id="detail-product" class="text-sm font-bold text-on-surface">-</p></div>
-                <div><p class="text-xs text-outline font-bold uppercase mb-1">交付日期</p><p id="detail-submission-date" class="text-sm font-bold text-on-surface">-</p></div>
+            <div class="sm:col-span-2 border-t border-gray-100 dark:border-pm-dark-border pt-6 mt-2">
+              <div class="grid grid-cols-2 gap-6 mb-6">
+                <div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Physical Product</p><p id="detail-product" class="text-sm font-semibold text-gray-900 dark:text-white">-</p></div>
+                <div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Submission Date</p><p id="detail-submission-date" class="text-sm font-semibold text-gray-900 dark:text-white">-</p></div>
               </div>
-              <p class="text-xs text-outline font-bold uppercase mb-1.5">特殊要求 / 備註</p>
-              <div class="bg-surface-container-high p-4 rounded-lg text-sm text-on-surface-variant whitespace-pre-wrap min-h-[60px]" id="detail-remarks">無</div>
+              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Remarks / Special Requests</p>
+              <div class="bg-gray-50 dark:bg-[#1A211D] p-5 rounded-xl border border-gray-100 dark:border-pm-dark-border text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap min-h-[80px]" id="detail-remarks">無</div>
             </div>
           </div>
         </div>
+
       </div>
 
-      <div class="md:col-span-5 space-y-6">
-        <div class="bg-surface-container-low rounded-xl p-6 border border-white/5 space-y-4">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-headline font-bold text-lg text-on-surface flex items-center gap-2"><span class="material-symbols-outlined text-primary">photo_library</span> 交付相片連結</h3>
-            <span id="link-save-msg" class="text-xs text-primary font-bold opacity-0 transition-opacity">已自動儲存 ✅</span>
+      <div class="lg:col-span-5 space-y-6">
+        
+        <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white">Workflow Status</h3>
+            <span id="status-msg" class="text-xs text-pm-green dark:text-[#8DBA76] font-bold tracking-wider opacity-0 transition-opacity flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Saved</span>
           </div>
-          <input type="url" id="detail-gallery-url" placeholder="貼上 Google Drive 連結..." class="w-full bg-surface-container-high border-transparent focus:border-primary rounded-lg px-4 py-3 text-sm transition-colors">
-        </div>
-
-        <div class="bg-surface-container-low rounded-xl p-6 border border-white/5 space-y-4">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-headline font-bold text-lg text-on-surface">目前進度</h3>
-            <span id="status-msg" class="text-sm text-primary font-bold tracking-wider opacity-0 transition-opacity">已更新 ✅</span>
-          </div>
-          <select id="body-status-select" class="w-full bg-surface-container-high border-transparent focus:border-primary rounded-lg px-4 py-3 font-bold cursor-pointer transition-colors">
-            <option value="col-new">🆕 新預約</option>
-            <option value="col-basic-edit">🎨 基本修輯</option>
-            <option value="col-pick-photos">📸 揀相</option>
-            <option value="col-final-retouch">✨ 精修</option>
-            <option value="col-completed">✅ 完成</option>
+          <select id="body-status-select" class="status-select w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-900 dark:text-white rounded-xl px-4 py-3.5 font-bold cursor-pointer transition-colors focus:ring-pm-oak/30 focus:border-pm-oak appearance-none">
+            <option value="col-new">🆕 New Request (新預約)</option>
+            <option value="col-basic-edit">🎨 Basic Retouch (基本修輯)</option>
+            <option value="col-pick-photos">📸 Client Selection (揀相)</option>
+            <option value="col-final-retouch">✨ Final Polish (精修)</option>
+            <option value="col-completed">✅ Delivered (完成)</option>
           </select>
         </div>
 
-        <div class="bg-surface-container-low rounded-xl p-6 border border-white/5 space-y-4">
-          <h3 class="font-headline font-bold text-lg text-on-surface mb-2">一鍵聯絡與管理</h3>
+        <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2"><i data-lucide="link-2" class="w-4 h-4 text-pm-oak"></i> Gallery Link</h3>
+            <span id="link-save-msg" class="text-xs text-pm-green dark:text-[#8DBA76] font-bold tracking-wider opacity-0 transition-opacity flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Saved</span>
+          </div>
+          <input type="url" id="detail-gallery-url" placeholder="Paste Google Drive/Pic-Time link..." class="w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-pm-oak rounded-xl px-4 py-3.5 text-sm transition-colors focus:ring-pm-oak/30">
+        </div>
+
+        <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
+          <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white mb-5">Quick Actions</h3>
           
-          <button onclick="copyTrackerLink()" class="w-full bg-primary/10 border border-primary/30 text-primary py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/20 transition-all mb-4">
-            <span class="material-symbols-outlined text-[18px]">content_copy</span> 複製客人進度查詢連結
+          <button onclick="copyTrackerLink()" class="w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-700 dark:text-gray-200 py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-[#252C28] transition-all mb-5">
+            <i data-lucide="copy" class="w-4 h-4 text-pm-oak"></i> Copy Client Portal Link
           </button>
 
-          <select id="wa-template-select" class="w-full bg-surface-container-high border border-outline/30 rounded-lg px-4 py-3 text-sm mb-4 font-bold">
-            <option value="reminder">🔔 溫馨提示 (拍攝前)</option>
-            <option value="pick_photos">📸 提醒揀相 (修圖前)</option>
-            <option value="finished">🎉 相片已起貨 (完成交付)</option>
-            <option value="balance">💳 尾數追收 (拍攝後)</option>
-          </select>
+          <div class="relative mb-5">
+            <select id="wa-template-select" class="status-select w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-900 dark:text-white rounded-xl px-4 py-3.5 text-sm font-semibold appearance-none focus:ring-pm-oak/30 focus:border-pm-oak">
+              <option value="reminder">🔔 Reminder (拍攝前)</option>
+              <option value="pick_photos">📸 Selection Ready (修圖前)</option>
+              <option value="finished">🎉 Final Delivery (完成交付)</option>
+              <option value="balance">💳 Payment Request (尾數追收)</option>
+            </select>
+          </div>
           
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <button id="btn-edit" class="w-full bg-surface-container-high border border-outline/30 p-4 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-all">
-              <span class="material-symbols-outlined font-bold text-2xl text-on-surface-variant">edit_square</span><span class="font-headline font-bold text-sm text-on-surface-variant">編輯資料</span>
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <button id="btn-edit" class="w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-pm-oak hover:text-pm-oak text-gray-600 dark:text-gray-400 transition-all group">
+              <i data-lucide="edit-3" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
+              <span class="font-semibold text-xs uppercase tracking-wider">Edit Data</span>
             </button>
-            <button id="btn-whatsapp" class="w-full bg-gradient-to-br from-primary to-[#10b981] p-4 rounded-lg flex flex-col items-center justify-center gap-2 shadow-lg hover:scale-[0.98] transition-all">
-              <span class="material-symbols-outlined text-[#003824] font-bold text-2xl">chat</span><span class="font-headline font-bold text-sm text-[#003824]">WhatsApp</span>
+            <button id="btn-whatsapp" class="w-full bg-[#25D366] text-white p-4 rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all">
+              <i data-lucide="message-circle" class="w-6 h-6"></i>
+              <span class="font-semibold text-xs uppercase tracking-wider">WhatsApp</span>
             </button>
           </div>
           
-          <button id="btn-generate-pdf" class="w-full bg-white text-black py-4 rounded-lg flex items-center justify-center gap-2 font-bold hover:bg-gray-200 transition-colors shadow-lg mb-4">
-            <span class="material-symbols-outlined text-[20px]">receipt_long</span> 下載 PDF 收據
+          <button id="btn-generate-pdf" class="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold hover:opacity-90 transition-opacity shadow-md mb-5">
+            <i data-lucide="file-text" class="w-4 h-4"></i> Download Invoice (PDF)
           </button>
           
-          <button id="btn-delete" class="w-full bg-error/10 text-error border border-error/30 py-4 rounded-lg flex items-center justify-center gap-2 font-bold hover:bg-error hover:text-surface transition-colors">
-            <span class="material-symbols-outlined text-[20px]">delete</span> 刪除此預約單
+          <button id="btn-delete" class="w-full bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-500/20 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold hover:bg-red-600 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-colors">
+            <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Booking
           </button>
         </div>
       </div>
@@ -210,45 +283,61 @@
   <div id="pdf-container">
     <div id="invoice-template">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
-        <img src="logo.png" style="max-height: 80px; object-fit: contain;">
-        <div style="font-size: 50px; font-weight: bold; letter-spacing: -1px; line-height: 1;">Invoice</div>
+        <div style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: bold; color: #244018;">Pawfect Memories</div>
+        <div style="font-size: 50px; font-weight: bold; letter-spacing: -1px; line-height: 1; color: #111827;">INVOICE</div>
       </div>
       <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
         <div>
-          <p style="color: #666; font-size: 14px; margin-bottom: 5px;">Billed To:</p>
-          <p style="font-size: 18px; font-weight: bold; margin: 0;" id="pdf-client-name"></p>
+          <p style="color: #6B7280; font-size: 14px; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Billed To:</p>
+          <p style="font-size: 20px; font-weight: bold; margin: 0; color: #111827;" id="pdf-client-name"></p>
         </div>
-        <div style="text-align: right;">
+        <div style="text-align: right; color: #374151;">
           <p style="margin: 0 0 5px 0;"><strong>Invoice #:</strong> <span id="pdf-invoice-id"></span></p>
           <p style="margin: 0 0 15px 0;"><strong>Date:</strong> <span id="pdf-invoice-date"></span></p>
-          <p style="margin: 0 0 5px 0; font-weight: bold;">Pawfect Memories</p>
-          <p style="margin: 0; color: #666;">+852-9442 2612</p>
+          <p style="margin: 0 0 5px 0; font-weight: bold; color: #111827;">Pawfect Memories</p>
+          <p style="margin: 0; color: #6B7280;">+852-9442 2612</p>
         </div>
       </div>
       <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
         <thead>
           <tr>
-            <th style="border-bottom: 2px solid #000; padding: 10px; text-align: left; width: 60%;">Description</th>
-            <th style="border-bottom: 2px solid #000; padding: 10px; text-align: right; width: 40%;">Amount</th>
+            <th style="border-bottom: 2px solid #111827; padding: 12px 10px; text-align: left; width: 70%; font-weight: bold; text-transform: uppercase; font-size: 14px;">Description</th>
+            <th style="border-bottom: 2px solid #111827; padding: 12px 10px; text-align: right; width: 30%; font-weight: bold; text-transform: uppercase; font-size: 14px;">Amount (HKD)</th>
           </tr>
         </thead>
         <tbody id="pdf-table-body"></tbody>
       </table>
-      <div style="display: flex; justify-content: flex-end; font-size: 18px; margin-bottom: 40px;">
-        <div style="width: 300px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>Subtotal</span><span id="pdf-subtotal"></span></div>
-          <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 20px;"><span>Total Balance:</span><span id="pdf-total-balance"></span></div>
+      <div style="display: flex; justify-content: flex-end; font-size: 16px; margin-bottom: 40px;">
+        <div style="width: 350px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #4B5563;"><span>Subtotal</span><span id="pdf-subtotal"></span></div>
+          <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 24px; color: #111827; border-top: 2px solid #E5E7EB; padding-top: 12px;"><span>Total Balance:</span><span id="pdf-total-balance"></span></div>
         </div>
       </div>
-      <div style="font-size: 14px; line-height: 1.6; border-top: 1px solid #eee; padding-top: 20px;">
-        <p style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">Payment Information</p>
-        <p style="margin: 0;"><strong>Bank Name:</strong> HANG SENG BANK</p>
-        <p style="margin: 0;"><strong>Account Name:</strong> Pawfect Memories</p>
-        <p style="margin: 0;"><strong>Account Number:</strong> 769-644758-883</p>
-        <p style="margin: 0;"><strong>FPS:</strong> 118198266</p>
+      <div style="font-size: 14px; line-height: 1.6; border-top: 1px solid #E5E7EB; padding-top: 24px; color: #4B5563;">
+        <p style="font-weight: bold; font-size: 16px; margin-bottom: 12px; color: #111827;">Payment Information</p>
+        <p style="margin: 0 0 4px 0;"><strong>Bank:</strong> HANG SENG BANK</p>
+        <p style="margin: 0 0 4px 0;"><strong>Account Name:</strong> Pawfect Memories</p>
+        <p style="margin: 0 0 4px 0;"><strong>Account Number:</strong> 769-644758-883</p>
+        <p style="margin: 0;"><strong>FPS ID:</strong> 118198266</p>
       </div>
     </div>
   </div>
+
+  <div id="custom-delete-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900/20 dark:bg-black/60 backdrop-blur-sm transition-opacity opacity-0">
+    <div class="bg-white dark:bg-[#121714] p-8 rounded-[24px] shadow-2xl max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300 border border-gray-100 dark:border-pm-dark-border">
+      <div class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center mb-5">
+        <i data-lucide="alert-triangle" class="w-6 h-6 text-red-500 dark:text-red-400"></i>
+      </div>
+      <h3 class="text-xl font-serif font-bold text-gray-900 dark:text-white mb-2">Delete Booking?</h3>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mb-8 leading-relaxed">This action cannot be undone. All data associated with this booking will be permanently removed.</p>
+      <div class="flex justify-end gap-3">
+        <button id="modal-cancel-btn" class="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-pm-dark-border transition-colors">Cancel</button>
+        <button id="modal-confirm-btn" class="px-5 py-2.5 rounded-lg text-sm font-medium bg-red-500 hover:bg-red-600 text-white shadow-sm transition-colors active:scale-95">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -257,6 +346,35 @@
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    lucide.createIcons();
+    function updateIcons() { lucide.createIcons(); }
+
+    window.toggleDarkMode = function() {
+      const htmlEl = document.documentElement;
+      if (htmlEl.classList.contains('dark')) {
+        htmlEl.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        htmlEl.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    };
+
+    window.showToast = function(msg, type='success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgColor = type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900';
+      const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
+      
+      toast.className = `px-4 py-3 rounded-lg shadow-2xl text-sm font-medium transform transition-all translate-y-10 opacity-0 flex items-center gap-3 ${bgColor}`;
+      toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i> ${msg}`;
+      
+      container.appendChild(toast);
+      updateIcons();
+      requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
+      setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id') || urlParams.get('editId'); 
@@ -271,20 +389,30 @@
 
     window.openLightbox = (url) => { 
         document.getElementById('lightbox-img').src = url; 
-        document.getElementById('lightbox').style.display = 'flex'; 
+        const lb = document.getElementById('lightbox');
+        lb.style.display = 'flex'; 
+        // Trigger reflow for fade in
+        void lb.offsetWidth;
+        lb.style.opacity = '1';
     };
 
-    // 🚨 一鍵複製修正：將網址指向 Portal 大堂 🚨
+    window.closeLightbox = () => {
+        const lb = document.getElementById('lightbox');
+        lb.style.opacity = '0';
+        setTimeout(() => lb.style.display = 'none', 300);
+    };
+
+    document.getElementById('lightbox').addEventListener('click', window.closeLightbox);
+
     window.copyTrackerLink = () => {
       const baseUrl = window.location.href.split('?')[0];
       const dirUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/'));
       const portalUrl = dirUrl + "/portal.html";
       
       navigator.clipboard.writeText(portalUrl).then(() => {
-        alert("✅ 成功複製客戶大堂連結！\n你可以直接貼畀客喇。\n\n網址為：\n" + portalUrl);
+        showToast("Client Portal Link Copied");
       }).catch(err => {
-        console.error("Copy failed", err);
-        alert("複製失敗，請手動複製。");
+        showToast("Failed to copy link", "error");
       });
     };
 
@@ -292,7 +420,7 @@
       try { 
           const snap = await getDoc(doc(db, "Settings", "whatsapp_templates")); 
           if (snap.exists()) waTemplates = snap.data(); 
-          else waTemplates = { reminder: "哈囉 {name}！聽日見！", balance: "哈囉 {name}！尾數 HK$ {balance} 未收。" }; 
+          else waTemplates = { reminder: "Hi {name}! See you tomorrow!", balance: "Hi {name}! A balance of HK$ {balance} is due." }; 
       } catch (err) {}
     }
 
@@ -308,22 +436,22 @@
         orderShootDate = data.shootDate; 
         orderLocation = data.shootLocation;
 
-        document.getElementById('detail-date').innerText = (data.shootDate || "-") + " " + (data.shootTime || "");
-        document.getElementById('detail-location').innerText = data.shootLocation || "-";
-        document.getElementById('detail-package').innerText = data.package || "-";
-        document.getElementById('detail-price').innerText = data.price ? `HK$ ${data.price}` : "-";
-        document.getElementById('detail-remarks').innerText = data.notes || "無";
+        document.getElementById('detail-date').innerText = (data.shootDate || "TBD") + (data.shootTime ? " " + data.shootTime : "");
+        document.getElementById('detail-location').innerText = data.shootLocation || "TBD";
+        document.getElementById('detail-package').innerText = data.package || "Not selected";
+        document.getElementById('detail-price').innerText = data.price ? `HK$ ${data.price.toLocaleString()}` : "HK$ 0";
+        document.getElementById('detail-remarks').innerText = data.notes || "None";
         document.getElementById('detail-gallery-url').value = data.galleryUrl || "";
         
         if(data.status) document.getElementById('body-status-select').value = data.status;
 
-        document.getElementById('detail-platform').innerText = data.platform || "未填寫";
-        document.getElementById('detail-product').innerText = data.product || "無";
-        document.getElementById('detail-submission-date').innerText = data.submissionDate || "-";
+        document.getElementById('detail-platform').innerText = data.platform || "N/A";
+        document.getElementById('detail-product').innerText = data.product || "None";
+        document.getElementById('detail-submission-date').innerText = data.submissionDate || "TBD";
         
         const extraPax = data.extraPaxCount || 0;
         const kids = data.kidsCount || 0;
-        document.getElementById('detail-pax-info').innerText = `額外人數/寵物: ${extraPax} 位 (+HK$${extraPax*300}) | 6歲以下小童: ${kids} 位 (免費)`;
+        document.getElementById('detail-pax-info').innerText = `${extraPax} extra pax/pet (+HK$${extraPax*300}) • ${kids} kid(s) under 6 (Free)`;
 
         if (data.studio) { 
             const stdEl = document.getElementById('detail-studio'); 
@@ -332,12 +460,12 @@
         }
         if (data.otherFee > 0) { 
             const feeEl = document.getElementById('detail-other-fee'); 
-            feeEl.innerText = `(含各項附加費總額: $${data.otherFee})`; 
+            feeEl.innerText = `Includes $${data.otherFee} surcharge`; 
             feeEl.classList.remove('hidden'); 
         }
         if (data.discount > 0) { 
             const discEl = document.getElementById('detail-discount'); 
-            discEl.innerText = `(已扣平日優惠 -$${data.discount})`; 
+            discEl.innerText = `Weekday Discount -$${data.discount}`; 
             discEl.classList.remove('hidden'); 
         }
 
@@ -350,24 +478,26 @@
           
           let avatarsHTML = '';
           pets.slice(0, 3).forEach((p, i) => { 
-              avatarsHTML += `<div class="w-32 h-32 rounded-full overflow-hidden border-4 border-surface bg-surface-container-high relative shrink-0 shadow-lg ${i > 0 ? '-ml-8' : ''}" style="z-index:${30-(i*10)};"><img class="w-full h-full object-cover" src="${p.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop'}"></div>`; 
+              avatarsHTML += `<div class="w-32 h-32 rounded-full overflow-hidden ring-4 ring-white dark:ring-[#121714] bg-gray-50 dark:bg-pm-dark-surface relative shrink-0 shadow-lg ${i > 0 ? '-ml-12' : ''}" style="z-index:${30-(i*10)};"><img class="w-full h-full object-cover" src="${p.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop'}"></div>`; 
           });
           document.getElementById('detail-avatars').innerHTML = avatarsHTML;
           
           document.getElementById('pets-list-container').innerHTML = pets.map((p, i) => `
-            <div class="flex items-start gap-4 sm:col-span-2">
-                <div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0 overflow-hidden border border-outline/30">
+            <div class="sm:col-span-1 flex items-start gap-4">
+                <div class="w-12 h-12 rounded-[14px] bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center shrink-0 overflow-hidden border border-gray-100 dark:border-pm-dark-border">
                     <img src="${p.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop'}" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <p class="text-xs text-outline font-bold uppercase mb-0.5">寵物 ${i+1}</p>
-                    <p class="font-semibold">${p.name} <span class="text-on-surface-variant font-normal text-sm ml-1">(${p.type || '未填'}${p.breed ? ' - '+p.breed : ''})</span></p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Pet ${i+1}</p>
+                    <p class="font-semibold text-gray-900 dark:text-white">${p.name} <span class="text-gray-500 dark:text-gray-400 font-normal text-xs ml-1">(${p.type || 'N/A'}${p.breed ? ' - '+p.breed : ''})</span></p>
                 </div>
             </div>`).join('');
+        } else {
+          document.getElementById('detail-pet-name').innerText = "Unknown Pet";
         }
         
         if (data.tags) {
-            document.getElementById('detail-tags').innerHTML = data.tags.map(t => `<span class="px-2.5 py-1 rounded-md text-xs font-bold ${t.color}">${t.name}</span>`).join('');
+            document.getElementById('detail-tags').innerHTML = data.tags.map(t => `<span class="px-3 py-1 rounded-md text-[11px] font-semibold bg-gray-100 dark:bg-pm-dark-surface border border-gray-200/50 dark:border-pm-dark-border text-gray-700 dark:text-gray-300 shadow-sm">${t.name}</span>`).join('');
         }
 
         if (data.clientId) {
@@ -377,22 +507,22 @@
             loadedClientName = c.name; 
             loadedClientPhone = c.phone;
             document.getElementById('detail-client-name').innerText = c.name; 
-            document.getElementById('detail-client-phone').innerText = c.phone || "無電話";
+            document.getElementById('detail-client-phone').innerText = c.phone || "No phone";
             
             const igEl = document.getElementById('detail-client-ig');
             if(c.instagram) { 
                 const cleanIg = c.instagram.replace('@', ''); 
-                igEl.innerHTML = `<a href="https://instagram.com/${cleanIg}" target="_blank" class="text-primary hover:underline flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">photo_camera</span> @${cleanIg}</a>`; 
+                igEl.innerHTML = `<a href="https://instagram.com/${cleanIg}" target="_blank" class="text-pm-oak hover:underline flex items-center gap-1.5 text-sm font-medium"><i data-lucide="instagram" class="w-3.5 h-3.5"></i> @${cleanIg}</a>`; 
                 igEl.classList.remove('hidden'); 
             }
             if(c.email) { 
                 const emailEl = document.getElementById('detail-client-email'); 
-                emailEl.innerText = c.email; 
+                emailEl.innerHTML = `<i data-lucide="mail" class="w-3 h-3 inline mr-1"></i>${c.email}`; 
                 emailEl.classList.remove('hidden'); 
             }
             if(c.address) { 
                 const addrEl = document.getElementById('detail-client-address'); 
-                addrEl.innerText = c.address; 
+                addrEl.innerHTML = `<i data-lucide="map-pin" class="w-3 h-3 inline mr-1"></i>${c.address}`; 
                 addrEl.classList.remove('hidden'); 
             }
           }
@@ -400,7 +530,7 @@
 
         if (data.depositDate) { 
             const dDate = document.getElementById('detail-deposit-date'); 
-            dDate.innerText = `入數日: ${data.depositDate}`; 
+            dDate.innerText = `Uploaded: ${data.depositDate}`; 
             dDate.classList.remove('hidden'); 
         }
         if (data.depositReceiptUrl) {
@@ -408,7 +538,7 @@
         }
         if (data.balanceDate) { 
             const bDate = document.getElementById('detail-balance-date'); 
-            bDate.innerText = `入數日: ${data.balanceDate}`; 
+            bDate.innerText = `Uploaded: ${data.balanceDate}`; 
             bDate.classList.remove('hidden'); 
         }
         if (data.balanceReceiptUrl) {
@@ -419,18 +549,18 @@
         const pStatus = data.paymentStatus || (data.depositPaid ? "deposit" : "unpaid");
         
         if (pStatus === 'full') {
-            depositEl.innerHTML = `<span class="flex items-center gap-1 text-primary font-bold"><span class="material-symbols-outlined text-[18px]">verified</span> 全數已付</span>`;
+            depositEl.innerHTML = `<span class="flex items-center gap-1.5 text-pm-green dark:text-[#8DBA76] font-bold"><i data-lucide="check-circle" class="w-4 h-4"></i> Fully Paid</span>`;
         } else if (pStatus === 'deposit') {
-          depositEl.innerHTML = `<span class="flex items-center gap-1 text-secondary font-bold"><span class="material-symbols-outlined text-[18px]">check_circle</span> 已付訂金</span>`;
+          depositEl.innerHTML = `<span class="flex items-center gap-1.5 text-pm-oak font-bold"><i data-lucide="credit-card" class="w-4 h-4"></i> Deposit Paid</span>`;
           const bal = Number(data.price || 0) - Number(data.depositAmount || 0);
           if (bal > 0) { 
-              document.getElementById('detail-balance').innerText = `尚欠尾數: HK$ ${bal}`; 
+              document.getElementById('detail-balance').innerText = `Balance Due: HK$ ${bal.toLocaleString()}`; 
               document.getElementById('detail-balance').classList.remove('hidden'); 
           }
         } else {
-            depositEl.innerHTML = `<span class="flex items-center gap-1 text-error font-bold"><span class="material-symbols-outlined text-[18px]">cancel</span> 未付款</span>`;
+            depositEl.innerHTML = `<span class="flex items-center gap-1.5 text-red-500 dark:text-red-400 font-bold"><i data-lucide="x-circle" class="w-4 h-4"></i> Unpaid</span>`;
         }
-
+        updateIcons();
       } catch (err) { console.error(err); }
     }
 
@@ -444,7 +574,7 @@
           const msg = document.getElementById('status-msg'); 
           msg.classList.remove('opacity-0'); 
           setTimeout(() => msg.classList.add('opacity-0'), 2000); 
-      } catch (err) {}
+      } catch (err) { showToast("Failed to update status", "error"); }
     });
 
     document.getElementById('detail-gallery-url').addEventListener('change', async (e) => {
@@ -454,11 +584,11 @@
           const msg = document.getElementById('link-save-msg'); 
           msg.classList.remove('opacity-0'); 
           setTimeout(() => msg.classList.add('opacity-0'), 2000); 
-      } catch(err) {}
+      } catch(err) { showToast("Failed to save link", "error"); }
     });
 
     document.getElementById('btn-whatsapp').addEventListener('click', () => {
-      if(!loadedClientPhone) return alert("此客戶沒有提供電話號碼！");
+      if(!loadedClientPhone) return alert("No phone number found for this client.");
       let phone = loadedClientPhone.replace(/\D/g, ''); 
       if (phone.length === 8) phone = "852" + phone;
       
@@ -467,15 +597,21 @@
       let msg = (waTemplates[templateKey] || "")
           .replace(/{name}/g, loadedClientName || "")
           .replace(/{pets}/g, loadedPetsString || "")
-          .replace(/{date}/g, orderShootDate || "待定")
-          .replace(/{location}/g, orderLocation || "待定")
-          .replace(/{link}/g, document.getElementById('detail-gallery-url').value.trim() || "未提供連結")
+          .replace(/{date}/g, orderShootDate || "TBD")
+          .replace(/{location}/g, orderLocation || "TBD")
+          .replace(/{link}/g, document.getElementById('detail-gallery-url').value.trim() || "[No Link Provided]")
           .replace(/{balance}/g, bal || "0");
           
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     });
 
     document.getElementById('btn-generate-pdf').addEventListener('click', () => {
+      const btn = document.getElementById('btn-generate-pdf');
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Generating...`;
+      btn.classList.add('opacity-70', 'cursor-not-allowed');
+      updateIcons();
+
       document.getElementById('pdf-client-name').innerText = loadedClientName;
       document.getElementById('pdf-invoice-id').innerText = orderId;
       document.getElementById('pdf-invoice-date').innerText = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -491,37 +627,69 @@
       
       const basePrice = grandTotal - totalOtherFee + discount; 
       
-      let tableHtml = `<tr><td style="padding:15px 10px; border-bottom:1px solid #ddd;"><strong>${rawData.package || "Photography Service"}</strong></td><td style="padding:15px 10px; border-bottom:1px solid #ddd; text-align:right;">$ ${basePrice}</td></tr>`;
+      let tableHtml = `<tr><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; color: #111827;"><strong>${rawData.package || "Photography Service"}</strong></td><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; text-align:right; color: #111827;">${basePrice.toLocaleString()}</td></tr>`;
       
       if(studioTopUp > 0) {
-          tableHtml += `<tr><td style="padding:10px; border-bottom:1px solid #eee; font-size: 14px; color: #555; padding-left:20px;">+ Extra Studio Fee (補地租差價)</td><td style="padding:10px; border-bottom:1px solid #eee; text-align:right; font-size: 14px; color: #555;">$ ${studioTopUp}</td></tr>`;
+          tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Extra Studio Fee</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${studioTopUp.toLocaleString()}</td></tr>`;
       }
       if(extraPaxCost > 0) {
-          tableHtml += `<tr><td style="padding:10px; border-bottom:1px solid #eee; font-size: 14px; color: #555; padding-left:20px;">+ Extra Pax/Pet (額外人數/寵物 x ${rawData.extraPaxCount})</td><td style="padding:10px; border-bottom:1px solid #eee; text-align:right; font-size: 14px; color: #555;">$ ${extraPaxCost}</td></tr>`;
+          tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Extra Pax/Pet (x ${rawData.extraPaxCount})</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${extraPaxCost.toLocaleString()}</td></tr>`;
       }
       if(manualOtherFee > 0) {
-          tableHtml += `<tr><td style="padding:10px; border-bottom:1px solid #eee; font-size: 14px; color: #555; padding-left:20px;">+ Other Fees (化妝/車馬/其他附加費)</td><td style="padding:10px; border-bottom:1px solid #eee; text-align:right; font-size: 14px; color: #555;">$ ${manualOtherFee}</td></tr>`;
+          tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Other Surcharges</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${manualOtherFee.toLocaleString()}</td></tr>`;
       }
       if(discount > 0) {
-          tableHtml += `<tr><td style="padding:15px 10px; border-bottom:1px solid #ddd; font-size: 14px; color: #555;">- Weekday Discount (平日優惠)</td><td style="padding:15px 10px; border-bottom:1px solid #ddd; text-align:right; font-size: 14px; color: red;">- $ ${discount}</td></tr>`;
+          tableHtml += `<tr><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; font-size: 14px; color: #4B5563;">- Discount Applied</td><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; text-align:right; font-size: 14px; color: #EF4444;">- ${discount.toLocaleString()}</td></tr>`;
       }
       if(dep > 0) {
-          tableHtml += `<tr><td style="padding:15px 10px; border-bottom:1px solid #ddd;"><strong>Deposit Paid</strong></td><td style="padding:15px 10px; border-bottom:1px solid #ddd; text-align:right; color:red;">- $ ${dep}</td></tr>`;
+          tableHtml += `<tr><td style="padding:16px 10px; border-bottom:1px solid #111827; color: #111827;"><strong>Deposit Paid</strong></td><td style="padding:16px 10px; border-bottom:1px solid #111827; text-align:right; color:#EF4444;">- ${dep.toLocaleString()}</td></tr>`;
       }
       
       document.getElementById('pdf-table-body').innerHTML = tableHtml;
-      document.getElementById('pdf-subtotal').innerText = `$ ${grandTotal}`;
-      document.getElementById('pdf-total-balance').innerText = `$ ${grandTotal - dep > 0 ? grandTotal - dep : 0}`;
+      document.getElementById('pdf-subtotal').innerText = `${grandTotal.toLocaleString()}`;
+      document.getElementById('pdf-total-balance').innerText = `HK$ ${(grandTotal - dep > 0 ? grandTotal - dep : 0).toLocaleString()}`;
 
       const element = document.getElementById('invoice-template');
-      html2pdf().set({ margin: 0, filename: `Invoice_${orderId}.pdf`, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(element).save();
+      
+      setTimeout(() => {
+        html2pdf().set({ 
+          margin: 0, 
+          filename: `Invoice_${orderId}.pdf`, 
+          html2canvas: { scale: 2, useCORS: true }, 
+          jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
+        }).from(element).save().then(() => {
+          btn.innerHTML = originalHTML;
+          btn.classList.remove('opacity-70', 'cursor-not-allowed');
+          updateIcons();
+        });
+      }, 500); // 畀少少時間 UI 更新
     });
 
     document.getElementById('btn-edit').addEventListener('click', () => window.location.href = `add.html?editId=${orderId}`);
-    document.getElementById('btn-delete').addEventListener('click', async () => {
-      if(confirm("⚠️ 確定要刪除這筆預約單嗎？\n刪除後將無法復原！")) {
+    
+    // Custom Delete Modal Logic
+    const delModal = document.getElementById('custom-delete-modal');
+    document.getElementById('btn-delete').addEventListener('click', () => {
+      delModal.classList.remove('hidden');
+      void delModal.offsetWidth;
+      delModal.classList.remove('opacity-0');
+      delModal.firstElementChild.classList.remove('scale-95');
+      delModal.firstElementChild.classList.add('scale-100');
+    });
+
+    document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+      delModal.classList.add('opacity-0');
+      delModal.firstElementChild.classList.remove('scale-100');
+      delModal.firstElementChild.classList.add('scale-95');
+      setTimeout(() => delModal.classList.add('hidden'), 300);
+    });
+
+    document.getElementById('modal-confirm-btn').addEventListener('click', async () => {
+      try {
         await deleteDoc(doc(db, "Orders", orderId));
         window.location.href = 'index.html'; 
+      } catch(e) {
+        showToast("Failed to delete booking", "error");
       }
     });
 
