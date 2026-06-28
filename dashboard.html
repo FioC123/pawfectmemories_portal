@@ -1,81 +1,145 @@
 <!DOCTYPE html>
-<html class="dark" lang="zh-Hant">
+<html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
   <script>if(!sessionStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <script>
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <title>營運與財務中心 | Pawfect Memories</title>
+  
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@400;500;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
   
   <script id="tailwind-config">
-    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { "surface-container-high": "#2a2a2a", "surface": "#131313", "primary": "#4edea3", "on-primary": "#003824", "surface-container-low": "#1c1b1b", "outline": "#86948a", "on-surface-variant": "#bbcabf", "on-surface": "#e5e2e1", "secondary": "#ffb95f", "error": "#ffb4ab" }, fontFamily: { headline: ['Manrope'], body: ['Inter'], cursive: ['Dancing Script'] } } } }
+    tailwind.config = { 
+      darkMode: 'class', 
+      theme: { 
+        extend: { 
+          colors: { 
+            "pm-green": "#244018",       
+            "pm-oak": "#C4905E",         
+            "pm-cream": "#FAFAFA",       
+            "pm-dark-bg": "#0B0E0C",       
+            "pm-dark-surface": "#121714",  
+            "pm-dark-border": "#1E2621",
+            "error": "#EF4444"
+          }, 
+          fontFamily: { 
+            serif: ['"Playfair Display"', 'serif'], 
+            sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] 
+          },
+          boxShadow: {
+            'taste': '0 4px 24px -8px rgba(0, 0, 0, 0.05)',
+            'taste-dark': '0 4px 24px -8px rgba(0, 0, 0, 0.4)'
+          }
+        } 
+      } 
+    }
   </script>
   <style>
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    body { min-height: 100dvh; }
+    body { min-height: 100dvh; transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease; font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
+    
+    /* Excel 專用綠色，微調適應 Dark Mode */
+    .excel-green { background-color: #107c41; }
+    .dark .excel-green { background-color: #0b5e30; }
   </style>
 </head>
-<body class="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen pb-32">
+<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white pb-32">
 
-  <header class="fixed top-0 w-full z-50 bg-[#131313] bg-gradient-to-b from-[#1C1B1B] to-transparent h-20 flex justify-between items-center px-6 border-b border-white/5">
+  <header class="bg-white/80 dark:bg-pm-dark-bg/80 backdrop-blur-md border-b border-gray-200/60 dark:border-pm-dark-border fixed top-0 w-full z-50 h-16 md:h-20 flex justify-between items-center px-4 md:px-8 transition-colors duration-400">
     <div class="flex items-center gap-4">
-      <button onclick="window.location.href='index.html';" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
-        <span class="material-symbols-outlined text-primary">arrow_back</span>
+      <button type="button" onclick="window.location.href='index.html';" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-pm-dark-surface text-gray-500 dark:text-gray-400 transition-colors cursor-pointer">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
       </button>
       <div class="flex flex-col cursor-pointer select-none" onclick="window.location.href='index.html';">
-        <h1 class="font-cursive text-xl text-on-surface leading-none">Pawfect Memories</h1>
-        <span class="text-[8px] text-primary font-bold tracking-[0.3em] uppercase mt-0.5">Photography</span>
+        <h1 class="font-serif text-xl md:text-2xl text-pm-green dark:text-[#D1E2C7] font-bold leading-none tracking-tight">Pawfect Memories</h1>
+        <span class="text-[9px] text-pm-oak font-bold tracking-[0.3em] uppercase mt-1 ml-0.5">Finance</span>
       </div>
+    </div>
+    
+    <div class="flex items-center gap-2 shrink-0">
+      <button onclick="toggleDarkMode()" class="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-pm-dark-surface transition-colors" title="Theme">
+        <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+      </button>
     </div>
   </header>
 
-  <main class="pt-24 px-6 max-w-4xl mx-auto space-y-8">
+  <main class="pt-24 md:pt-32 px-4 md:px-8 max-w-5xl mx-auto space-y-8">
     
-    <div class="text-center md:text-left mb-8">
-      <h2 class="font-headline font-extrabold text-3xl md:text-4xl tracking-tight text-on-surface">營運與財務中心</h2>
-      <p class="text-on-surface-variant text-sm mt-2">管理尾數追收與匯出財務報表</p>
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+      <div>
+        <h2 class="font-serif font-bold text-3xl md:text-4xl tracking-tight text-gray-900 dark:text-white mb-2">財務與營運中心</h2>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">監控總營業額與管理待收尾數</p>
+      </div>
+      
+      <button id="btn-export-excel" class="w-full md:w-auto excel-green text-white px-5 py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md">
+        <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+        匯出 Excel 報表
+      </button>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div class="bg-surface-container-low p-6 rounded-xl border border-white/5 flex flex-col justify-center items-center sm:items-start">
-        <p class="text-xs text-outline font-bold uppercase mb-1">系統總營業額</p>
-        <p id="total-revenue" class="text-3xl font-headline font-bold text-primary">載入中...</p>
-      </div>
-      <div class="bg-surface-container-low p-6 rounded-xl border border-white/5 flex flex-col justify-center items-center sm:items-start">
-        <p class="text-xs text-outline font-bold uppercase mb-1">未收尾數總額</p>
-        <p id="total-pending" class="text-3xl font-headline font-bold text-error">載入中...</p>
-      </div>
-    </div>
-
-    <div class="bg-surface-container-low rounded-xl p-6 border border-white/5 space-y-4">
-        <div class="flex items-center justify-between">
-            <div>
-                <h3 class="font-headline font-bold text-lg text-on-surface">匯出財務報表</h3>
-                <p class="text-xs text-on-surface-variant mt-1">將所有訂單資料匯出為 Excel，格式已對應你的 Google Sheets。</p>
-            </div>
-            <button id="btn-export-excel" class="bg-[#107c41] text-white px-4 py-3 rounded-lg font-bold flex items-center gap-2 hover:bg-[#185c37] transition-colors shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.781l2.116 2.54a.5.5 0 0 0 .768-.641L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.219l-2.116-2.54z"/>
-                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
-                </svg>
-                一鍵匯出 Excel
-            </button>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <div class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-6 opacity-10 dark:opacity-5 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+          <i data-lucide="trending-up" class="w-24 h-24 text-pm-green"></i>
         </div>
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-full bg-pm-green/10 dark:bg-[#8DBA76]/10 flex items-center justify-center text-pm-green dark:text-[#8DBA76]">
+              <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+            </div>
+            <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">系統總營業額</p>
+          </div>
+          <p id="total-revenue" class="text-4xl md:text-5xl font-serif font-bold text-gray-900 dark:text-white leading-none">Loading...</p>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-6 opacity-10 dark:opacity-5 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+          <i data-lucide="alert-circle" class="w-24 h-24 text-red-500"></i>
+        </div>
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 dark:text-red-400">
+              <i data-lucide="clock" class="w-4 h-4"></i>
+            </div>
+            <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">未收尾數總額</p>
+          </div>
+          <p id="total-pending" class="text-4xl md:text-5xl font-serif font-bold text-red-500 dark:text-red-400 leading-none">Loading...</p>
+        </div>
+      </div>
+
     </div>
 
-    <div class="bg-surface-container-low rounded-xl border border-white/5 overflow-hidden">
-      <div class="p-6 border-b border-white/5 flex items-center gap-2">
-        <span class="material-symbols-outlined text-error">warning</span>
-        <h3 class="font-headline font-bold text-lg text-on-surface">待追收尾數名單</h3>
+    <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors overflow-hidden mt-8">
+      <div class="p-6 md:p-8 border-b border-gray-100 dark:border-pm-dark-border flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 dark:text-red-400 shrink-0">
+          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white">待追收尾數名單</h3>
       </div>
-      <div id="pending-list" class="divide-y divide-white/5">
-        <div class="p-6 text-center text-sm text-on-surface-variant">載入中...</div>
+      
+      <div id="pending-list" class="divide-y divide-gray-100 dark:divide-pm-dark-border">
+        <div class="p-6 flex items-center gap-4 animate-pulse">
+            <div class="w-12 h-12 bg-gray-100 dark:bg-[#1A211D] rounded-xl shrink-0"></div>
+            <div class="flex-1 space-y-2"><div class="h-4 bg-gray-100 dark:bg-[#1A211D] w-1/4 rounded"></div><div class="h-3 bg-gray-50 dark:bg-[#1A211D]/50 w-1/3 rounded"></div></div>
+        </div>
       </div>
     </div>
 
   </main>
+
+  <div id="toast-container" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -84,6 +148,35 @@
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    lucide.createIcons();
+
+    window.toggleDarkMode = function() {
+      const htmlEl = document.documentElement;
+      if (htmlEl.classList.contains('dark')) {
+        htmlEl.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        htmlEl.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    };
+
+    window.showToast = function(msg, type='success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgColor = type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900';
+      const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
+      
+      toast.className = `px-5 py-3 rounded-full shadow-2xl text-sm font-medium transform transition-all translate-y-10 opacity-0 flex items-center gap-2 ${bgColor}`;
+      toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i> ${msg}`;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+      
+      requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
+      setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
+    }
 
     let allOrdersData = [];
 
@@ -112,8 +205,10 @@
           }
 
           let pets = data.pets || [];
-          if (pets.length === 0 && data.petName) pets = [{ name: data.petName }];
+          if (pets.length === 0 && data.petName) pets = [{ name: data.petName, photoUrl: data.photoUrl }];
           let petNames = pets.length > 0 ? pets.map(p => p.name).join(' & ') : "未填寫";
+          
+          let avatarUrl = pets.length > 0 && pets[0].photoUrl ? pets[0].photoUrl : "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
 
           const price = Number(data.price || 0);
           const deposit = Number(data.depositAmount || 0);
@@ -146,51 +241,78 @@
             "Other Fee": data.otherFee || ""
           });
 
-          // --- 構建待收尾數列表 ---
+          // --- 構建待收尾數列表 (Taste Card Style) ---
           if (pStatus === 'deposit' && balance > 0) {
             totalPending += balance;
             pendingHTML += `
-              <div class="p-4 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="window.location.href='detail.html?id=${orderId}'">
-                <div>
-                  <div class="flex items-center gap-2">
-                    <h4 class="font-bold text-on-surface">${clientName} - ${petNames}</h4>
-                    <span class="text-[10px] bg-secondary/20 text-secondary px-1.5 py-0.5 rounded font-bold">欠尾數</span>
+              <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-[#1A211D] transition-colors cursor-pointer group" onclick="window.location.href='detail.html?id=${orderId}'">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-100 dark:bg-pm-dark-border border border-gray-200 dark:border-transparent">
+                    <img src="${avatarUrl}" class="w-full h-full object-cover">
                   </div>
-                  <p class="text-xs text-on-surface-variant mt-1">拍攝日: ${data.shootDate || '未定'} | 套餐: ${data.package || '未定'}</p>
+                  <div>
+                    <div class="flex items-center gap-2 mb-1">
+                      <h4 class="font-bold text-gray-900 dark:text-white group-hover:text-pm-oak transition-colors">${clientName} & ${petNames}</h4>
+                      <span class="text-[10px] bg-pm-oak/10 border border-pm-oak/20 text-pm-oak px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">欠尾數</span>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${data.shootDate || '未定'} <span class="px-1">•</span> <i data-lucide="package" class="w-3.5 h-3.5"></i> ${data.package || '未定'}</p>
+                  </div>
                 </div>
-                <div class="text-left sm:text-right">
-                  <p class="text-xs text-outline mb-0.5">尚欠尾數</p>
-                  <p class="font-bold text-error text-lg">HK$ ${balance}</p>
+                <div class="text-left sm:text-right flex items-center justify-between sm:block">
+                  <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1 sm:block hidden">尚欠尾數</p>
+                  <p class="font-bold text-red-500 dark:text-red-400 text-lg flex items-center gap-2 justify-end">HK$ ${balance.toLocaleString()} <i data-lucide="chevron-right" class="w-5 h-5 text-gray-300 dark:text-gray-600 group-hover:text-pm-oak transition-all transform group-hover:translate-x-1"></i></p>
                 </div>
               </div>
             `;
           } else if (pStatus === 'unpaid' && price > 0) {
              totalPending += price;
              pendingHTML += `
-              <div class="p-4 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-container-high transition-colors cursor-pointer" onclick="window.location.href='detail.html?id=${orderId}'">
-                <div>
-                  <div class="flex items-center gap-2">
-                    <h4 class="font-bold text-on-surface">${clientName} - ${petNames}</h4>
-                    <span class="text-[10px] bg-error/20 text-error px-1.5 py-0.5 rounded font-bold">未付款</span>
+              <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-[#1A211D] transition-colors cursor-pointer group" onclick="window.location.href='detail.html?id=${orderId}'">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-100 dark:bg-pm-dark-border border border-gray-200 dark:border-transparent">
+                    <img src="${avatarUrl}" class="w-full h-full object-cover">
                   </div>
-                  <p class="text-xs text-on-surface-variant mt-1">拍攝日: ${data.shootDate || '未定'} | 套餐: ${data.package || '未定'}</p>
+                  <div>
+                    <div class="flex items-center gap-2 mb-1">
+                      <h4 class="font-bold text-gray-900 dark:text-white group-hover:text-pm-oak transition-colors">${clientName} & ${petNames}</h4>
+                      <span class="text-[10px] bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">未付款</span>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${data.shootDate || '未定'} <span class="px-1">•</span> <i data-lucide="package" class="w-3.5 h-3.5"></i> ${data.package || '未定'}</p>
+                  </div>
                 </div>
-                <div class="text-left sm:text-right">
-                  <p class="text-xs text-outline mb-0.5">尚未付款</p>
-                  <p class="font-bold text-error text-lg">HK$ ${price}</p>
+                <div class="text-left sm:text-right flex items-center justify-between sm:block">
+                  <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1 sm:block hidden">尚未付款</p>
+                  <p class="font-bold text-red-500 dark:text-red-400 text-lg flex items-center gap-2 justify-end">HK$ ${price.toLocaleString()} <i data-lucide="chevron-right" class="w-5 h-5 text-gray-300 dark:text-gray-600 group-hover:text-pm-oak transition-all transform group-hover:translate-x-1"></i></p>
                 </div>
               </div>
             `;
           }
         }
 
-        document.getElementById('total-revenue').innerText = `HK$ ${totalRev}`;
-        document.getElementById('total-pending').innerText = `HK$ ${totalPending}`;
-        document.getElementById('pending-list').innerHTML = pendingHTML || `<div class="p-6 text-center text-sm text-on-surface-variant">太棒了！目前沒有被拖欠的尾數 🎉</div>`;
+        document.getElementById('total-revenue').innerText = `HK$ ${totalRev.toLocaleString()}`;
+        document.getElementById('total-pending').innerText = `HK$ ${totalPending.toLocaleString()}`;
+        
+        const emptyStateHTML = `
+          <div class="py-12 flex flex-col items-center justify-center text-center opacity-80">
+            <div class="w-16 h-16 rounded-full bg-pm-green/10 dark:bg-[#8DBA76]/10 text-pm-green dark:text-[#8DBA76] flex items-center justify-center mb-4">
+                <i data-lucide="party-popper" class="w-8 h-8"></i>
+            </div>
+            <p class="text-gray-900 dark:text-white font-bold text-lg mb-1">太棒了！</p>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">目前沒有任何被拖欠的尾數 🎉</p>
+          </div>
+        `;
+        
+        document.getElementById('pending-list').innerHTML = pendingHTML || emptyStateHTML;
+        lucide.createIcons();
 
       } catch (err) {
         console.error(err);
-        document.getElementById('pending-list').innerHTML = `<div class="p-6 text-center text-sm text-error">載入失敗，請檢查網絡連線。</div>`;
+        document.getElementById('pending-list').innerHTML = `
+          <div class="py-12 flex flex-col items-center justify-center text-center">
+            <i data-lucide="wifi-off" class="w-8 h-8 text-red-500 mb-3"></i>
+            <p class="text-red-500 text-sm font-medium">載入失敗，請檢查網絡連線。</p>
+          </div>`;
+        lucide.createIcons();
       }
     }
 
@@ -199,18 +321,35 @@
     // --- 匯出 Excel 邏輯 ---
     document.getElementById('btn-export-excel').addEventListener('click', () => {
         if (allOrdersData.length === 0) {
-            alert("目前沒有任何訂單資料可以匯出！");
+            showToast("目前沒有訂單資料可以匯出", "error");
             return;
         }
         
-        const headerOrder = ["No.", "Client", "Pet", "Tel/IG", "Shooting date", "Platform", "Package", "Studio", "Deposit", "Deposit date", "Balance", "Balance Date", "Product", "Payment", "Total", "Submission date", "Other Fee"];
+        const btn = document.getElementById('btn-export-excel');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> 匯出中...`;
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+        lucide.createIcons();
         
-        const worksheet = XLSX.utils.json_to_sheet(allOrdersData, { header: headerOrder });
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "2026 Summary");
+        setTimeout(() => {
+            try {
+                const headerOrder = ["No.", "Client", "Pet", "Tel/IG", "Shooting date", "Platform", "Package", "Studio", "Deposit", "Deposit date", "Balance", "Balance Date", "Product", "Payment", "Total", "Submission date", "Other Fee"];
+                const worksheet = XLSX.utils.json_to_sheet(allOrdersData, { header: headerOrder });
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "2026 Summary");
 
-        const today = new Date().toISOString().split('T')[0];
-        XLSX.writeFile(workbook, `Pawfect_Memories_Export_${today}.xlsx`);
+                const today = new Date().toISOString().split('T')[0];
+                XLSX.writeFile(workbook, `Pawfect_Memories_Export_${today}.xlsx`);
+                
+                showToast("✅ 成功匯出 Excel 報表");
+            } catch(e) {
+                showToast("匯出失敗", "error");
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                lucide.createIcons();
+            }
+        }, 800); // 畀少少時間 UI 更新，等客覺得系統真係做緊嘢
     });
   </script>
 </body>
