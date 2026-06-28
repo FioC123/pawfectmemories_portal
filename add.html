@@ -2,7 +2,7 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <script>if(!localStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
+  <script>if(!sessionStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
   <script>
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
