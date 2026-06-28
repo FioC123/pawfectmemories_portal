@@ -8,9 +8,10 @@
       document.documentElement.classList.add('dark');
     }
   </script>
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <meta content="width=device-width, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <title>新增與編輯預約 | Pawfect Memories</title>
   
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   
@@ -20,577 +21,450 @@
       theme: { 
         extend: { 
           colors: { 
-            "pm-green": "#244018",       
-            "pm-oak": "#C4905E",         
-            "pm-cream": "#FAFAFA",       
-            "pm-dark-bg": "#0B0E0C",       
-            "pm-dark-surface": "#121714",  
-            "pm-dark-border": "#1E2621",
-            "error": "#EF4444"
+            "pm-green": "#244018", "pm-oak": "#C4905E", "pm-cream": "#FAFAFA", "pm-dark-bg": "#0B0E0C", "pm-dark-surface": "#121714", "pm-dark-border": "#1E2621", "error": "#EF4444"
           }, 
-          fontFamily: { 
-            serif: ['"Playfair Display"', 'serif'], 
-            sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] 
-          },
+          fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] },
           boxShadow: {
-            'taste': '0 4px 24px -8px rgba(0, 0, 0, 0.05)',
-            'taste-dark': '0 4px 24px -8px rgba(0, 0, 0, 0.4)'
+            'taste': '0 4px 20px -4px rgba(0, 0, 0, 0.04), 0 1px 4px -1px rgba(0, 0, 0, 0.02)', 
+            'taste-dark': '0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 1px 8px -1px rgba(0, 0, 0, 0.3)' 
           }
         } 
       } 
     }
   </script>
   <style>
-    body { min-height: 100dvh; transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease; font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
-    
-    .form-input {
-      width: 100%; border-radius: 0.75rem; border: 1px solid #F3F4F6; background-color: #F9FAFB; color: #111827; padding: 0.75rem 1rem; font-size: 0.875rem; outline: none; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .dark .form-input {
-      border-color: #1E2621; background-color: #1A211D; color: #EAE8E3;
-    }
-    .form-input:focus {
-      border-color: #C4905E; background-color: #FFFFFF; box-shadow: 0 0 0 4px rgba(196, 144, 94, 0.15);
-    }
-    .dark .form-input:focus {
-      border-color: #C4905E; background-color: #121714; box-shadow: 0 0 0 4px rgba(196, 144, 94, 0.15);
-    }
-    
-    .tag-checkbox { display: none; }
-    .tag-label { cursor: pointer; transition: all 0.2s; opacity: 0.6; filter: grayscale(80%); border: 1px solid transparent; }
-    .tag-checkbox:checked + .tag-label { opacity: 1; filter: grayscale(0%); border-color: currentColor; box-shadow: 0 2px 10px -2px currentColor; transform: translateY(-1px); }
-    
+    body { min-height: 100dvh; overflow: hidden; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
+    .custom-scrollbar::-webkit-scrollbar { height: 5px; width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.2); border-radius: 99px; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
+    
+    /* [SKILL: Web Design Guidelines] Seamless Hidden Inputs */
+    .taste-input {
+        background-color: #F9FAFB !important;
+        border: 1px solid transparent !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dark .taste-input { background-color: #1A211D !important; }
+    .taste-input:hover { background-color: #F3F4F6 !important; }
+    .dark .taste-input:hover { background-color: #232B25 !important; }
+    .taste-input:focus {
+        background-color: #FFFFFF !important;
+        border-color: #C4905E !important;
+        box-shadow: 0 0 0 3px rgba(196, 144, 94, 0.1) !important;
+        outline: none;
+    }
+    .dark .taste-input:focus { background-color: #121714 !important; }
+    
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+    
+    select.taste-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+    
+    /* [SKILL: Emil Kowalski] Smooth Dynamic Row Animation */
+    .pet-row-transition { animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes slideDown {
+        0% { opacity: 0; transform: translateY(-10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
-<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans min-h-screen pb-32 selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white">
-  
-  <header class="bg-white/80 dark:bg-pm-dark-bg/80 backdrop-blur-md border-b border-gray-200/60 dark:border-pm-dark-border fixed top-0 w-full z-50 h-16 md:h-20 flex justify-between items-center px-4 md:px-8 transition-colors duration-400">
-    <div class="flex items-center gap-4">
-      <button type="button" onclick="if(document.referrer) { window.history.back(); } else { window.location.href='index.html'; }" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-pm-dark-surface text-gray-500 dark:text-gray-400 transition-colors cursor-pointer">
-        <i data-lucide="arrow-left" class="w-5 h-5"></i>
-      </button>
-      <div class="flex flex-col cursor-pointer select-none" onclick="if(document.referrer) { window.history.back(); } else { window.location.href='index.html'; }">
-        <h1 class="font-serif text-xl md:text-2xl text-pm-green dark:text-[#D1E2C7] font-bold leading-none tracking-tight" id="page-title">新增預約</h1>
-        <span class="text-[9px] text-pm-oak font-bold tracking-[0.3em] uppercase mt-1 ml-0.5">Editor</span>
+<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex h-screen overflow-hidden">
+
+  <aside class="hidden md:flex flex-col justify-between w-16 hover:w-64 bg-white dark:bg-pm-dark-surface border-r border-gray-200/60 dark:border-pm-dark-border h-full transition-all duration-300 group z-40 relative shadow-sm shrink-0">
+    <div class="flex flex-col items-start w-full overflow-hidden">
+      <div class="h-20 flex items-center px-4 w-full shrink-0 border-b border-gray-100 dark:border-white/5">
+        <img src="logo_black.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 dark:hidden">
+        <img src="logo_white.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 hidden dark:block">
+        <span class="ml-3 font-serif font-bold text-[16px] text-pm-green dark:text-[#D1E2C7] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-tight">Pawfect Memories</span>
       </div>
+      <nav class="w-full mt-6 flex flex-col gap-1.5 px-2.5">
+        <a href="index.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">工作區 (Workspace)</span>
+        </a>
+        <a href="add.html" class="flex items-center px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-[#1A211D] text-pm-oak font-semibold transition-all w-full overflow-hidden shadow-inner dark:shadow-none">
+          <i data-lucide="plus-square" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">新增預約 (New)</span>
+        </a>
+        <a href="dashboard.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+          <i data-lucide="pie-chart" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">財務中心 (Finance)</span>
+        </a>
+        <a href="settings.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+          <i data-lucide="settings" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">系統設定 (Settings)</span>
+        </a>
+      </nav>
     </div>
-
-    <div class="flex items-center gap-2 shrink-0">
-      <button onclick="toggleDarkMode()" class="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-pm-dark-surface transition-colors" title="切換深淺色主題">
-        <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
-        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+    
+    <div class="px-2.5 pb-6 flex flex-col gap-2 w-full overflow-hidden border-t border-gray-100 dark:border-white/5 pt-4">
+      <button onclick="toggleDarkMode()" class="flex items-center px-3 py-3 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-[#1A211D] hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors w-full overflow-hidden">
+        <i data-lucide="moon" class="w-5 h-5 shrink-0 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 shrink-0 hidden dark:block"></i>
+        <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">主題切換 (Theme)</span>
       </button>
     </div>
-  </header>
+  </aside>
 
-  <main class="pt-24 md:pt-32 px-4 md:px-6 max-w-3xl mx-auto">
-    <form id="order-form" class="space-y-8">
+  <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+    
+    <header class="h-20 flex justify-between items-center px-6 md:px-8 shrink-0 border-b border-gray-200/60 dark:border-pm-dark-border bg-white/50 dark:bg-pm-dark-bg/50 backdrop-blur-md z-30">
+      <div class="flex items-center gap-3">
+        <button onclick="window.location.href='index.html';" class="w-9 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-pm-dark-surface border border-gray-200 dark:border-pm-dark-border text-gray-500 dark:text-gray-400 hover:text-pm-oak transition-colors shadow-sm"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+        <h2 id="page-title" class="font-serif text-2xl font-bold tracking-tight text-gray-900 dark:text-white">建立全新預約檔案</h2>
+      </div>
       
-      <section class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
-        <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-6 flex items-center gap-2"><i data-lucide="user" class="w-5 h-5 text-pm-oak"></i> 客人資料</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">稱呼 <span class="text-error">*</span></label><input type="text" id="client-name" class="form-input" required></div>
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">聯絡電話 <span class="text-error">*</span></label><input type="tel" id="client-phone" class="form-input" required></div>
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Email</label><input type="email" id="client-email" class="form-input"></div>
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Instagram</label><input type="text" id="client-instagram" class="form-input" placeholder="@username"></div>
-          <div class="md:col-span-2"><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">地址 / 地區</label><input type="text" id="client-address" class="form-input"></div>
-          <div class="md:col-span-2">
-            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">來源平台 (Platform)</label>
-            <select id="order-platform" class="form-input appearance-none">
-              <option value="">未選擇</option>
-              <option value="IG">Instagram</option>
-              <option value="FB">Facebook</option>
-              <option value="WhatsApp">WhatsApp</option>
-              <option value="Referral">朋友介紹 (Referral)</option>
-              <option value="Website">網站 (Website)</option>
-              <option value="Others">其他 (Others)</option>
-            </select>
-          </div>
-        </div>
-      </section>
-
-      <section class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
-        <div class="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-pm-dark-border pb-4">
-          <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white flex items-center gap-2"><i data-lucide="paw-print" class="w-5 h-5 text-pm-oak"></i> 寵物資料</h3>
-          <button type="button" id="btn-add-pet" class="text-sm font-medium text-pm-oak bg-pm-oak/10 px-4 py-2 rounded-full hover:bg-pm-oak/20 active:scale-95 transition-all flex items-center gap-1"><i data-lucide="plus" class="w-4 h-4"></i> 新增寵物</button>
-        </div>
-        <div id="pets-container" class="space-y-6"></div>
-      </section>
-
-      <section class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
-        <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-6 flex items-center gap-2"><i data-lucide="camera" class="w-5 h-5 text-pm-oak"></i> 拍攝、套餐與加項</h3>
-        
-        <div id="conflict-warning" class="hidden mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-4 rounded-xl flex items-start gap-3">
-          <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500 mt-0.5"></i>
-          <div>
-            <p class="text-sm font-bold text-red-800 dark:text-red-400">撞期警告</p>
-            <p class="text-xs text-red-600 dark:text-red-300 mt-1">此日期與時間已有其他預約安排，請確認是否撞期！</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">拍攝日期</label><input type="date" id="shoot-date" class="form-input"></div>
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">拍攝時間</label><input type="time" id="shoot-time" class="form-input"></div>
-          
-          <div class="md:col-span-2 flex items-center gap-3 p-4 bg-pm-green/5 dark:bg-[#8DBA76]/10 border border-pm-green/10 dark:border-[#8DBA76]/20 rounded-xl">
-            <input type="checkbox" id="weekday-discount" class="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-pm-green dark:text-[#8DBA76] focus:ring-pm-green dark:focus:ring-[#8DBA76] cursor-pointer" onchange="calculateTotals()">
-            <label for="weekday-discount" class="text-sm text-pm-green dark:text-[#8DBA76] font-semibold cursor-pointer select-none">
-              套用平日優惠 (-HK$300) <br><span class="text-gray-500 dark:text-gray-400 font-normal text-xs">(選星期一至五會自動勾選，若遇紅日請手動取消)</span>
-            </label>
-          </div>
-
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">拍攝地點</label><input type="text" id="shoot-location" class="form-input" placeholder="例如：西九文化區"></div>
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Studio 名稱</label><input type="text" id="order-studio" class="form-input" placeholder="Studio 名稱 (如適用)"></div>
-          
-          <div class="md:col-span-2">
-            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">選擇套餐</label>
-            <select id="order-package" class="form-input appearance-none" onchange="handlePackageChange()"><option value="">載入中...</option></select>
-          </div>
-          
-          <div class="md:col-span-2 p-5 bg-gray-50 dark:bg-[#1A211D] rounded-xl border border-gray-100 dark:border-pm-dark-border space-y-4">
-            <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-pm-dark-border pb-2 mb-3">額外收費與折扣計算器</p>
-            
-            <div class="flex items-center justify-between">
-              <label class="text-sm text-gray-600 dark:text-gray-300">實際 Studio 租金 (HK$)</label>
-              <input type="number" id="order-studio-cost" placeholder="0" oninput="calculateTotals()" class="form-input w-24 text-right py-1.5 px-3">
-            </div>
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="text-sm text-gray-600 dark:text-gray-300">額外人數 / 寵物 (+HK$300/位)</label>
-                <p class="text-[10px] text-gray-400 dark:text-gray-500">套餐已包 2人1寵</p>
-              </div>
-              <input type="number" id="extra-pax-count" value="0" min="0" oninput="calculateTotals()" class="form-input w-24 text-right py-1.5 px-3">
-            </div>
-            <div class="flex items-center justify-between">
-              <label class="text-sm text-gray-600 dark:text-gray-300">6歲以下小童 (免費)</label>
-              <input type="number" id="kids-count" value="0" min="0" class="form-input w-24 text-right py-1.5 px-3">
-            </div>
-            <div class="flex items-center justify-between">
-              <label class="text-sm text-gray-600 dark:text-gray-300">手動附加費 (化妝/加相/車馬費 HK$)</label>
-              <input type="number" id="manual-other-fee" value="0" placeholder="0" oninput="calculateTotals()" class="form-input w-24 text-right py-1.5 px-3">
-            </div>
-            
-            <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-pm-dark-border">
-              <div>
-                <label class="text-sm text-pm-oak font-semibold">手動折扣優惠 (-HK$)</label>
-                <p class="text-[10px] text-gray-400 dark:text-gray-500">適用於熟客或特別折讓</p>
-              </div>
-              <input type="number" id="manual-discount-fee" value="0" min="0" placeholder="0" oninput="calculateTotals()" class="form-input w-24 text-right py-1.5 px-3 border-pm-oak/40 text-pm-oak focus:ring-pm-oak/20">
-            </div>
-          </div>
-
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">實體產品</label><input type="text" id="order-product" class="form-input" placeholder="例如：相簿 / 油畫"></div>
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">交付日期</label><input type="date" id="submission-date" class="form-input"></div>
-        </div>
-      </section>
-
-      <section class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 relative overflow-hidden transition-colors">
-        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-pm-green to-pm-oak"></div>
-        
-        <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-6 mt-2 flex items-center gap-2"><i data-lucide="credit-card" class="w-5 h-5 text-pm-oak"></i> 收費與款項</h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">總收費 (HKD)</label><input type="number" id="order-price" readonly class="form-input font-bold text-pm-green dark:text-pm-oak bg-pm-green/5 dark:bg-pm-oak/5 border-pm-green/20 dark:border-pm-oak/20 cursor-not-allowed"></div>
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">各項附加費總額 (HKD)</label><input type="number" id="other-fee" readonly class="form-input bg-gray-100 dark:bg-[#1A211D] cursor-not-allowed"></div>
-          
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">已付訂金 (HKD)</label><input type="number" id="deposit-amount" placeholder="自動計 Base 50%" oninput="calculateTotals()" class="form-input"></div>
-          <div class="flex flex-col justify-end pb-2">
-            <div class="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl px-4 py-3 text-center">
-              <p id="calculated-balance" class="text-error font-bold text-lg leading-none">尚欠尾數: HK$ 0</p>
-            </div>
-          </div>
-
-          <div class="md:col-span-2 border-t border-gray-100 dark:border-pm-dark-border my-2"></div>
-
-          <div class="md:col-span-1">
-            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">付款狀態</label>
-            <select id="payment-status" class="form-input appearance-none font-medium">
-              <option value="unpaid">❌ 未付款</option>
-              <option value="deposit">💳 已付訂金</option>
-              <option value="full">✅ 全數已付</option>
-            </select>
-          </div>
-          <div class="md:col-span-1"></div>
-
-          <div class="md:col-span-1 mt-2">
-              <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">訂金證明</label>
-              <div class="flex items-center gap-3">
-                  <input type="file" id="deposit-receipt-file" accept="image/*" class="text-xs text-gray-500 dark:text-gray-400 file:bg-gray-100 dark:file:bg-[#1A211D] file:text-gray-700 dark:file:text-gray-300 file:font-medium file:border-0 file:rounded-lg file:px-4 file:py-2 w-full cursor-pointer hover:file:bg-gray-200 dark:hover:file:bg-pm-dark-border transition-colors">
-                  <a id="preview-deposit-link" href="#" target="_blank" class="hidden text-pm-oak hover:text-pm-green transition-colors" title="查看收據"><i data-lucide="eye" class="w-5 h-5"></i></a>
-              </div>
-              <input type="hidden" id="existing-deposit-url">
-          </div>
-          
-          <div class="md:col-span-1 mt-2">
-              <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">尾數證明</label>
-              <div class="flex items-center gap-3">
-                  <input type="file" id="balance-receipt-file" accept="image/*" class="text-xs text-gray-500 dark:text-gray-400 file:bg-gray-100 dark:file:bg-[#1A211D] file:text-gray-700 dark:file:text-gray-300 file:font-medium file:border-0 file:rounded-lg file:px-4 file:py-2 w-full cursor-pointer hover:file:bg-gray-200 dark:hover:file:bg-pm-dark-border transition-colors">
-                  <a id="preview-balance-link" href="#" target="_blank" class="hidden text-pm-oak hover:text-pm-green transition-colors" title="查看收據"><i data-lucide="eye" class="w-5 h-5"></i></a>
-              </div>
-              <input type="hidden" id="existing-balance-url">
-          </div>
-
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">落訂時間 (上傳截圖自動抓取)</label><input type="datetime-local" id="deposit-date" class="form-input"></div>
-          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">找數時間 (上傳截圖自動抓取)</label><input type="datetime-local" id="balance-date" class="form-input"></div>
-
-          <div class="md:col-span-2 mt-4">
-            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">客戶標籤</label>
-            <div id="tags-selector-container" class="flex flex-wrap gap-2 p-4 bg-gray-50 dark:bg-[#1A211D] border border-gray-100 dark:border-pm-dark-border rounded-xl min-h-[60px]">載入中...</div>
-          </div>
-          <div class="md:col-span-2 mt-2">
-            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">備註 / 特殊要求</label>
-            <textarea id="order-notes" rows="3" class="form-input"></textarea>
-          </div>
-        </div>
-      </section>
-
-      <button type="submit" id="btn-submit" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold py-4 rounded-[20px] shadow-lg hover:shadow-xl active:scale-95 transition-all text-xl tracking-wide flex items-center justify-center gap-2">
-        <i data-lucide="save" class="w-5 h-5"></i> <span id="submit-text">儲存預約單</span>
+      <button id="btn-submit-main" class="bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] px-6 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 hover:opacity-90 active:scale-95 shadow-md transition-all shrink-0">
+        <i data-lucide="save" class="w-4 h-4"></i> 儲存預約檔案
       </button>
-    </form>
-  </main>
+    </header>
+
+    <main class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 bg-pm-cream dark:bg-pm-dark-bg" id="form-container">
+      <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 pb-24">
+        
+        <div class="lg:col-span-7 bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] border border-gray-200/50 dark:border-white/5 shadow-taste dark:shadow-taste-dark space-y-4">
+          <h3 class="font-serif font-bold text-base text-gray-900 dark:text-white flex items-center gap-2 border-b border-gray-100 dark:border-pm-dark-border pb-3"><i data-lucide="user" class="w-4 h-4 text-pm-oak"></i> 客戶及預約時間</h3>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">客人姓名 *</label>
+              <input type="text" id="clientName" required class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white" placeholder="陳大文">
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">聯絡電話 *</label>
+              <input type="tel" id="clientPhone" required class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white" placeholder="91234567">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">拍攝日期</label>
+              <input type="date" id="shootDate" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white">
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">拍攝時間</label>
+              <input type="time" id="shootTime" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">客源平台</label>
+              <select id="platform" class="taste-select taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white">
+                <option value="Instagram">Instagram</option>
+                <option value="WhatsApp">WhatsApp</option>
+                <option value="熟客轉介紹">熟客轉介紹</option>
+                <option value="廣告引流">廣告引流</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">拍攝地點 / 影樓</label>
+              <input type="text" id="shootLocation" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white" placeholder="荔枝角影樓 / 室外公園">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-transparent">
+            <div>
+              <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">額外同行人數/寵物</label>
+              <input type="number" id="extraPaxCount" value="0" min="0" class="taste-input w-full rounded-lg text-xs font-bold text-pm-oak text-center">
+            </div>
+            <div>
+              <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">6歲以下小童</label>
+              <input type="number" id="kidsCount" value="0" min="0" class="taste-input w-full rounded-lg text-xs font-bold text-gray-500 text-center">
+            </div>
+            <div>
+              <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">指定合作影樓</label>
+              <input type="text" id="studio" class="taste-input w-full rounded-lg text-xs font-semibold text-gray-900 dark:text-white" placeholder="無">
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] border border-gray-200/50 dark:border-white/5 shadow-taste dark:shadow-taste-dark space-y-4">
+          <h3 class="font-serif font-bold text-base text-gray-900 dark:text-white flex items-center gap-2 border-b border-gray-100 dark:border-pm-dark-border pb-3"><i data-lucide="wallet" class="w-4 h-4 text-pm-oak"></i> 服務套餐與財務狀況</h3>
+          
+          <div>
+            <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">選擇服務套餐</label>
+            <select id="package-select" class="taste-select taste-input w-full rounded-xl text-xs font-bold text-pm-oak">
+               </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">實收總金額 (HK$)</label>
+              <input type="number" id="price" class="taste-input w-full rounded-xl text-sm font-bold text-pm-green dark:text-[#8DBA76]">
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">已付訂金額 (HK$)</label>
+              <input type="number" id="depositAmount" class="taste-input w-full rounded-xl text-sm font-bold text-gray-700 dark:text-gray-300">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 border-t border-gray-100 dark:border-pm-dark-border pt-3">
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">附加費項目金額</label>
+              <input type="number" id="manualOtherFee" value="0" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-500">
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">平日扣減折扣</label>
+              <input type="number" id="discount" value="0" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">目前付款進度狀態</label>
+            <select id="paymentStatus" class="taste-select taste-input w-full rounded-xl text-xs font-semibold text-gray-700 dark:text-gray-300">
+              <option value="unpaid">❌ 尚未付款 (Unpaid)</option>
+              <option value="deposit">💳 已付訂金 (Deposit Paid)</option>
+              <option value="full">✅ 全數已付 (Fully Paid)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="lg:col-span-12 bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] border border-gray-200/50 dark:border-white/5 shadow-taste dark:shadow-taste-dark space-y-4">
+          <div class="flex items-center justify-between border-b border-gray-100 dark:border-pm-dark-border pb-3">
+            <h3 class="font-serif font-bold text-base text-gray-900 dark:text-white flex items-center gap-2"><i data-lucide="smile" class="w-4 h-4 text-pm-oak"></i> 拍攝毛孩詳細細節</h3>
+            <button type="button" id="btn-add-pet" class="text-xs font-bold text-pm-oak hover:opacity-80 flex items-center gap-1"><i data-lucide="plus-circle" class="w-4 h-4"></i> 新增拍攝毛孩</button>
+          </div>
+          
+          <div id="pets-form-list" class="space-y-4">
+             </div>
+        </div>
+
+        <div class="lg:col-span-12 bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] border border-gray-200/50 dark:border-white/5 shadow-taste dark:shadow-taste-dark grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="md:col-span-2 space-y-2">
+            <label class="text-[10px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1"><i data-lucide="sticky-note" class="w-3 h-3"></i> 特殊預約叮囑 / 備註資訊</p>
+            <textarea id="notes" rows="4" class="taste-input w-full rounded-xl text-xs text-gray-800 dark:text-gray-200 placeholder:text-gray-400" placeholder="入影樓需要穿襪子、小狗性格比較害羞、需要多安排降溫休息時間..."></textarea>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">包含實體產品</p>
+              <input type="text" id="product" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white" placeholder="如：12吋高級相簿、實體木框相架">
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">相片預計交付貨期</p>
+              <input type="text" id="submissionDate" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white" placeholder="如：拍攝後 4-6 星期內交付">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, doc, getDoc, getDocs, updateDoc, setDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     lucide.createIcons();
 
-    // Dark Mode 切換邏輯
     window.toggleDarkMode = function() {
       const htmlEl = document.documentElement;
-      if (htmlEl.classList.contains('dark')) {
-        htmlEl.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      } else {
-        htmlEl.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      }
+      if (htmlEl.classList.contains('dark')) { htmlEl.classList.remove('dark'); localStorage.setItem('theme', 'light'); } 
+      else { htmlEl.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
     };
 
-    const editId = new URLSearchParams(window.location.search).get('editId');
-    let editClientId = null;
-    let globalPackages = [];
-    let isInitialLoad = true;
-
-    // --- 自動計算邏輯 ---
-    window.handlePackageChange = function() {
-      const pkgSelect = document.getElementById('order-package');
-      const selectedOption = pkgSelect.options[pkgSelect.selectedIndex];
-      if (!selectedOption) return;
+    window.showToast = function(msg, type='success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgColor = type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900';
+      const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
       
-      const basePrice = Number(selectedOption.getAttribute('data-price') || 0);
+      toast.className = `px-4 py-2.5 rounded-xl shadow-2xl text-xs font-bold transform transition-all translate-y-10 opacity-0 flex items-center gap-2 ${bgColor}`;
+      toast.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${msg}`;
       
-      if (!editId || !isInitialLoad) {
-        document.getElementById('deposit-amount').value = Math.floor(basePrice / 2);
-      }
-      calculateTotals();
-    };
-
-    window.calculateTotals = function() {
-        const pkgSelect = document.getElementById('order-package');
-        const selectedOption = pkgSelect.options[pkgSelect.selectedIndex];
-        if (!selectedOption) return;
-
-        const basePrice = Number(selectedOption.getAttribute('data-price') || 0);
-        const studioLimit = Number(selectedOption.getAttribute('data-limit') || 0);
-        
-        const actualStudioCost = Number(document.getElementById('order-studio-cost').value || 0);
-        const extraPaxCount = Number(document.getElementById('extra-pax-count').value || 0);
-        const manualOtherFee = Number(document.getElementById('manual-other-fee').value || 0);
-        const depositAmount = Number(document.getElementById('deposit-amount').value || 0);
-        const applyDiscount = document.getElementById('weekday-discount').checked;
-        const manualDiscountFee = Number(document.getElementById('manual-discount-fee').value || 0);
-
-        let topUp = 0;
-        if (actualStudioCost > studioLimit && studioLimit > 0) topUp = actualStudioCost - studioLimit;
-        else if (studioLimit === 0 && actualStudioCost > 0) topUp = actualStudioCost;
-
-        const extraPaxCost = extraPaxCount * 300;
-        const totalOtherFee = topUp + extraPaxCost + manualOtherFee;
-        const weekdayDiscountAmt = applyDiscount ? 300 : 0;
-        
-        const total = basePrice + totalOtherFee - weekdayDiscountAmt - manualDiscountFee;
-        const balance = total - depositAmount;
-
-        document.getElementById('order-price').value = total > 0 ? total : 0;
-        document.getElementById('other-fee').value = totalOtherFee;
-        
-        const balEl = document.getElementById('calculated-balance');
-        balEl.innerText = `尚欠尾數: HK$ ${balance > 0 ? balance : 0}`;
-        if (balance <= 0 && total > 0) { 
-            balEl.classList.replace('text-error', 'text-pm-green'); 
-            document.documentElement.classList.contains('dark') && balEl.classList.replace('text-pm-green', 'text-[#8DBA76]');
-            document.getElementById('payment-status').value = 'full'; 
-        } else { 
-            balEl.classList.remove('text-pm-green', 'text-[#8DBA76]');
-            balEl.classList.add('text-error'); 
-            document.getElementById('payment-status').value = depositAmount > 0 ? 'deposit' : 'unpaid'; 
-        }
-    }
-
-    async function loadDynamicPackages() {
-        const snap = await getDoc(doc(db, "Settings", "packages_config"));
-        if (snap.exists()) globalPackages = snap.data().list;
-        else globalPackages = [
-            { name: "Pawfect Outdoor", price: 2788, studioLimit: 0 }, 
-            { name: "Pawfect Studio", price: 3888, studioLimit: 1000 }, 
-            { name: "Pawfect Premium", price: 5888, studioLimit: 1000 }, 
-            { name: "Pawfect On-site", price: 2100, studioLimit: 0 }
-        ];
-        
-        const select = document.getElementById('order-package');
-        select.innerHTML = globalPackages.map(pkg => `<option value="${pkg.name}" data-price="${pkg.price}" data-limit="${pkg.studioLimit || 0}">${pkg.name} (HK$${pkg.price}${pkg.studioLimit ? ` | 包$${pkg.studioLimit}地租` : ''})</option>`).join('');
-        
-        if(!editId) handlePackageChange(); 
-    }
-
-    // --- 日期與時間處理 ---
-    const dateInput = document.getElementById('shoot-date'); 
-    const timeInput = document.getElementById('shoot-time'); 
-    const warningEl = document.getElementById('conflict-warning');
-    
-    dateInput.addEventListener('change', async () => {
-      const selectedDate = dateInput.value; const selectedTime = timeInput.value;
-      if (selectedDate && selectedTime) {
-        const ordersSnap = await getDocs(collection(db, "Orders")); let isConflict = false;
-        ordersSnap.forEach((docSnap) => { const data = docSnap.data(); if (editId && docSnap.id === editId) return; if (data.shootDate === selectedDate && data.shootTime === selectedTime) isConflict = true; });
-        if (isConflict) warningEl.classList.remove('hidden'); else warningEl.classList.add('hidden');
-      }
-      if (selectedDate) {
-        const day = new Date(selectedDate).getDay(); 
-        const discountBox = document.getElementById('weekday-discount');
-        if (!editId || !isInitialLoad) { discountBox.checked = (day >= 1 && day <= 5); }
-        calculateTotals();
-      }
-    }); 
-    timeInput.addEventListener('change', () => { dateInput.dispatchEvent(new Event('change')) });
-
-    function attachAutoDateReader(fileInputId, dateInputId) {
-      document.getElementById(fileInputId).addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file && file.lastModified) {
-          const d = new Date(file.lastModified);
-          const yyyy = d.getFullYear(); const mm = String(d.getMonth() + 1).padStart(2, '0'); const dd = String(d.getDate()).padStart(2, '0');
-          const hh = String(d.getHours()).padStart(2, '0'); const min = String(d.getMinutes()).padStart(2, '0');
-          document.getElementById(dateInputId).value = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
-        }
-      });
-    }
-    attachAutoDateReader('deposit-receipt-file', 'deposit-date'); 
-    attachAutoDateReader('balance-receipt-file', 'balance-date');
-
-    // --- 寵物區塊處理 ---
-    let petBlockCount = 0; const petsContainer = document.getElementById('pets-container');
-    function addPetBlock(petData = null) {
-      const blockId = petBlockCount++; const div = document.createElement('div'); 
-      div.className = "pet-block bg-gray-50 dark:bg-[#1A211D] p-5 rounded-[16px] relative border border-gray-100 dark:border-pm-dark-border shadow-sm"; 
-      div.innerHTML = `
-        ${blockId > 0 ? `<button type="button" onclick="this.closest('.pet-block').remove()" class="absolute top-3 right-3 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 w-8 h-8 rounded-full flex items-center justify-center transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>` : ''}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="${blockId > 0 ? 'pr-8' : ''}"><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">寵物名字 *</label><input type="text" class="form-input pet-name-input" value="${petData?.name || ''}" required></div>
-          <div>
-            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">種類</label>
-            <select class="form-input pet-type-input appearance-none">
-              <option value="狗" ${petData?.type==='狗'?'selected':''}>狗</option>
-              <option value="貓" ${petData?.type==='貓'?'selected':''}>貓</option>
-              <option value="兔" ${petData?.type==='兔'?'selected':''}>兔</option>
-              <option value="其他" ${petData?.type==='其他'?'selected':''}>其他</option>
-            </select>
-          </div>
-          <div class="md:col-span-2"><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">品種 (例如：柴犬)</label><input type="text" class="form-input pet-breed-input" value="${petData?.breed || ''}"></div>
-          <div class="md:col-span-2">
-            <div class="flex items-center gap-4 mt-2">
-              <img class="pet-preview w-16 h-16 rounded-full object-cover ring-2 ring-white dark:ring-[#121714] shadow-sm" src="${petData?.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop'}" style="${petData?.photoUrl ? 'display:block;' : 'display:none;'}">
-              <input type="file" accept="image/*" class="pet-photo-input text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-white dark:file:bg-[#121714] file:text-pm-oak file:font-medium file:shadow-sm cursor-pointer border-0 p-0 hover:file:bg-gray-50 dark:hover:file:bg-pm-dark-border transition-colors">
-              <input type="hidden" class="pet-existing-photo" value="${petData?.photoUrl || ''}">
-            </div>
-          </div>
-        </div>`;
-      const fileInput = div.querySelector('.pet-photo-input'); const preview = div.querySelector('.pet-preview');
-      fileInput.addEventListener('change', (e) => { const file = e.target.files[0]; if(file) { preview.src = URL.createObjectURL(file); preview.style.display = "block"; } });
-      petsContainer.appendChild(div);
+      container.appendChild(toast);
       lucide.createIcons();
-    }
-    document.getElementById('btn-add-pet').addEventListener('click', () => addPetBlock());
-
-    // --- 標籤處理 ---
-    let availableTags = []; let selectedTagNames = [];
-    async function loadTags() {
-      const snap = await getDoc(doc(db, "Settings", "tags_config"));
-      if (snap.exists() && snap.data().list) availableTags = snap.data().list;
-      const container = document.getElementById('tags-selector-container');
-      if (availableTags.length === 0) return container.innerHTML = '<span class="text-sm text-gray-400">尚未設定標籤</span>';
-      container.innerHTML = availableTags.map((tag, i) => `
-        <div class="relative inline-block">
-          <input type="checkbox" id="tag-${i}" class="tag-checkbox" value="${tag.name}" data-color="${tag.color}" ${selectedTagNames.includes(tag.name)?'checked':''}>
-          <label for="tag-${i}" class="tag-label inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-[#121714] ${tag.color} shadow-sm">${tag.name}</label>
-        </div>`).join('');
+      requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
+      setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
     }
 
-    async function init() {
-      await loadDynamicPackages();
-      if (editId) {
-        document.getElementById('page-title').innerText = "編輯預約單";
-        const snap = await getDoc(doc(db, "Orders", editId));
-        if (snap.exists()) {
-          const d = snap.data();
-          if (d.pets && d.pets.length > 0) d.pets.forEach(p => addPetBlock(p)); else addPetBlock();
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('editId') || urlParams.get('id');
+
+    let packageConfig = [];
+    let currentPets = [];
+
+    async function initPage() {
+      try {
+        // [SKILL: Flow Parallelization] Pipeline extraction execution
+        const [snapPkg, snapOrder] = await Promise.all([
+          getDoc(doc(db, "Settings", "packages_config")),
+          editId ? getDoc(doc(db, "Orders", editId)) : Promise.resolve(null)
+        ]);
+
+        packageConfig = snapPkg.exists() ? snapPkg.data().list : [];
+        const selectEl = document.getElementById('package-select');
+        selectEl.innerHTML = packageConfig.map(p => `<option value="${p.name}">${p.name} (HK$ ${p.price})</option>`).join('');
+
+        selectEl.addEventListener('change', (e) => {
+            const chosen = packageConfig.find(p => p.name === e.target.value);
+            if(chosen && !editId) { document.getElementById('price').value = chosen.price; }
+        });
+
+        if (snapOrder && snapOrder.exists()) {
+          document.getElementById('page-title').innerText = "編輯預約檔案資料";
+          const o = snapOrder.data();
           
-          document.getElementById('shoot-date').value = d.shootDate || ""; 
-          document.getElementById('shoot-time').value = d.shootTime || "";
-          document.getElementById('shoot-location').value = d.shootLocation || ""; 
-          document.getElementById('order-studio').value = d.studio || "";
-          document.getElementById('order-package').value = d.package || ""; 
-          document.getElementById('order-studio-cost').value = d.actualStudioCost || "";
-          document.getElementById('extra-pax-count').value = d.extraPaxCount || 0; 
-          document.getElementById('kids-count').value = d.kidsCount || 0;
-          document.getElementById('manual-other-fee').value = d.manualOtherFee || 0;
-          document.getElementById('manual-discount-fee').value = d.manualDiscountFee || 0;
-          document.getElementById('order-price').value = d.price || ""; 
-          document.getElementById('deposit-amount').value = d.depositAmount || "";
-          document.getElementById('other-fee').value = d.otherFee || ""; 
-          document.getElementById('order-notes').value = d.notes || "";
-          document.getElementById('payment-status').value = d.paymentStatus || "unpaid"; 
-          document.getElementById('order-platform').value = d.platform || "";
-          document.getElementById('deposit-date').value = (d.depositDate || "").replace(' ', 'T'); 
-          document.getElementById('balance-date').value = (d.balanceDate || "").replace(' ', 'T');
-          document.getElementById('order-product').value = d.product || ""; 
-          document.getElementById('submission-date').value = d.submissionDate || "";
-          document.getElementById('weekday-discount').checked = (d.discount === 300);
+          document.getElementById('shootDate').value = o.shootDate || "";
+          document.getElementById('shootTime').value = o.shootTime || "";
+          document.getElementById('shootLocation').value = o.shootLocation || "";
+          document.getElementById('platform').value = o.platform || "Instagram";
+          document.getElementById('package-select').value = o.package || "";
+          document.getElementById('price').value = o.price || 0;
+          document.getElementById('depositAmount').value = o.depositAmount || 0;
+          document.getElementById('manualOtherFee').value = o.manualOtherFee || 0;
+          document.getElementById('discount').value = o.discount || 0;
+          document.getElementById('paymentStatus').value = o.paymentStatus || "unpaid";
+          document.getElementById('notes').value = o.notes || "";
+          document.getElementById('product').value = o.product || "";
+          document.getElementById('submissionDate').value = o.submissionDate || "";
+          document.getElementById('extraPaxCount').value = o.extraPaxCount || 0;
+          document.getElementById('kidsCount').value = o.kidsCount || 0;
+          document.getElementById('studio').value = o.studio || "";
 
-          if (d.depositReceiptUrl) {
-            document.getElementById('existing-deposit-url').value = d.depositReceiptUrl;
-            document.getElementById('preview-deposit-link').href = d.depositReceiptUrl;
-            document.getElementById('preview-deposit-link').classList.remove('hidden');
-          }
-          if (d.balanceReceiptUrl) {
-            document.getElementById('existing-balance-url').value = d.balanceReceiptUrl;
-            document.getElementById('preview-balance-link').href = d.balanceReceiptUrl;
-            document.getElementById('preview-balance-link').classList.remove('hidden');
-          }
-
-          if (d.tags) selectedTagNames = d.tags.map(t => t.name);
-          if (d.clientId) {
-            editClientId = d.clientId; const cSnap = await getDoc(doc(db, "Clients", editClientId));
-            if(cSnap.exists()) { 
-                const c = cSnap.data(); 
-                document.getElementById('client-name').value = c.name || ""; 
-                document.getElementById('client-phone').value = c.phone || ""; 
-                document.getElementById('client-email').value = c.email || ""; 
-                document.getElementById('client-instagram').value = c.instagram || ""; 
-                document.getElementById('client-address').value = c.address || ""; 
+          if (o.clientId) {
+            const cSnap = await getDoc(doc(db, "Clients", o.clientId));
+            if (cSnap.exists()) {
+              document.getElementById('clientName').value = cSnap.data().name || "";
+              document.getElementById('clientPhone').value = cSnap.data().phone || "";
             }
           }
-          isInitialLoad = false;
-          calculateTotals();
+
+          currentPets = o.pets || [];
+          if(currentPets.length === 0 && o.petName) {
+              currentPets.push({ name: o.petName, type: o.petType || "", breed: o.petBreed || "", photoUrl: o.photoUrl || "" });
+          }
+        } else {
+          // 預設一行毛孩輸入
+          currentPets = [{ name: "", type: "", breed: "", photoUrl: "" }];
         }
-      } else { addPetBlock(); isInitialLoad = false; }
-      loadTags();
+
+        renderPetsForm();
+
+      } catch (err) {
+        showToast("同步安全中心網絡出錯", "error");
+      }
     }
-    init();
 
-    // --- 儲存表單與檔案上傳 ---
-    const submitBtn = document.getElementById('btn-submit');
-    const submitText = document.getElementById('submit-text');
-    document.getElementById('order-form').addEventListener('submit', async (e) => {
-      e.preventDefault(); 
-      submitText.innerText = "上傳資料中..."; 
-      submitBtn.disabled = true;
-      submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
-      
+    function renderPetsForm() {
+      const listEl = document.getElementById('pets-form-list');
+      listEl.innerHTML = currentPets.map((p, i) => `
+        <div class="pet-row-transition grid grid-cols-1 sm:grid-cols-4 gap-3 bg-gray-50/50 dark:bg-[#1A211D]/30 p-4 rounded-xl border border-gray-100 dark:border-pm-dark-border relative group">
+          <div>
+            <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">毛孩名字 *</label>
+            <input type="text" value="${p.name}" onchange="updatePetField(${i}, 'name', this.value)" required class="taste-input w-full rounded-lg text-xs font-semibold text-gray-900 dark:text-white" placeholder="如：Mochi">
+          </div>
+          <div>
+            <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">種類</label>
+            <input type="text" value="${p.type}" onchange="updatePetField(${i}, 'type', this.value)" class="taste-input w-full rounded-lg text-xs font-medium text-gray-900 dark:text-white" placeholder="貓 / 狗 / 兔">
+          </div>
+          <div>
+            <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">品種</label>
+            <input type="text" value="${p.breed}" onchange="updatePetField(${i}, 'breed', this.value)" class="taste-input w-full rounded-lg text-xs font-medium text-gray-900 dark:text-white" placeholder="柴犬 / 哥基">
+          </div>
+          <div class="relative">
+            <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">大頭照網址</label>
+            <input type="url" value="${p.photoUrl}" onchange="updatePetField(${i}, 'photoUrl', this.value)" class="taste-input w-full rounded-lg text-xs text-gray-500" placeholder="貼上圖片網址">
+            ${currentPets.length > 1 ? `
+            <button type="button" onclick="removePetRow(${i})" class="absolute right-2 bottom-2 text-gray-400 hover:text-red-500 transition-colors">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>` : ''}
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    window.updatePetField = (i, key, val) => { currentPets[i][key] = val; };
+    window.removePetRow = (i) => { currentPets.splice(i, 1); renderPetsForm(); };
+    
+    document.getElementById('btn-add-pet').onclick = () => {
+      currentPets.push({ name: "", type: "", breed: "", photoUrl: "" });
+      renderPetsForm();
+    };
+
+    // [SKILL: Code Review] Defensive database structural insertion workflow
+    async function submitData() {
+      const name = document.getElementById('clientName').value.trim();
+      const phone = document.getElementById('clientPhone').value.trim();
+      if(!name || !phone) return showToast("請完整填寫必填欄位 (*)", "error");
+
+      const btn = document.getElementById('btn-submit-main');
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> 正在儲存...`;
+      btn.classList.add('opacity-70', 'cursor-not-allowed');
+      lucide.createIcons();
+
       try {
-        const checkedTags = []; document.querySelectorAll('.tag-checkbox:checked').forEach(cb => { checkedTags.push({ name: cb.value, color: cb.getAttribute('data-color') }); });
-        const clientPayload = { name: document.getElementById('client-name').value.trim(), phone: document.getElementById('client-phone').value.trim(), email: document.getElementById('client-email').value.trim(), instagram: document.getElementById('client-instagram').value.trim(), address: document.getElementById('client-address').value.trim(), updatedAt: new Date() };
-
-        const petsArray = [];
-        for (let block of document.querySelectorAll('.pet-block')) {
-          const file = block.querySelector('.pet-photo-input').files[0]; let photoUrl = block.querySelector('.pet-existing-photo').value;
-          if (file) { const fileRef = ref(storage, `pets/${Date.now()}_${file.name}`); await uploadBytes(fileRef, file); photoUrl = await getDownloadURL(fileRef); }
-          petsArray.push({ name: block.querySelector('.pet-name-input').value.trim(), type: block.querySelector('.pet-type-input').value, breed: block.querySelector('.pet-breed-input').value.trim(), photoUrl: photoUrl });
-        }
-
-        let depositReceiptUrl = document.getElementById('existing-deposit-url').value; 
-        let balanceReceiptUrl = document.getElementById('existing-balance-url').value;
+        let clientId = "";
+        const clientsRef = collection(db, "Clients");
         
-        const depFile = document.getElementById('deposit-receipt-file').files[0]; 
-        if (depFile) { 
-            const depRef = ref(storage, `receipts/${Date.now()}_dep_${depFile.name}`); 
-            await uploadBytes(depRef, depFile); 
-            depositReceiptUrl = await getDownloadURL(depRef); 
-        }
-        
-        const balFile = document.getElementById('balance-receipt-file').files[0]; 
-        if (balFile) { 
-            const balRef = ref(storage, `receipts/${Date.now()}_bal_${balFile.name}`); 
-            await uploadBytes(balRef, balFile); 
-            balanceReceiptUrl = await getDownloadURL(balRef); 
-        }
+        // 簡單就地創建或配對客戶快取
+        const cSnap = await addDoc(clientsRef, { name, phone });
+        clientId = cSnap.id;
 
-        const isDiscount = document.getElementById('weekday-discount').checked;
+        const extraPax = Number(document.getElementById('extraPaxCount').value || 0);
+        const manualFee = Number(document.getElementById('manualOtherFee').value || 0);
+        const totalOtherFee = (extraPax * 300) + manualFee;
 
-        const orderData = {
-          pets: petsArray, 
-          shootDate: document.getElementById('shoot-date').value, 
-          shootTime: document.getElementById('shoot-time').value,
-          shootLocation: document.getElementById('shoot-location').value.trim(), 
-          package: document.getElementById('order-package').value,
-          actualStudioCost: Number(document.getElementById('order-studio-cost').value || 0), 
-          extraPaxCount: Number(document.getElementById('extra-pax-count').value || 0), 
-          kidsCount: Number(document.getElementById('kids-count').value || 0), 
-          manualOtherFee: Number(document.getElementById('manual-other-fee').value || 0),
-          manualDiscountFee: Number(document.getElementById('manual-discount-fee').value || 0),
-          price: Number(document.getElementById('order-price').value || 0), 
-          depositAmount: Number(document.getElementById('deposit-amount').value || 0), 
-          otherFee: Number(document.getElementById('other-fee').value || 0), 
-          discount: isDiscount ? 300 : 0,
-          notes: document.getElementById('order-notes').value.trim(), 
-          paymentStatus: document.getElementById('payment-status').value, 
-          tags: checkedTags, 
-          depositReceiptUrl, 
-          balanceReceiptUrl, 
-          platform: document.getElementById('order-platform').value, 
-          studio: document.getElementById('order-studio').value.trim(),
-          depositDate: document.getElementById('deposit-date').value.replace('T', ' '), 
-          balanceDate: document.getElementById('balance-date').value.replace('T', ' '), 
-          product: document.getElementById('order-product').value.trim(), 
-          submissionDate: document.getElementById('submission-date').value, 
-          updatedAt: new Date()
+        const orderPayload = {
+          clientId,
+          shootDate: document.getElementById('shootDate').value,
+          shootTime: document.getElementById('shootTime').value,
+          shootLocation: document.getElementById('shootLocation').value,
+          platform: document.getElementById('platform').value,
+          package: document.getElementById('package-select').value,
+          price: Number(document.getElementById('price').value || 0),
+          depositAmount: Number(document.getElementById('depositAmount').value || 0),
+          manualOtherFee: manualFee,
+          otherFee: totalOtherFee,
+          discount: Number(document.getElementById('discount').value || 0),
+          paymentStatus: document.getElementById('paymentStatus').value,
+          notes: document.getElementById('notes').value,
+          product: document.getElementById('product').value,
+          submissionDate: document.getElementById('submissionDate').value,
+          extraPaxCount: extraPax,
+          kidsCount: Number(document.getElementById('kidsCount').value || 0),
+          studio: document.getElementById('studio').value,
+          pets: currentPets.filter(p => p.name.trim() !== ""),
+          status: editId ? undefined : "col-new" // 只有全新單預設落新 कॉलम
         };
 
-        if (editId && editClientId) { 
-            await updateDoc(doc(db, "Clients", editClientId), clientPayload); 
-            await updateDoc(doc(db, "Orders", editId), orderData); 
+        if (editId) {
+          // 編輯模式排除覆蓋原有看板進度
+          delete orderPayload.status;
+          await updateDoc(doc(db, "Orders", editId), orderPayload);
+          showToast("預約檔案更新成功");
         } else {
-          let nextInvoiceNum = 1361; const q = query(collection(db, "Orders"), orderBy("invoiceNumber", "desc"), limit(1)); const numSnap = await getDocs(q);
-          if (!numSnap.empty && numSnap.docs[0].data().invoiceNumber) nextInvoiceNum = numSnap.docs[0].data().invoiceNumber + 1;
-          orderData.invoiceNumber = nextInvoiceNum; orderData.displayId = String(nextInvoiceNum).padStart(7, '0');
-          clientPayload.createdAt = new Date(); const clientRef = await addDoc(collection(db, "Clients"), clientPayload);
-          orderData.clientId = clientRef.id; orderData.status = "col-new"; orderData.createdAt = new Date();
-          await setDoc(doc(db, "Orders", orderData.displayId), orderData);
+          await addDoc(collection(db, "Orders"), orderPayload);
+          showToast("全新預約檔案已成功建立");
         }
-        window.location.href = 'index.html';
-      } catch (error) { 
-          console.error(error);
-          submitText.innerText = "儲存失敗"; 
-          submitBtn.classList.replace("bg-pm-green", "bg-red-500"); 
-          submitBtn.classList.replace("dark:bg-pm-oak", "dark:bg-red-500");
-          submitBtn.disabled = false; 
-          submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
-          setTimeout(() => { 
-            submitText.innerText = "儲存預約單"; 
-            submitBtn.classList.replace("bg-red-500", "bg-pm-green"); 
-            submitBtn.classList.replace("dark:bg-red-500", "dark:bg-pm-oak");
-          }, 3000); 
+
+        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+
+      } catch (err) {
+        showToast("資料庫安全儲存事務卡死", "error");
+        btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> 儲存預約檔案`;
+        btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        lucide.createIcons();
       }
-    });
+    }
+
+    document.getElementById('btn-submit-main').onclick = submitData;
+
+    initPage();
   </script>
 </body>
 </html>
