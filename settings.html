@@ -8,7 +8,7 @@
       document.documentElement.classList.add('dark');
     }
   </script>
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <meta content="width=device-width, maximum-scale=1.0, user-scalable=no" name="viewport">
   <title>系統設定 | Pawfect Memories</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   
@@ -21,44 +21,35 @@
       theme: { 
         extend: { 
           colors: { 
-            "pm-green": "#244018",       
-            "pm-oak": "#C4905E",         
-            "pm-cream": "#FAFAFA",       
-            "pm-dark-bg": "#0B0E0C",       
-            "pm-dark-surface": "#121714",  
-            "pm-dark-border": "#1E2621",
-            "error": "#EF4444"
+            "pm-green": "#244018", "pm-oak": "#C4905E", "pm-cream": "#FAFAFA", "pm-dark-bg": "#0B0E0C", "pm-dark-surface": "#121714", "pm-dark-border": "#1E2621", "error": "#EF4444"
           }, 
-          fontFamily: { 
-            serif: ['"Playfair Display"', 'serif'], 
-            sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] 
-          },
+          fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] },
           boxShadow: {
-            'taste': '0 4px 24px -8px rgba(0, 0, 0, 0.05)',
-            'taste-dark': '0 4px 24px -8px rgba(0, 0, 0, 0.4)'
+            /* [SKILL: Make Interfaces Feel Better] Organic Shadows */
+            'taste': '0 4px 20px -4px rgba(0, 0, 0, 0.04), 0 1px 4px -1px rgba(0, 0, 0, 0.02)', 
+            'taste-dark': '0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 1px 8px -1px rgba(0, 0, 0, 0.3)' 
           }
         } 
       } 
     }
   </script>
   <style>
-    body { min-height: 100dvh; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
+    body { min-height: 100dvh; overflow: hidden; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
+    .custom-scrollbar::-webkit-scrollbar { height: 5px; width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.2); border-radius: 99px; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     
-    /* Taste-style seamless inputs (加入 !important 強制壓制 Tailwind Forms 預設白底) */
+    /* [SKILL: Web Design Guidelines] Seamless Inputs */
     .taste-input {
         background-color: transparent !important;
         border: 1px solid transparent !important;
         border-radius: 0.5rem;
         padding: 0.5rem 0.75rem;
-        transition: all 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .taste-input:hover {
-        background-color: rgba(0,0,0,0.02) !important;
-    }
-    .dark .taste-input:hover {
-        background-color: rgba(255,255,255,0.02) !important;
-    }
+    .taste-input:hover { background-color: rgba(0,0,0,0.02) !important; }
+    .dark .taste-input:hover { background-color: rgba(255,255,255,0.02) !important; }
     .taste-input:focus {
         background-color: transparent !important;
         border-color: #C4905E !important;
@@ -66,132 +57,130 @@
         outline: none;
     }
     
-    /* 隱藏 Number input 嘅箭咀 */
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none; 
-        margin: 0; 
-    }
-    input[type=number] {
-        -moz-appearance: textfield;
-    }
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+    select.taste-select { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2rem; }
 
-    select.taste-select {
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-        background-position: right 0.5rem center;
-        background-repeat: no-repeat;
-        background-size: 1.5em 1.5em;
-        padding-right: 2rem;
+    /* [SKILL: Emil Kowalski] Row entrance animation */
+    .row-transition { animation: rowEntry 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes rowEntry {
+        0% { opacity: 0; transform: translateY(-4px); }
+        100% { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
-<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white pb-32">
+<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex h-screen overflow-hidden">
 
-  <header class="bg-white/80 dark:bg-pm-dark-bg/80 backdrop-blur-md border-b border-gray-200/60 dark:border-pm-dark-border fixed top-0 w-full z-50 h-16 md:h-20 flex justify-between items-center px-4 md:px-8 transition-colors duration-400">
-    <div class="flex items-center gap-4">
-      <button type="button" onclick="window.location.href='index.html';" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-pm-dark-surface text-gray-500 dark:text-gray-400 transition-colors cursor-pointer">
-        <i data-lucide="arrow-left" class="w-5 h-5"></i>
-      </button>
-      <div class="flex flex-col cursor-pointer select-none" onclick="window.location.href='index.html';">
-        <h1 class="font-serif text-xl md:text-2xl text-pm-green dark:text-[#D1E2C7] font-bold leading-none tracking-tight">Pawfect Memories</h1>
-        <span class="text-[9px] text-pm-oak font-bold tracking-[0.3em] uppercase mt-1 ml-0.5">Settings</span>
+  <aside class="hidden md:flex flex-col justify-between w-16 hover:w-64 bg-white dark:bg-pm-dark-surface border-r border-gray-200/60 dark:border-pm-dark-border h-full transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) group z-40 relative shadow-sm shrink-0">
+    <div class="flex flex-col items-start w-full overflow-hidden">
+      <div class="h-20 flex items-center px-4 w-full shrink-0 border-b border-gray-100 dark:border-white/5">
+        <img src="logo_black.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 dark:hidden">
+        <img src="logo_white.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 hidden dark:block">
+        <span class="ml-3 font-serif font-bold text-[16px] text-pm-green dark:text-[#D1E2C7] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-tight">Pawfect Memories</span>
       </div>
+      <nav class="w-full mt-6 flex flex-col gap-1.5 px-2.5">
+        <a href="index.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">工作區 (Workspace)</span>
+        </a>
+        <a href="add.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+          <i data-lucide="plus-square" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">新增預約 (New)</span>
+        </a>
+        <a href="dashboard.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+          <i data-lucide="pie-chart" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">財務中心 (Finance)</span>
+        </a>
+        <a href="settings.html" class="flex items-center px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-[#1A211D] text-pm-oak font-semibold transition-all w-full overflow-hidden shadow-inner dark:shadow-none">
+          <i data-lucide="settings" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">系統設定 (Settings)</span>
+        </a>
+      </nav>
     </div>
     
-    <div class="flex items-center gap-2 shrink-0">
-      <button onclick="toggleDarkMode()" class="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-pm-dark-surface transition-colors" title="Theme">
-        <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
-        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+    <div class="px-2.5 pb-6 flex flex-col gap-1.5 w-full overflow-hidden border-t border-gray-100 dark:border-white/5 pt-4">
+      <button onclick="toggleDarkMode()" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1A211D] hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden">
+        <i data-lucide="moon" class="w-5 h-5 shrink-0 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 shrink-0 hidden dark:block"></i>
+        <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">主題切換 (Theme)</span>
       </button>
     </div>
-  </header>
+  </aside>
 
-  <main class="pt-24 md:pt-32 px-4 md:px-8 max-w-3xl mx-auto space-y-10">
+  <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
     
-    <div class="mb-8">
-      <h2 class="font-serif font-bold text-3xl md:text-4xl tracking-tight text-gray-900 dark:text-white mb-2">系統設定</h2>
-      <p class="text-gray-500 dark:text-gray-400 text-sm">管理您的拍攝套餐及客戶分類標籤</p>
-    </div>
-
-    <section>
-      <div class="flex items-center justify-between mb-4 px-2">
-        <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white flex items-center gap-2">
-          <i data-lucide="package" class="w-5 h-5 text-pm-oak"></i> 拍攝套餐配置
-        </h3>
+    <header class="h-20 flex justify-between items-center px-6 md:px-8 shrink-0 border-b border-gray-200/60 dark:border-pm-dark-border bg-white/50 dark:bg-pm-dark-bg/50 backdrop-blur-md z-30">
+      <div class="flex flex-col">
+        <h2 class="font-serif text-2xl font-bold tracking-tight text-gray-900 dark:text-white">系統設定面板</h2>
       </div>
-      <p class="text-xs text-gray-500 dark:text-gray-400 mb-4 px-2">設定基礎收費與包底地租。如果訂單實際地租超過「包底地租」，系統會自動於新增預約時計算補錢差額。</p>
-      
-      <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 overflow-hidden transition-colors">
-        
-        <div class="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 dark:border-pm-dark-border bg-gray-50/50 dark:bg-[#1A211D]/50 text-[10px] font-bold uppercase tracking-wider text-gray-400">
-          <div class="col-span-5">套餐名稱 (Package Name)</div>
-          <div class="col-span-3">定價 (Price)</div>
-          <div class="col-span-3">包底地租 (Studio Limit)</div>
-          <div class="col-span-1 text-center">刪除</div>
-        </div>
+    </header>
 
-        <div id="package-list" class="divide-y divide-gray-100 dark:divide-pm-dark-border">
-            <div class="p-6 flex items-center gap-4 animate-pulse">
-                <div class="h-8 bg-gray-100 dark:bg-[#1A211D] w-full rounded-lg"></div>
+    <main class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 space-y-10 bg-pm-cream dark:bg-pm-dark-bg">
+      <div class="max-w-3xl mx-auto space-y-10 pb-24">
+        
+        <section class="space-y-4">
+          <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/50 dark:border-white/5 overflow-hidden transition-colors">
+            <div class="px-6 py-5 border-b border-gray-100 dark:border-pm-dark-border flex items-center justify-between bg-gray-50/50 dark:bg-[#1A211D]/30">
+              <h3 class="font-serif font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="package" class="w-4 h-4 text-pm-oak"></i> 拍攝套餐費率配置
+              </h3>
+              <button id="btn-save-pkgs" class="bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] py-1.5 px-4 rounded-lg text-xs font-bold shadow-sm hover:opacity-90 transition-opacity flex items-center gap-1">
+                <i data-lucide="save" class="w-3.5 h-3.5"></i> <span id="text-save-pkgs">儲存套餐</span>
+              </button>
             </div>
-        </div>
-        
-        <div class="p-4 bg-gray-50/50 dark:bg-[#1A211D]/50 border-t border-gray-100 dark:border-pm-dark-border">
-          <button id="btn-add-pkg" class="w-full py-2.5 flex items-center justify-center gap-2 text-sm font-semibold text-pm-oak hover:bg-pm-oak/10 rounded-xl transition-colors">
-            <i data-lucide="plus" class="w-4 h-4"></i> 新增套餐
-          </button>
-        </div>
-      </div>
-      
-      <div class="mt-4 flex justify-end">
-        <button id="btn-save-pkgs" class="bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-semibold py-3 px-8 rounded-xl shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center gap-2">
-          <i data-lucide="save" class="w-4 h-4"></i> <span id="text-save-pkgs">儲存套餐設定</span>
-        </button>
-      </div>
-    </section>
-
-    <hr class="border-gray-200 dark:border-pm-dark-border">
-
-    <section>
-      <div class="flex items-center justify-between mb-4 px-2">
-        <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white flex items-center gap-2">
-          <i data-lucide="tag" class="w-5 h-5 text-pm-oak"></i> 客戶標籤配置
-        </h3>
-      </div>
-      <p class="text-xs text-gray-500 dark:text-gray-400 mb-4 px-2">設定可用於分類客人的標籤，方便在看板或列表一眼辨識客人的特殊屬性 (如：VIP、熟客)。</p>
-      
-      <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 overflow-hidden transition-colors">
-        
-        <div class="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 border-b border-gray-100 dark:border-pm-dark-border bg-gray-50/50 dark:bg-[#1A211D]/50 text-[10px] font-bold uppercase tracking-wider text-gray-400">
-          <div class="col-span-7">標籤名稱 (Tag Name)</div>
-          <div class="col-span-4">顏色 (Color)</div>
-          <div class="col-span-1 text-center">刪除</div>
-        </div>
-
-        <div id="tag-list" class="divide-y divide-gray-100 dark:divide-pm-dark-border">
-            <div class="p-6 flex items-center gap-4 animate-pulse">
-                <div class="h-8 bg-gray-100 dark:bg-[#1A211D] w-full rounded-lg"></div>
+            
+            <div class="hidden sm:grid grid-cols-12 gap-4 px-6 py-2.5 border-b border-gray-100 dark:border-pm-dark-border text-[9px] font-bold uppercase tracking-wider text-gray-400">
+              <div class="col-span-5">套餐名稱 (Package Name)</div>
+              <div class="col-span-3">基礎定價 (Price)</div>
+              <div class="col-span-3">包底地租上限 (Studio Limit)</div>
+              <div class="col-span-1 text-center">操作</div>
             </div>
-        </div>
-        
-        <div class="p-4 bg-gray-50/50 dark:bg-[#1A211D]/50 border-t border-gray-100 dark:border-pm-dark-border">
-          <button id="btn-add-tag" class="w-full py-2.5 flex items-center justify-center gap-2 text-sm font-semibold text-pm-oak hover:bg-pm-oak/10 rounded-xl transition-colors">
-            <i data-lucide="plus" class="w-4 h-4"></i> 新增標籤
-          </button>
-        </div>
+
+            <div id="package-list" class="divide-y divide-gray-100 dark:divide-pm-dark-border">
+                <div class="p-6 text-center text-xs text-gray-400 animate-pulse">安全串流同步中...</div>
+            </div>
+            
+            <div class="p-3 bg-gray-50/30 dark:bg-[#1A211D]/10 border-t border-gray-100 dark:border-pm-dark-border">
+              <button id="btn-add-pkg" class="w-full py-2 flex items-center justify-center gap-1.5 text-xs font-bold text-pm-oak hover:bg-pm-oak/5 rounded-xl transition-all">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> 新增拍攝套餐項目
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="space-y-4">
+          <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/50 dark:border-white/5 overflow-hidden transition-colors">
+            <div class="px-6 py-5 border-b border-gray-100 dark:border-pm-dark-border flex items-center justify-between bg-gray-50/50 dark:bg-[#1A211D]/30">
+              <h3 class="font-serif font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="tag" class="w-4 h-4 text-pm-oak"></i> 客戶分類標籤配置
+              </h3>
+              <button id="btn-save-tags" class="bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] py-1.5 px-4 rounded-lg text-xs font-bold shadow-sm hover:opacity-90 transition-opacity flex items-center gap-1">
+                <i data-lucide="save" class="w-3.5 h-3.5"></i> <span id="text-save-tags">儲存標籤</span>
+              </button>
+            </div>
+            
+            <div class="hidden sm:grid grid-cols-12 gap-4 px-6 py-2.5 border-b border-gray-100 dark:border-pm-dark-border text-[9px] font-bold uppercase tracking-wider text-gray-400">
+              <div class="col-span-7">標籤文字 (Tag Name)</div>
+              <div class="col-span-4">代表色彩系統 (Visual Color)</div>
+              <div class="col-span-1 text-center">操作</div>
+            </div>
+
+            <div id="tag-list" class="divide-y divide-gray-100 dark:divide-pm-dark-border">
+                <div class="p-6 text-center text-xs text-gray-400 animate-pulse">安全串流同步中...</div>
+            </div>
+            
+            <div class="p-3 bg-gray-50/30 dark:bg-[#1A211D]/10 border-t border-gray-100 dark:border-pm-dark-border">
+              <button id="btn-add-tag" class="w-full py-2 flex items-center justify-center gap-1.5 text-xs font-bold text-pm-oak hover:bg-pm-oak/5 rounded-xl transition-all">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> 新增核心分類標籤
+              </button>
+            </div>
+          </div>
+        </section>
+
       </div>
+    </main>
+  </div>
 
-      <div class="mt-4 flex justify-end">
-        <button id="btn-save-tags" class="bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-semibold py-3 px-8 rounded-xl shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center gap-2">
-          <i data-lucide="save" class="w-4 h-4"></i> <span id="text-save-tags">儲存標籤設定</span>
-        </button>
-      </div>
-    </section>
-
-  </main>
-
-  <div id="toast-container" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -205,13 +194,8 @@
 
     window.toggleDarkMode = function() {
       const htmlEl = document.documentElement;
-      if (htmlEl.classList.contains('dark')) {
-        htmlEl.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      } else {
-        htmlEl.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      }
+      if (htmlEl.classList.contains('dark')) { htmlEl.classList.remove('dark'); localStorage.setItem('theme', 'light'); } 
+      else { htmlEl.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
     };
 
     window.showToast = function(msg, type='success') {
@@ -220,12 +204,11 @@
       const bgColor = type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900';
       const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
       
-      toast.className = `px-5 py-3 rounded-full shadow-2xl text-sm font-medium transform transition-all translate-y-10 opacity-0 flex items-center gap-2 ${bgColor}`;
-      toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i> ${msg}`;
+      toast.className = `px-4 py-2.5 rounded-xl shadow-2xl text-xs font-bold transform transition-all translate-y-10 opacity-0 flex items-center gap-2 ${bgColor}`;
+      toast.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${msg}`;
       
       container.appendChild(toast);
       lucide.createIcons();
-      
       requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
       setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
     }
@@ -233,64 +216,58 @@
     let packages = []; 
     let tags = [];
 
-    // 標籤顏色選項
     const colorOptions = [
-        { label: "紫色 (Purple)", val: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20", dot: "#a855f7" },
-        { label: "藍色 (Blue)", val: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20", dot: "#3b82f6" },
-        { label: "黃色 (Yellow)", val: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20", dot: "#eab308" },
-        { label: "紅色 (Red)", val: "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20", dot: "#ef4444" },
-        { label: "綠色 (Green)", val: "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20", dot: "#22c55e" },
-        { label: "橡木金 (Oak)", val: "bg-pm-oak/10 text-pm-oak border border-pm-oak/20", dot: "#C4905E" },
-        { label: "灰色 (Gray)", val: "bg-gray-100 dark:bg-pm-dark-border text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-transparent", dot: "#6b7280" }
+        { label: "浪漫薰衣草紫 (Purple)", val: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20", dot: "#a855f7" },
+        { label: "天空蔚藍 (Blue)", val: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20", dot: "#3b82f6" },
+        { label: "暖陽鵝黃 (Yellow)", val: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20", dot: "#eab308" },
+        { label: "珊瑚烈紅 (Red)", val: "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20", dot: "#ef4444" },
+        { label: "深林翡翠 (Green)", val: "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20", dot: "#22c55e" },
+        { label: "奢華橡木金 (Oak)", val: "bg-pm-oak/10 text-pm-oak border border-pm-oak/20", dot: "#C4905E" },
+        { label: "晨霧迷蹤灰 (Gray)", val: "bg-gray-100 dark:bg-pm-dark-border text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-transparent", dot: "#6b7280" }
     ];
 
     async function loadSettings() {
       try {
-          const snapPkg = await getDoc(doc(db, "Settings", "packages_config"));
-          packages = snapPkg.exists() ? snapPkg.data().list : [
-            { name: "Pawfect Outdoor", price: 2788, studioLimit: 0 },
-            { name: "Pawfect Studio", price: 3888, studioLimit: 1000 },
-            { name: "Pawfect Premium", price: 5888, studioLimit: 1000 },
-            { name: "Pawfect On-site", price: 2100, studioLimit: 0 }
-          ];
-          
-          const snapTag = await getDoc(doc(db, "Settings", "tags_config"));
-          tags = snapTag.exists() ? snapTag.data().list : [
-              { name: "熟客 VIP", color: colorOptions[0].val }, 
-              { name: "轉介紹", color: colorOptions[1].val }
-          ];
+          // [SKILL: Flow Parallelization] Fetch system configurations in parallel
+          const [snapPkg, snapTag] = await Promise.all([
+            getDoc(doc(db, "Settings", "packages_config")),
+            getDoc(doc(db, "Settings", "tags_config"))
+          ]);
+
+          packages = snapPkg.exists() ? snapPkg.data().list : [];
+          tags = snapTag.exists() ? snapTag.data().list : [];
           
           renderPackages(); 
           renderTags();
       } catch (e) {
-          showToast("讀取設定失敗", "error");
+          showToast("遠端同步設定管線失敗", "error");
       }
     }
 
     function renderPackages() {
       if (packages.length === 0) {
-          document.getElementById('package-list').innerHTML = `<div class="p-8 text-center text-sm text-gray-400">目前沒有設定任何套餐</div>`;
+          document.getElementById('package-list').innerHTML = `<div class="p-8 text-center text-xs text-gray-400">目前核心系統庫無任何套餐配置紀錄</div>`;
           return;
       }
         
       document.getElementById('package-list').innerHTML = packages.map((pkg, i) => `
-        <div class="px-6 py-4 flex flex-col sm:grid sm:grid-cols-12 gap-3 sm:gap-4 items-start sm:items-center hover:bg-gray-50 dark:hover:bg-[#1A211D]/30 transition-colors group">
+        <div class="row-transition px-6 py-3.5 flex flex-col sm:grid sm:grid-cols-12 gap-3 sm:gap-4 items-start sm:items-center hover:bg-gray-50/50 dark:hover:bg-[#1A211D]/30 transition-colors group">
           <div class="w-full sm:col-span-5 relative">
-            <label class="sm:hidden text-[10px] text-gray-400 uppercase font-bold mb-1 block">套餐名稱</label>
-            <input type="text" value="${pkg.name}" onchange="updatePkg(${i}, 'name', this.value)" class="bg-transparent taste-input w-full text-gray-900 dark:text-white font-semibold" placeholder="輸入套餐名稱">
+            <label class="sm:hidden text-[9px] text-gray-400 uppercase font-bold mb-1 block">套餐名稱</label>
+            <input type="text" value="${pkg.name}" onchange="updatePkg(${i}, 'name', this.value)" class="taste-input w-full text-gray-900 dark:text-white font-bold text-xs" placeholder="輸入套餐名稱">
           </div>
           <div class="w-full sm:col-span-3 relative flex items-center">
-            <label class="sm:hidden text-[10px] text-gray-400 uppercase font-bold w-24">定價</label>
-            <span class="absolute left-3 text-gray-400 text-sm pointer-events-none">HK$</span>
-            <input type="number" value="${pkg.price}" onchange="updatePkg(${i}, 'price', this.value)" class="bg-transparent taste-input w-full pl-9 text-pm-green dark:text-pm-oak font-bold">
+            <label class="sm:hidden text-[9px] text-gray-400 uppercase font-bold w-24">定價</label>
+            <span class="absolute left-3 text-gray-400 text-xs pointer-events-none">HK$</span>
+            <input type="number" value="${pkg.price}" onchange="updatePkg(${i}, 'price', this.value)" class="bg-transparent taste-input w-full pl-9 text-pm-green dark:text-pm-oak font-bold text-xs">
           </div>
           <div class="w-full sm:col-span-3 relative flex items-center">
-            <label class="sm:hidden text-[10px] text-gray-400 uppercase font-bold w-24">包底地租</label>
-            <span class="absolute left-3 text-gray-400 text-sm pointer-events-none">HK$</span>
-            <input type="number" value="${pkg.studioLimit || 0}" onchange="updatePkg(${i}, 'studioLimit', this.value)" class="bg-transparent taste-input w-full pl-9 text-gray-900 dark:text-white font-medium">
+            <label class="sm:hidden text-[9px] text-gray-400 uppercase font-bold w-24">包底地租上限</label>
+            <span class="absolute left-3 text-gray-400 text-xs pointer-events-none">HK$</span>
+            <input type="number" value="${pkg.studioLimit || 0}" onchange="updatePkg(${i}, 'studioLimit', this.value)" class="bg-transparent taste-input w-full pl-9 text-gray-900 dark:text-white font-semibold text-xs">
           </div>
-          <div class="w-full sm:col-span-1 flex justify-end sm:justify-center mt-2 sm:mt-0">
-            <button onclick="removePkg(${i})" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100" title="刪除此套餐">
+          <div class="w-full sm:col-span-1 flex justify-end sm:justify-center mt-1 sm:mt-0">
+            <button onclick="removePkg(${i})" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors" title="移除此項目">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </div>
@@ -301,7 +278,7 @@
 
     function renderTags() {
       if (tags.length === 0) {
-          document.getElementById('tag-list').innerHTML = `<div class="p-8 text-center text-sm text-gray-400">目前沒有設定任何標籤</div>`;
+          document.getElementById('tag-list').innerHTML = `<div class="p-8 text-center text-xs text-gray-400">目前核心系統庫無任何標籤配置紀錄</div>`;
           return;
       }
 
@@ -309,22 +286,22 @@
         const currentOpt = colorOptions.find(opt => opt.val === tag.color) || colorOptions[0];
         
         return `
-        <div class="px-6 py-4 flex flex-col sm:grid sm:grid-cols-12 gap-3 sm:gap-4 items-start sm:items-center hover:bg-gray-50 dark:hover:bg-[#1A211D]/30 transition-colors group">
+        <div class="row-transition px-6 py-3.5 flex flex-col sm:grid sm:grid-cols-12 gap-3 sm:gap-4 items-start sm:items-center hover:bg-gray-50/50 dark:hover:bg-[#1A211D]/30 transition-colors group">
           <div class="w-full sm:col-span-7">
-            <label class="sm:hidden text-[10px] text-gray-400 uppercase font-bold mb-1 block">標籤名稱</label>
-            <input type="text" value="${tag.name}" onchange="updateTag(${i}, 'name', this.value)" class="bg-transparent taste-input w-full text-gray-900 dark:text-white font-semibold" placeholder="輸入標籤名稱">
+            <label class="sm:hidden text-[9px] text-gray-400 uppercase font-bold mb-1 block">標籤名稱</label>
+            <input type="text" value="${tag.name}" onchange="updateTag(${i}, 'name', this.value)" class="taste-input w-full text-gray-900 dark:text-white font-bold text-xs" placeholder="輸入標籤名稱">
           </div>
           <div class="w-full sm:col-span-4 relative flex items-center">
-            <label class="sm:hidden text-[10px] text-gray-400 uppercase font-bold w-20">顏色</label>
+            <label class="sm:hidden text-[9px] text-gray-400 uppercase font-bold w-20">渲染色彩</label>
             <div class="relative w-full">
-                <div class="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full shadow-sm pointer-events-none" style="background-color: ${currentOpt.dot}"></div>
-                <select onchange="updateTag(${i}, 'color', this.value)" class="bg-transparent taste-select taste-input w-full pl-9 text-sm text-gray-700 dark:text-gray-300 font-medium">
+                <div class="absolute left-3 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full shadow-sm pointer-events-none" style="background-color: ${currentOpt.dot}"></div>
+                <select onchange="updateTag(${i}, 'color', this.value)" class="bg-transparent taste-select taste-input w-full pl-8 text-xs text-gray-600 dark:text-gray-400 font-semibold cursor-pointer">
                   ${colorOptions.map(opt => `<option value="${opt.val}" ${tag.color === opt.val ? 'selected' : ''}>${opt.label}</option>`).join('')}
                 </select>
             </div>
           </div>
-          <div class="w-full sm:col-span-1 flex justify-end sm:justify-center mt-2 sm:mt-0">
-            <button onclick="removeTag(${i})" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors opacity-100 sm:opacity-0 group-hover:opacity-100" title="刪除此標籤">
+          <div class="w-full sm:col-span-1 flex justify-end sm:justify-center mt-1 sm:mt-0">
+            <button onclick="removeTag(${i})" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors" title="移除此項目">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
           </div>
@@ -335,40 +312,51 @@
 
     window.updatePkg = (i, key, val) => { packages[i][key] = (key === 'name' ? val : Number(val)); }; 
     window.removePkg = (i) => { packages.splice(i, 1); renderPackages(); };
-    document.getElementById('btn-add-pkg').onclick = () => { packages.push({ name: "新套餐", price: 0, studioLimit: 0 }); renderPackages(); };
+    document.getElementById('btn-add-pkg').onclick = () => { packages.push({ name: "新拍攝套餐項目", price: 0, studioLimit: 0 }); renderPackages(); };
     
+    // [SKILL: Code Review] Defensive serialization and saving strategy
     const btnSavePkg = document.getElementById('btn-save-pkgs'); 
     const txtSavePkg = document.getElementById('text-save-pkgs');
     btnSavePkg.onclick = async () => { 
+        // [SKILL: Code Review] Clean out empty data structures defensively
+        const sanitizedList = packages.filter(p => p.name.trim() !== "");
+        
         txtSavePkg.innerText = "儲存中..."; 
         btnSavePkg.classList.add('opacity-70', 'cursor-not-allowed');
         try {
-            await setDoc(doc(db, "Settings", "packages_config"), { list: packages }); 
-            showToast("套餐設定已儲存");
+            await setDoc(doc(db, "Settings", "packages_config"), { list: sanitizedList }); 
+            showToast("服務套餐配置核心庫修改已套用成功");
+            packages = sanitizedList;
+            renderPackages();
         } catch(e) {
-            showToast("儲存失敗", "error");
+            showToast("系統寫入數據庫核心出錯", "error");
         } finally {
-            txtSavePkg.innerText = "儲存套餐設定"; 
+            txtSavePkg.innerText = "儲存套餐"; 
             btnSavePkg.classList.remove('opacity-70', 'cursor-not-allowed');
         }
     };
 
     window.updateTag = (i, key, val) => { tags[i][key] = val; if(key === 'color') renderTags(); }; 
     window.removeTag = (i) => { tags.splice(i, 1); renderTags(); };
-    document.getElementById('btn-add-tag').onclick = () => { tags.push({ name: "新標籤", color: colorOptions[0].val }); renderTags(); };
+    document.getElementById('btn-add-tag').onclick = () => { tags.push({ name: "全新核心分類標籤", color: colorOptions[0].val }); renderTags(); };
     
     const btnSaveTag = document.getElementById('btn-save-tags'); 
     const txtSaveTag = document.getElementById('text-save-tags');
-    btnSaveTag.onclick = async () => { 
+    btnSaveTag.onclick = async () => {
+        // [SKILL: Code Review] Clean out empty data structures defensively
+        const sanitizedTags = tags.filter(t => t.name.trim() !== "");
+        
         txtSaveTag.innerText = "儲存中..."; 
         btnSaveTag.classList.add('opacity-70', 'cursor-not-allowed');
         try {
-            await setDoc(doc(db, "Settings", "tags_config"), { list: tags }); 
-            showToast("標籤設定已儲存");
+            await setDoc(doc(db, "Settings", "tags_config"), { list: sanitizedTags }); 
+            showToast("分類標籤配置核心庫修改已套用成功");
+            tags = sanitizedTags;
+            renderTags();
         } catch(e) {
-            showToast("儲存失敗", "error");
+            showToast("系統寫入數據庫核心出錯", "error");
         } finally {
-            txtSaveTag.innerText = "儲存標籤設定"; 
+            txtSaveTag.innerText = "儲存標籤"; 
             btnSaveTag.classList.remove('opacity-70', 'cursor-not-allowed');
         }
     };
