@@ -2,7 +2,7 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <script>if(!sessionStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
+  <script>if(!sessionStorage.getItem('pm_admin_logged') && !localStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
   <script>
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -190,7 +190,7 @@
 
           <div class="grid grid-cols-3 gap-3 bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-transparent mt-2">
             <div>
-              <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">額外同行人數/寵物</label>
+              <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">額外人數/寵物</label>
               <input type="number" id="extraPaxCount" value="0" min="0" class="taste-input w-full rounded-lg text-xs font-bold text-pm-oak text-center">
             </div>
             <div>
@@ -345,7 +345,7 @@
     let availableTags = [];
     let currentPets = [];
     let selectedTags = [];
-    let originalClientId = ""; // 用來追蹤編輯模式，避免重複建立客人
+    let originalClientId = ""; 
 
     async function initPage() {
       try {
@@ -560,7 +560,6 @@
         let clientId = originalClientId;
         const clientsRef = collection(db, "Clients");
         
-        // [防禦修復] 編輯模式時只更新不重複新增 Client
         if (editId && clientId) {
             await updateDoc(doc(db, "Clients", clientId), { name, phone, instagram, email, address });
         } else {
@@ -574,7 +573,7 @@
 
         const orderPayload = {
           clientId,
-          tags: selectedTags, // [修復] 儲存所選的分類標籤
+          tags: selectedTags, 
           shootDate: document.getElementById('shootDate').value,
           shootTime: document.getElementById('shootTime').value,
           shootLocation: document.getElementById('shootLocation').value,
