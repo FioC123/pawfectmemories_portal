@@ -15,7 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script id="tailwind-config">
     tailwind.config = { 
-      darkMode: 'class', // 啟用 class-based dark mode
+      darkMode: 'class',
       theme: { 
         extend: { 
           colors: { 
@@ -24,10 +24,9 @@
             "pm-cream": "#FDFBF7", 
             "pm-accent": "#E8B4B8",
             "whatsapp": "#25D366",
-            // 專屬高級暗黑模式色彩
-            "pm-dark-bg": "#161916",       // 深炭灰偏墨綠 (主背景)
-            "pm-dark-surface": "#1C211D",  // 稍微淺一點嘅表面 (卡片/欄位)
-            "pm-dark-border": "#2A302B"    // 柔和嘅暗色邊框
+            "pm-dark-bg": "#161916",       
+            "pm-dark-surface": "#1C211D",  
+            "pm-dark-border": "#2A302B"    
           }, 
           fontFamily: { 
             serif: ['"Playfair Display"', 'serif'], 
@@ -41,9 +40,18 @@
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     body { min-height: 100dvh; overflow: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
-    /* Dark Mode 下的拖拽殘影設定 */
-    .sortable-ghost { opacity: 0.6; background-color: #FDFBF7; border: 2px dashed #D4A373; border-radius: 0.75rem; }
+    
+    /* 拖拽微交互效果 */
+    .sortable-ghost { opacity: 0.4; background-color: #FDFBF7; border: 2px dashed #D4A373; border-radius: 0.75rem; }
     .dark .sortable-ghost { background-color: #161916; border-color: #D4A373; }
+    .sortable-drag { transform: scale(1.02) rotate(2deg); opacity: 0.95 !important; cursor: grabbing !important; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.15); }
+    
+    /* Skeleton Loading 動畫 */
+    @keyframes pulse-soft {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .5; }
+    }
+    .animate-pulse-soft { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
   </style>
 </head>
 <body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans h-[100dvh] flex flex-col selection:bg-pm-oak selection:text-white">
@@ -54,14 +62,11 @@
         <h1 class="font-serif text-2xl md:text-3xl text-pm-green dark:text-[#D1E2C7] font-bold leading-none tracking-tight">Pawfect Memories</h1>
         <span class="text-[9px] md:text-[10px] text-pm-oak font-bold tracking-[0.3em] uppercase mt-0.5 ml-0.5">Admin Desk</span>
       </div>
-      <button onclick="window.open('tracker.html', '_blank');" class="ml-2 w-8 h-8 flex items-center justify-center rounded-lg bg-gray-50 dark:bg-pm-dark-border text-gray-400 dark:text-gray-300 hover:text-pm-green dark:hover:text-pm-oak transition-colors" title="前往客人查詢頁">
-        <span class="material-symbols-outlined text-[18px]">open_in_new</span>
-      </button>
     </div>
     
-    <div class="hidden md:flex relative w-64 mx-4">
-      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-[18px]">search</span>
-      <input type="text" id="global-search" placeholder="搜尋客人、寵物、標籤..." class="w-full bg-gray-50 dark:bg-[#131613] border border-gray-200 dark:border-pm-dark-border text-gray-700 dark:text-gray-200 text-sm rounded-full pl-9 pr-4 py-2 focus:outline-none focus:border-pm-green dark:focus:border-pm-oak focus:ring-1 focus:ring-pm-green dark:focus:ring-pm-oak transition-all">
+    <div class="hidden md:flex relative w-64 mx-4 group">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-[18px] transition-colors group-focus-within:text-pm-green dark:group-focus-within:text-pm-oak">search</span>
+      <input type="text" id="global-search" placeholder="搜尋 (按 '/' 快速定位)..." class="w-full bg-gray-50 dark:bg-[#131613] border border-gray-200 dark:border-pm-dark-border text-gray-700 dark:text-gray-200 text-sm rounded-full pl-9 pr-4 py-2 focus:outline-none focus:border-pm-green dark:focus:border-pm-oak focus:ring-1 focus:ring-pm-green dark:focus:ring-pm-oak transition-all shadow-sm focus:shadow-md">
     </div>
 
     <div class="flex items-center gap-2 md:gap-4 shrink-0">
@@ -153,6 +158,22 @@
     </div>
   </main>
 
+  <div id="custom-confirm-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity opacity-0">
+    <div class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-3xl shadow-2xl max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300 border border-gray-100 dark:border-pm-dark-border">
+      <div class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center mb-4">
+        <span class="material-symbols-outlined text-red-500 dark:text-red-400 text-2xl">warning</span>
+      </div>
+      <h3 class="text-xl font-serif font-bold text-gray-900 dark:text-white mb-2">確定刪除預約？</h3>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mb-8 leading-relaxed">刪除後此訂單的所有資料將無法復原。請確認是否繼續操作。</p>
+      <div class="flex justify-end gap-3">
+        <button id="modal-cancel-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-pm-dark-border transition-colors">取消保留</button>
+        <button id="modal-confirm-btn" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600 text-white shadow-md transition-colors active:scale-95">確認刪除</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, doc, updateDoc, collection, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -173,10 +194,85 @@
       }
     };
 
-    window.deleteOrder = async function(orderId) {
-      if (!confirm("⚠️ 警告：確定要刪除這筆預約單嗎？\n刪除後將無法復原！")) return;
-      try { await deleteDoc(doc(db, "Orders", orderId)); window.location.reload(); } 
-      catch (e) { alert("刪除失敗，請檢查網路！"); }
+    // 鍵盤快捷鍵 '/' 快速搜尋
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        document.getElementById('global-search').focus();
+      }
+    });
+
+    // 輕量提示 (Toast)
+    window.showToast = function(msg, type='success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgColor = type === 'error' ? 'bg-red-500' : 'bg-pm-green dark:bg-pm-oak';
+      const textColor = type === 'error' ? 'text-white' : 'text-white dark:text-[#2A1E11]';
+      const icon = type === 'error' ? 'error' : 'check_circle';
+      
+      toast.className = `px-5 py-3 rounded-xl shadow-xl ${textColor} text-sm font-medium transform transition-all translate-y-10 opacity-0 flex items-center gap-3 ${bgColor}`;
+      toast.innerHTML = `<span class="material-symbols-outlined text-[20px]">${icon}</span> ${msg}`;
+      
+      container.appendChild(toast);
+      
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-10', 'opacity-0');
+      });
+      
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // 自訂 Modal 刪除邏輯
+    let deleteTargetId = null;
+    const modal = document.getElementById('custom-confirm-modal');
+    const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+
+    function closeModal() {
+      modal.classList.add('opacity-0');
+      modal.firstElementChild.classList.remove('scale-100');
+      modal.firstElementChild.classList.add('scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+      deleteTargetId = null;
+    }
+
+    window.deleteOrder = function(orderId) {
+      deleteTargetId = orderId;
+      modal.classList.remove('hidden');
+      // Trigger reflow for animation
+      void modal.offsetWidth; 
+      modal.classList.remove('opacity-0');
+      modal.firstElementChild.classList.remove('scale-95');
+      modal.firstElementChild.classList.add('scale-100');
+    };
+
+    modalCancelBtn.onclick = closeModal;
+    modalConfirmBtn.onclick = async function() {
+      if (!deleteTargetId) return;
+      const id = deleteTargetId;
+      closeModal();
+      
+      // 顯示 loading 狀態嘅卡片
+      const card = document.querySelector(`[data-order-id="${id}"]`);
+      if(card) {
+        card.style.opacity = '0.5';
+        card.style.pointerEvents = 'none';
+      }
+
+      try { 
+        await deleteDoc(doc(db, "Orders", id)); 
+        if(card) card.remove();
+        showToast("訂單已成功刪除");
+        // 重新檢查 Empty State
+        checkEmptyStates();
+      } 
+      catch (e) { 
+        if(card) { card.style.opacity = '1'; card.style.pointerEvents = 'auto'; }
+        showToast("刪除失敗，請檢查網絡連線", "error"); 
+      }
     };
 
     let eventsByDate = {};
@@ -191,7 +287,54 @@
       return `${y}-${m}-${d}`;
     }
 
+    // 生成 Skeleton HTML
+    function getSkeletonHTML() {
+      return `
+        <div class="bg-gray-50 dark:bg-pm-dark-surface border border-gray-100 dark:border-pm-dark-border p-4 rounded-xl flex items-center gap-3 animate-pulse-soft mb-3">
+          <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-pm-dark-border shrink-0"></div>
+          <div class="flex-1">
+            <div class="h-4 bg-gray-200 dark:bg-pm-dark-border rounded w-3/4 mb-2"></div>
+            <div class="h-3 bg-gray-200 dark:bg-pm-dark-border rounded w-1/2"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 生成 Empty State HTML
+    function getEmptyStateHTML(type) {
+      const msg = type === 'calendar' ? '是日無預約行程' : '暫無處理訂單';
+      const icon = type === 'calendar' ? 'event_busy' : 'inbox';
+      return `
+        <div class="flex flex-col items-center justify-center h-32 text-gray-400 dark:text-gray-500 opacity-60 pointer-events-none empty-state-marker">
+          <span class="material-symbols-outlined text-3xl mb-2">${icon}</span>
+          <p class="text-xs font-medium">${msg}</p>
+        </div>
+      `;
+    }
+
+    function checkEmptyStates() {
+      ['col-new', 'col-basic-edit', 'col-pick-photos', 'col-final-retouch', 'col-completed'].forEach(colId => {
+        const col = document.getElementById(colId);
+        // 如果無 kanban-card，就顯示 Empty state
+        if (col.querySelectorAll('.kanban-card').length === 0) {
+          if (!col.querySelector('.empty-state-marker')) {
+            col.innerHTML = getEmptyStateHTML('kanban');
+          }
+        } else {
+          const emptyMarker = col.querySelector('.empty-state-marker');
+          if (emptyMarker) emptyMarker.remove();
+        }
+      });
+    }
+
     async function loadOrders() {
+      const colIds = ['col-new', 'col-basic-edit', 'col-pick-photos', 'col-final-retouch', 'col-completed'];
+      
+      // 1. 顯示 Skeleton Loading
+      colIds.forEach(id => {
+        document.getElementById(id).innerHTML = getSkeletonHTML() + getSkeletonHTML();
+      });
+
       try {
         const ordersSnap = await getDocs(collection(db, "Orders"));
         let monthCount = 0; 
@@ -199,11 +342,8 @@
         const now = new Date();
         const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         
-        document.getElementById('col-new').innerHTML = '';
-        document.getElementById('col-basic-edit').innerHTML = '';
-        document.getElementById('col-pick-photos').innerHTML = '';
-        document.getElementById('col-final-retouch').innerHTML = '';
-        document.getElementById('col-completed').innerHTML = '';
+        // 清除 Skeleton
+        colIds.forEach(id => document.getElementById(id).innerHTML = '');
         eventsByDate = {};
 
         for (let docSnap of ordersSnap.docs) {
@@ -288,7 +428,6 @@
           const container = document.getElementById(colId) || document.getElementById('col-new');
           const searchStr = `${clientName} ${displayName} ${data.package || ''} ${tagsSearchString}`.toLowerCase();
 
-          // 卡片本體：加入 dark 模式下的 class
           container.insertAdjacentHTML('beforeend', `
             <div data-order-id="${orderId}" data-search="${searchStr}" class="kanban-card bg-white dark:bg-[#242A26] border border-gray-100 dark:border-[#2A302B] p-4 rounded-xl flex items-center justify-between cursor-pointer border-l-4 border-l-pm-green dark:border-l-[#8DBA76] hover:shadow-lg dark:hover:shadow-black/40 hover:border-l-pm-oak dark:hover:border-l-pm-oak transition-all mb-3 shadow-sm group">
               <div onclick="window.location.href='detail.html?id=${orderId}'" class="flex items-center gap-3 md:gap-4 flex-1 overflow-hidden">
@@ -319,6 +458,9 @@
         document.getElementById('stat-count').innerText = monthCount;
         document.getElementById('stat-revenue').innerText = "HK$ " + totalRev; 
         
+        // 檢查並加入 Empty States
+        checkEmptyStates();
+
         const searchInput = document.getElementById('global-search');
         if (searchInput) {
           searchInput.addEventListener('input', (e) => {
@@ -329,7 +471,10 @@
             });
           });
         }
-      } catch (err) { console.error("載入失敗:", err); }
+      } catch (err) { 
+        colIds.forEach(id => document.getElementById(id).innerHTML = getEmptyStateHTML('kanban'));
+        showToast("無法載入資料，請檢查網絡連線", "error");
+      }
     }
 
     window.renderCustomCalendar = function() {
@@ -375,7 +520,7 @@
       header.innerText = dateStr; header.classList.remove('hidden');
       
       if (events.length === 0) {
-        list.innerHTML = '<p class="text-center text-gray-400 dark:text-gray-500 text-sm py-8 bg-gray-50 dark:bg-[#131613] rounded-xl border border-gray-100 dark:border-pm-dark-border">是日無預約行程</p>';
+        list.innerHTML = getEmptyStateHTML('calendar');
       } else {
         list.innerHTML = events.map(ev => `
           <div onclick="window.location.href='${ev.url}'" class="bg-gray-50 dark:bg-[#242A26] hover:bg-pm-green/5 dark:hover:bg-pm-oak/5 transition-colors p-4 rounded-xl flex justify-between items-center cursor-pointer border-l-[6px] border border-gray-100 dark:border-pm-dark-border" style="border-left-color:${ev.color === '#2D4F1E' ? (document.documentElement.classList.contains('dark') ? '#8DBA76' : '#2D4F1E') : ev.color}">
@@ -403,16 +548,28 @@
         if (el && typeof Sortable !== 'undefined') {
           new Sortable(el, {
             group: 'kanban',
-            animation: 150,
+            animation: 250, // 增加動畫順滑度
+            dragClass: 'sortable-drag', // 加入拖曳實體感 class
             delay: window.innerWidth < 768 ? 200 : 0,
             delayOnTouchOnly: true,
             onEnd: async function(evt) {
               const itemEl = evt.item;
               const targetColId = evt.to.id;
               const orderId = itemEl.getAttribute('data-order-id');
+              
+              // 拖曳結束後即時檢查兩邊嘅 Empty States
+              checkEmptyStates();
+
               if (orderId && evt.from.id !== evt.to.id) {
-                try { await updateDoc(doc(db, "Orders", orderId), { status: targetColId }); } 
-                catch(e) { evt.from.appendChild(itemEl); }
+                try { 
+                  await updateDoc(doc(db, "Orders", orderId), { status: targetColId }); 
+                  showToast("狀態已更新");
+                } 
+                catch(e) { 
+                  evt.from.appendChild(itemEl); 
+                  checkEmptyStates(); // 還原狀態
+                  showToast("更新失敗，請檢查網絡", "error");
+                }
               }
             }
           });
@@ -426,7 +583,6 @@
     document.getElementById('next-month-btn').onclick = () => { currentCalMonth++; if(currentCalMonth>11){currentCalMonth=0;currentCalYear++;} window.renderCustomCalendar(); };
 
     document.getElementById('btn-view-kanban').onclick = function() {
-      // 判斷當前模式賦予正確按鈕顏色
       const isDark = document.documentElement.classList.contains('dark');
       this.className = `px-5 py-2.5 rounded-lg text-sm font-bold shadow-md flex items-center gap-2 transition-all ${isDark ? 'bg-pm-oak text-[#2A1E11]' : 'bg-pm-green text-white'}`;
       document.getElementById('btn-view-calendar').className = "px-5 py-2.5 rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-pm-green dark:hover:text-white transition-all flex items-center gap-2";
