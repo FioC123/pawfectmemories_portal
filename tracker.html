@@ -46,12 +46,9 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     
-    /* 優雅嘅進度軸線條 */
     .step-line { position: absolute; top: 24px; left: 19px; bottom: -24px; width: 2px; background: #E5E7EB; z-index: 0; transition: background 0.4s ease; }
     .dark .step-line { background: #1E2621; }
     .step-active .step-line { background: #C4905E; }
-    
-    /* 隱藏最後一步嘅線條 */
     #s-5 .step-line { display: none; }
   </style>
 </head>
@@ -64,7 +61,8 @@
     <div class="flex flex-col items-center text-center">
       <h1 class="font-serif text-2xl text-pm-green dark:text-[#D1E2C7] font-bold tracking-tight">Pawfect Memories</h1>
     </div>
-    <div class="w-10 h-10"></div> </header>
+    <div class="w-10 h-10"></div>
+  </header>
 
   <main class="px-5 md:px-8 max-w-2xl mx-auto mt-4">
     
@@ -138,27 +136,27 @@
         <div id="stepper" class="space-y-8 pl-2">
           <div class="flex gap-5 relative" id="s-1">
               <div class="step-line"></div>
-              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="clock" class="w-4 h-4 text-gray-400"></i></div>
+              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="clock" class="w-4 h-4"></i></div>
               <div class="pt-2"><p class="font-bold text-gray-400 s-title transition-colors">新預約</p><p class="text-xs text-gray-400 mt-1">已收到您的預約申請</p></div>
           </div>
           <div class="flex gap-5 relative" id="s-2">
               <div class="step-line"></div>
-              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="sliders" class="w-4 h-4 text-gray-400"></i></div>
+              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="sliders" class="w-4 h-4"></i></div>
               <div class="pt-2"><p class="font-bold text-gray-400 s-title transition-colors">基本修輯</p><p class="text-xs text-gray-400 mt-1">正在處理光暗及色調優化</p></div>
           </div>
           <div class="flex gap-5 relative" id="s-3">
               <div class="step-line"></div>
-              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="image" class="w-4 h-4 text-gray-400"></i></div>
+              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="image" class="w-4 h-4"></i></div>
               <div class="pt-2"><p class="font-bold text-gray-400 s-title transition-colors">揀相</p><p class="text-xs text-gray-400 mt-1">相片已備妥，請挑選精修相片</p></div>
           </div>
           <div class="flex gap-5 relative" id="s-4">
               <div class="step-line"></div>
-              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="wand-2" class="w-4 h-4 text-gray-400"></i></div>
+              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="wand-2" class="w-4 h-4"></i></div>
               <div class="pt-2"><p class="font-bold text-gray-400 s-title transition-colors">精修</p><p class="text-xs text-gray-400 mt-1">正在進行精細人像/寵物修飾</p></div>
           </div>
           <div class="flex gap-5 relative" id="s-5">
               <div class="step-line"></div>
-              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="check" class="w-4 h-4 text-gray-400"></i></div>
+              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="check" class="w-4 h-4"></i></div>
               <div class="pt-2"><p class="font-bold text-gray-400 s-title transition-colors">完成</p><p class="text-xs text-gray-400 mt-1">相片已全數交付，感謝耐心等待</p></div>
           </div>
         </div>
@@ -223,18 +221,6 @@
 
     lucide.createIcons();
 
-    window.toggleDarkMode = function() {
-      const htmlEl = document.documentElement;
-      if (htmlEl.classList.contains('dark')) {
-        htmlEl.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      } else {
-        htmlEl.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      }
-    };
-
-    // Toast Notification (取代原來的 alert)
     window.showToast = function(msg, type='success') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -264,7 +250,6 @@
     const targetOrderId = urlParams.get('id');
 
     if (!targetOrderId) { 
-        // 隱藏查詢結果，顯示自訂 Login Box (呢度已經唔會再彈走，而係顯示輸入框)
         document.getElementById('login-box').classList.remove('hidden');
     } else { 
         loadOrderData(targetOrderId); 
@@ -273,7 +258,6 @@
     document.getElementById('btn-track').onclick = () => {
       const phone = document.getElementById('phone').value.trim(); 
       if(phone.length < 8) return showToast("請輸入正確嘅 8 位數字號碼", "error");
-      // 假設 portal.html 有處理 phone 嘅邏輯，保留原有跳轉
       window.location.href = `portal.html?phone=${phone}`;
     };
 
@@ -295,7 +279,6 @@
         let petNames = pets.length > 0 ? pets.map(p=>p.name).join(' & ') : '未知寵物';
         document.getElementById('res-pet').innerText = `${petNames}`;
         
-        // 頭像設計優化
         let avatarsHTML = '';
         if (pets.length === 0) {
             avatarsHTML = `<div class="flex flex-col items-center gap-2"><div class="w-24 h-24 rounded-full overflow-hidden ring-4 ring-white dark:ring-pm-dark-surface bg-gray-50 dark:bg-[#1A211D] shadow-lg"><img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop"></div></div>`;
@@ -339,30 +322,26 @@
             document.getElementById('res-notes-block').classList.remove('hidden');
         }
         
-        // 進度條邏輯與 UI 更新
+        // 進度條顏色控制 (修復 DOM 問題版)
         const cLv = stepMap[d.status] || 1;
         
-        // Reset all steps
         ['s-1','s-2','s-3','s-4','s-5'].forEach(sId => {
             const el = document.getElementById(sId); el.classList.remove('step-active');
             const icon = el.querySelector('.s-icon'); 
-            icon.classList.remove('bg-pm-oak', 'border-pm-oak');
-            icon.classList.add('bg-gray-100', 'dark:bg-[#1A211D]', 'border-white', 'dark:border-pm-dark-surface');
-            icon.querySelector('i').classList.replace('text-white', 'text-gray-400');
-            el.querySelector('.s-title').classList.replace('text-gray-900', 'text-gray-400');
-            el.querySelector('.s-title').classList.remove('dark:text-white');
+            icon.classList.remove('bg-pm-oak', 'border-pm-oak', 'text-white');
+            icon.classList.add('bg-gray-100', 'dark:bg-[#1A211D]', 'border-white', 'dark:border-pm-dark-surface', 'text-gray-400');
+            el.querySelector('.s-title').classList.remove('text-gray-900', 'dark:text-white');
+            el.querySelector('.s-title').classList.add('text-gray-400');
         });
 
-        // Activate steps up to current
         ['s-1','s-2','s-3','s-4','s-5'].forEach((sId, i) => {
           const el = document.getElementById(sId); const icon = el.querySelector('.s-icon');
           if(i < cLv) { 
               el.classList.add('step-active'); 
-              icon.classList.remove('bg-gray-100', 'dark:bg-[#1A211D]', 'border-white', 'dark:border-pm-dark-surface');
-              icon.classList.add('bg-pm-oak', 'border-pm-oak'); 
-              icon.querySelector('i').classList.replace('text-gray-400', 'text-white'); 
-              el.querySelector('.s-title').classList.replace('text-gray-400', 'text-gray-900');
-              el.querySelector('.s-title').classList.add('dark:text-white');
+              icon.classList.remove('bg-gray-100', 'dark:bg-[#1A211D]', 'border-white', 'dark:border-pm-dark-surface', 'text-gray-400');
+              icon.classList.add('bg-pm-oak', 'border-pm-oak', 'text-white'); 
+              el.querySelector('.s-title').classList.remove('text-gray-400');
+              el.querySelector('.s-title').classList.add('text-gray-900', 'dark:text-white');
           }
         });
 
@@ -372,7 +351,6 @@
             document.getElementById('gallery-url-text').value = d.galleryUrl;
         }
         
-        // 財務卡片邏輯
         const pStat = d.paymentStatus || 'unpaid';
         const price = Number(d.price || 0);
         const dep = d.depositAmount ? Number(d.depositAmount) : Math.floor(price / 2);
@@ -388,14 +366,11 @@
         const bLabelSec = document.getElementById('breakdown-label-secondary');
         const bAmtSec = document.getElementById('breakdown-amount-secondary');
 
-        // Taste: 更優雅嘅顏色設定，唔用刺眼嘅漸變背景
         if (pStat === 'full' || (pStat === 'deposit' && bal <= 0)) {
-            // Full Paid - Soft Green Border
             fCard.classList.add('border-pm-green/30', 'dark:border-[#8DBA76]/30');
             fStat.innerHTML = `<span class="flex items-center gap-1 text-pm-green dark:text-[#8DBA76]"><i data-lucide="check-circle" class="w-4 h-4"></i> 全數已付</span>`;
             fBal.innerText = ""; fBalLabel.innerText = ""; fBreakdown.classList.add('hidden');
         } else if (pStat === 'deposit') {
-            // Deposit - Soft Oak Border
             fCard.classList.add('border-pm-oak/40');
             fStat.innerHTML = `<span class="flex items-center gap-1 text-pm-oak"><i data-lucide="check-circle" class="w-4 h-4"></i> 已付訂金，等待拍攝</span>`;
             fBalLabel.innerText = "尚欠尾數";
@@ -408,7 +383,6 @@
             bAmtSec.innerText = `- HK$ ${(d.depositAmount || dep).toLocaleString()}`;
             fBreakdown.classList.remove('hidden');
         } else {
-            // Unpaid - Soft Red Border
             fCard.classList.add('border-red-500/30');
             fStat.innerHTML = `<span class="flex items-center gap-1 text-red-500 dark:text-red-400"><i data-lucide="x-circle" class="w-4 h-4"></i> 尚未付款</span>`;
             fBalLabel.innerText = "需付訂金";
@@ -423,7 +397,7 @@
         }
         
         document.getElementById('result').classList.remove('hidden');
-        lucide.createIcons(); // 重新渲染剛才 JS 生成嘅圖標
+        lucide.createIcons();
       } catch (err) {
           console.error(err); 
           showToast("讀取資料失敗，請稍後再試！", "error");
