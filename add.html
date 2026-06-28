@@ -1,67 +1,583 @@
 <!DOCTYPE html>
-<html class="dark" lang="zh-Hant">
+<html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
   <script>if(!sessionStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <script>
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@400;500;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
   <script id="tailwind-config">
-    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { "surface-container-high": "#2a2a2a", "surface": "#131313", "primary": "#4edea3", "surface-container-low": "#1c1b1b", "error": "#ffb4ab", "on-surface-variant": "#bbcabf", "on-surface": "#e5e2e1" }, fontFamily: { headline: ['Manrope', 'sans-serif'], body: ['Inter', 'sans-serif'], cursive: ['Dancing Script', 'cursive'] } } } }
+    tailwind.config = { 
+      darkMode: 'class', 
+      theme: { 
+        extend: { 
+          colors: { 
+            "pm-green": "#244018",       
+            "pm-oak": "#C4905E",         
+            "pm-cream": "#FAFAFA",       
+            "pm-dark-bg": "#0B0E0C",       
+            "pm-dark-surface": "#121714",  
+            "pm-dark-border": "#1E2621",
+            "error": "#EF4444"
+          }, 
+          fontFamily: { 
+            serif: ['"Playfair Display"', 'serif'], 
+            sans: ['"Inter"', 'sans-serif'] 
+          },
+          boxShadow: {
+            'taste': '0 4px 24px -8px rgba(0, 0, 0, 0.05)',
+            'taste-dark': '0 4px 24px -8px rgba(0, 0, 0, 0.4)'
+          }
+        } 
+      } 
+    }
   </script>
   <style>
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    body { min-height: max(884px, 100dvh); }
-    input[type="text"], input[type="tel"], input[type="number"], input[type="email"], input[type="date"], input[type="time"], input[type="datetime-local"], select, textarea { width: 100%; border-radius: 0.5rem; border: 1px solid #3c4a42; background-color: #2a2a2a; color: #e5e2e1; padding: 0.75rem 1rem; outline: none; transition: border-color 0.2s; }
-    input:focus, select:focus, textarea:focus { border-color: #4edea3; box-shadow: 0 0 0 1px #4edea3; }
+    body { min-height: 100dvh; transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease; font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
+    
+    /* Frontend Design: 頂級表單輸入框美學 */
+    .form-input {
+      width: 100%; border-radius: 0.75rem; border: 1px solid #F3F4F6; background-color: #F9FAFB; color: #111827; padding: 0.75rem 1rem; font-size: 0.875rem; outline: none; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dark .form-input {
+      border-color: #1E2621; background-color: #1A211D; color: #EAE8E3;
+    }
+    .form-input:focus {
+      border-color: #C4905E; background-color: #FFFFFF; box-shadow: 0 0 0 4px rgba(196, 144, 94, 0.15);
+    }
+    .dark .form-input:focus {
+      border-color: #C4905E; background-color: #121714; box-shadow: 0 0 0 4px rgba(196, 144, 94, 0.15);
+    }
+    
+    /* Tags 樣式優化 */
     .tag-checkbox { display: none; }
-    .tag-label { cursor: pointer; transition: all 0.2s; opacity: 0.5; filter: grayscale(100%); border: 1px solid transparent; }
-    .tag-checkbox:checked + .tag-label { opacity: 1; filter: grayscale(0%); border-color: currentColor; }
+    .tag-label { cursor: pointer; transition: all 0.2s; opacity: 0.6; filter: grayscale(80%); border: 1px solid transparent; }
+    .tag-checkbox:checked + .tag-label { opacity: 1; filter: grayscale(0%); border-color: currentColor; box-shadow: 0 2px 10px -2px currentColor; transform: translateY(-1px); }
+    
+    i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
   </style>
 </head>
-<body class="bg-surface text-on-surface font-body min-h-screen pb-32">
+<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans min-h-screen pb-32 selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white">
   
-  <header class="bg-[#131313] fixed top-0 w-full z-50 h-20 flex justify-between items-center px-6 border-b border-white/5">
+  <header class="bg-white/80 dark:bg-pm-dark-bg/80 backdrop-blur-md border-b border-gray-200/60 dark:border-pm-dark-border fixed top-0 w-full z-50 h-16 md:h-20 flex justify-between items-center px-4 md:px-8 transition-colors duration-400">
     <div class="flex items-center gap-4">
-      <button type="button" onclick="if(document.referrer) { window.history.back(); } else { window.location.href='index.html'; }" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors cursor-pointer">
-        <span class="material-symbols-outlined text-primary">close</span>
+      <button type="button" onclick="if(document.referrer) { window.history.back(); } else { window.location.href='index.html'; }" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-pm-dark-surface text-gray-500 dark:text-gray-400 transition-colors cursor-pointer">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
       </button>
       <div class="flex flex-col cursor-pointer select-none" onclick="if(document.referrer) { window.history.back(); } else { window.location.href='index.html'; }">
-        <h1 class="font-cursive text-xl text-on-surface leading-none tracking-tight">Pawfect Memories</h1>
-        <span class="text-[8px] text-primary font-bold tracking-[0.3em] uppercase mt-0.5 ml-0.5">Photography</span>
+        <h1 class="font-serif text-xl md:text-2xl text-pm-green dark:text-[#D1E2C7] font-bold leading-none tracking-tight" id="page-title">New Booking</h1>
+        <span class="text-[9px] text-pm-oak font-bold tracking-[0.3em] uppercase mt-1 ml-0.5">Editor</span>
       </div>
     </div>
   </header>
 
-  <main class="pt-24 px-6 max-w-2xl mx-auto">
-    <form id="order-form" class="space-y-10">
+  <main class="pt-24 md:pt-32 px-4 md:px-6 max-w-3xl mx-auto">
+    <form id="order-form" class="space-y-8">
       
-      <section class="bg-surface-container-low p-6 rounded-xl border border-white/5">
-        <h3 class="font-bold text-lg text-primary mb-4 flex items-center gap-2"><span class="material-symbols-outlined">person</span> 客人資料</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div><label class="block text-sm mb-1 text-gray-400">稱呼 <span class="text-error">*</span></label><input type="text" id="client-name" required></div>
-          <div><label class="block text-sm mb-1 text-gray-400">聯絡電話 <span class="text-error">*</span></label><input type="tel" id="client-phone" required></div>
-          <div><label class="block text-sm mb-1 text-gray-400">Email</label><input type="email" id="client-email"></div>
-          <div><label class="block text-sm mb-1 text-gray-400">Instagram</label><input type="text" id="client-instagram" placeholder="@username"></div>
-          <div class="md:col-span-2"><label class="block text-sm mb-1 text-gray-400">地址 / 地區</label><input type="text" id="client-address"></div>
+      <section class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
+        <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-6 flex items-center gap-2"><i data-lucide="user" class="w-5 h-5 text-pm-oak"></i> Client Details</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Name <span class="text-error">*</span></label><input type="text" id="client-name" class="form-input" required></div>
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Phone <span class="text-error">*</span></label><input type="tel" id="client-phone" class="form-input" required></div>
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Email</label><input type="email" id="client-email" class="form-input"></div>
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Instagram</label><input type="text" id="client-instagram" class="form-input" placeholder="@username"></div>
+          <div class="md:col-span-2"><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Address / Region</label><input type="text" id="client-address" class="form-input"></div>
           <div class="md:col-span-2">
-            <label class="block text-sm mb-1 text-gray-400">來源平台 (Platform)</label>
-            <select id="order-platform">
-              <option value="">未選擇</option>
+            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Platform</label>
+            <select id="order-platform" class="form-input appearance-none">
+              <option value="">Select Platform</option>
               <option value="IG">Instagram</option>
               <option value="FB">Facebook</option>
               <option value="WhatsApp">WhatsApp</option>
-              <option value="Referral">朋友介紹 (Referral)</option>
-              <option value="Website">網站 (Website)</option>
-              <option value="Others">其他 (Others)</option>
+              <option value="Referral">Referral</option>
+              <option value="Website">Website</option>
+              <option value="Others">Others</option>
             </select>
           </div>
         </div>
       </section>
 
-      <section class="bg-surface-container-low p-6 rounded-xl border border-white/5">
-        <div class="flex items-center justify-between mb-4">
+      <section class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
+        <div class="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-pm-dark-border pb-4">
+          <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white flex items-center gap-2"><i data-lucide="paw-print" class="w-5 h-5 text-pm-oak"></i> Pet Details</h3>
+          <button type="button" id="btn-add-pet" class="text-sm font-medium text-pm-oak bg-pm-oak/10 px-4 py-2 rounded-full hover:bg-pm-oak/20 active:scale-95 transition-all flex items-center gap-1"><i data-lucide="plus" class="w-4 h-4"></i> Add Pet</button>
+        </div>
+        <div id="pets-container" class="space-y-6"></div>
+      </section>
+
+      <section class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
+        <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-6 flex items-center gap-2"><i data-lucide="camera" class="w-5 h-5 text-pm-oak"></i> Shoot & Package</h3>
+        
+        <div id="conflict-warning" class="hidden mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-4 rounded-xl flex items-start gap-3">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500 mt-0.5"></i>
+          <div>
+            <p class="text-sm font-bold text-red-800 dark:text-red-400">Schedule Conflict</p>
+            <p class="text-xs text-red-600 dark:text-red-300 mt-1">There is already a booking scheduled for this date and time. Please double-check.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Shoot Date</label><input type="date" id="shoot-date" class="form-input"></div>
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Shoot Time</label><input type="time" id="shoot-time" class="form-input"></div>
+          
+          <div class="md:col-span-2 flex items-center gap-3 p-4 bg-pm-green/5 dark:bg-[#8DBA76]/10 border border-pm-green/10 dark:border-[#8DBA76]/20 rounded-xl">
+            <input type="checkbox" id="weekday-discount" class="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-pm-green dark:text-[#8DBA76] focus:ring-pm-green dark:focus:ring-[#8DBA76] cursor-pointer" onchange="calculateTotals()">
+            <label for="weekday-discount" class="text-sm text-pm-green dark:text-[#8DBA76] font-semibold cursor-pointer select-none">
+              Apply Weekday Discount (-HK$300) <br><span class="text-gray-500 dark:text-gray-400 font-normal text-xs">(Automatically checked for Mon-Fri. Uncheck manually for public holidays.)</span>
+            </label>
+          </div>
+
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Location</label><input type="text" id="shoot-location" class="form-input" placeholder="e.g. West Kowloon"></div>
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Studio Name</label><input type="text" id="order-studio" class="form-input" placeholder="If applicable"></div>
+          
+          <div class="md:col-span-2">
+            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Select Package</label>
+            <select id="order-package" class="form-input appearance-none" onchange="handlePackageChange()"><option value="">Loading...</option></select>
+          </div>
+          
+          <div class="md:col-span-2 p-5 bg-gray-50 dark:bg-[#1A211D] rounded-xl border border-gray-100 dark:border-pm-dark-border space-y-4">
+            <p class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-pm-dark-border pb-2 mb-3">Extra Charges & Discounts</p>
+            
+            <div class="flex items-center justify-between">
+              <label class="text-sm text-gray-600 dark:text-gray-300">Actual Studio Cost (HK$)</label>
+              <input type="number" id="order-studio-cost" placeholder="0" oninput="calculateTotals()" class="form-input w-24 text-right py-1.5 px-3">
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="text-sm text-gray-600 dark:text-gray-300">Extra Pax / Pet (+HK$300/ea)</label>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500">Package includes 2 Pax 1 Pet.</p>
+              </div>
+              <input type="number" id="extra-pax-count" value="0" min="0" oninput="calculateTotals()" class="form-input w-24 text-right py-1.5 px-3">
+            </div>
+            <div class="flex items-center justify-between">
+              <label class="text-sm text-gray-600 dark:text-gray-300">Kids Under 6 (Free)</label>
+              <input type="number" id="kids-count" value="0" min="0" class="form-input w-24 text-right py-1.5 px-3">
+            </div>
+            <div class="flex items-center justify-between">
+              <label class="text-sm text-gray-600 dark:text-gray-300">Manual Surcharge (MUA/Transport)</label>
+              <input type="number" id="manual-other-fee" value="0" placeholder="0" oninput="calculateTotals()" class="form-input w-24 text-right py-1.5 px-3">
+            </div>
+            
+            <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-pm-dark-border">
+              <div>
+                <label class="text-sm text-pm-oak font-semibold">Manual Discount (-HK$)</label>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500">Special price, VIP, etc.</p>
+              </div>
+              <input type="number" id="manual-discount-fee" value="0" min="0" placeholder="0" oninput="calculateTotals()" class="form-input w-24 text-right py-1.5 px-3 border-pm-oak/40 text-pm-oak focus:ring-pm-oak/20">
+            </div>
+          </div>
+
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Physical Product</label><input type="text" id="order-product" class="form-input" placeholder="e.g. Photo Album"></div>
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Submission Date</label><input type="date" id="submission-date" class="form-input"></div>
+        </div>
+      </section>
+
+      <section class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 relative overflow-hidden transition-colors">
+        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-pm-green to-pm-oak"></div>
+        
+        <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-6 mt-2 flex items-center gap-2"><i data-lucide="credit-card" class="w-5 h-5 text-pm-oak"></i> Payment Details</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Total (HKD)</label><input type="number" id="order-price" readonly class="form-input font-bold text-pm-green dark:text-pm-oak bg-pm-green/5 dark:bg-pm-oak/5 border-pm-green/20 dark:border-pm-oak/20 cursor-not-allowed"></div>
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Total Surcharge (HKD)</label><input type="number" id="other-fee" readonly class="form-input bg-gray-100 dark:bg-[#1A211D] cursor-not-allowed"></div>
+          
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Deposit Paid (HKD)</label><input type="number" id="deposit-amount" placeholder="Auto 50% of Base" oninput="calculateTotals()" class="form-input"></div>
+          <div class="flex flex-col justify-end pb-2">
+            <div class="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl px-4 py-3 text-center">
+              <p id="calculated-balance" class="text-error font-bold text-lg leading-none">Balance: HK$ 0</p>
+            </div>
+          </div>
+
+          <div class="md:col-span-2 border-t border-gray-100 dark:border-pm-dark-border my-2"></div>
+
+          <div class="md:col-span-1">
+            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Payment Status</label>
+            <select id="payment-status" class="form-input appearance-none font-medium">
+              <option value="unpaid">❌ Unpaid</option>
+              <option value="deposit">💳 Deposit Paid</option>
+              <option value="full">✅ Fully Paid</option>
+            </select>
+          </div>
+          <div class="md:col-span-1"></div>
+
+          <div class="md:col-span-1 mt-2">
+              <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Deposit Receipt</label>
+              <div class="flex items-center gap-3">
+                  <input type="file" id="deposit-receipt-file" accept="image/*" class="text-xs text-gray-500 dark:text-gray-400 file:bg-gray-100 dark:file:bg-[#1A211D] file:text-gray-700 dark:file:text-gray-300 file:font-medium file:border-0 file:rounded-lg file:px-4 file:py-2 w-full cursor-pointer hover:file:bg-gray-200 dark:hover:file:bg-pm-dark-border transition-colors">
+                  <a id="preview-deposit-link" href="#" target="_blank" class="hidden text-pm-oak hover:text-pm-green transition-colors" title="View Receipt"><i data-lucide="eye" class="w-5 h-5"></i></a>
+              </div>
+              <input type="hidden" id="existing-deposit-url">
+          </div>
+          
+          <div class="md:col-span-1 mt-2">
+              <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Balance Receipt</label>
+              <div class="flex items-center gap-3">
+                  <input type="file" id="balance-receipt-file" accept="image/*" class="text-xs text-gray-500 dark:text-gray-400 file:bg-gray-100 dark:file:bg-[#1A211D] file:text-gray-700 dark:file:text-gray-300 file:font-medium file:border-0 file:rounded-lg file:px-4 file:py-2 w-full cursor-pointer hover:file:bg-gray-200 dark:hover:file:bg-pm-dark-border transition-colors">
+                  <a id="preview-balance-link" href="#" target="_blank" class="hidden text-pm-oak hover:text-pm-green transition-colors" title="View Receipt"><i data-lucide="eye" class="w-5 h-5"></i></a>
+              </div>
+              <input type="hidden" id="existing-balance-url">
+          </div>
+
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Deposit Time (Auto)</label><input type="datetime-local" id="deposit-date" class="form-input"></div>
+          <div><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Balance Time (Auto)</label><input type="datetime-local" id="balance-date" class="form-input"></div>
+
+          <div class="md:col-span-2 mt-4">
+            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Client Tags</label>
+            <div id="tags-selector-container" class="flex flex-wrap gap-2 p-4 bg-gray-50 dark:bg-[#1A211D] border border-gray-100 dark:border-pm-dark-border rounded-xl min-h-[60px]">Loading...</div>
+          </div>
+          <div class="md:col-span-2 mt-2">
+            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Notes / Special Requests</label>
+            <textarea id="order-notes" rows="3" class="form-input"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <button type="submit" id="btn-submit" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold py-4 rounded-[20px] shadow-lg hover:shadow-xl active:scale-95 transition-all text-xl tracking-wide flex items-center justify-center gap-2">
+        <i data-lucide="save" class="w-5 h-5"></i> <span id="submit-text">Save Booking</span>
+      </button>
+    </form>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, doc, getDoc, getDocs, updateDoc, setDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    lucide.createIcons();
+
+    const editId = new URLSearchParams(window.location.search).get('editId');
+    let editClientId = null;
+    let globalPackages = [];
+    let isInitialLoad = true;
+
+    // --- 自動計算邏輯 ---
+    window.handlePackageChange = function() {
+      const pkgSelect = document.getElementById('order-package');
+      const selectedOption = pkgSelect.options[pkgSelect.selectedIndex];
+      if (!selectedOption) return;
+      
+      const basePrice = Number(selectedOption.getAttribute('data-price') || 0);
+      
+      if (!editId || !isInitialLoad) {
+        document.getElementById('deposit-amount').value = Math.floor(basePrice / 2);
+      }
+      calculateTotals();
+    };
+
+    window.calculateTotals = function() {
+        const pkgSelect = document.getElementById('order-package');
+        const selectedOption = pkgSelect.options[pkgSelect.selectedIndex];
+        if (!selectedOption) return;
+
+        const basePrice = Number(selectedOption.getAttribute('data-price') || 0);
+        const studioLimit = Number(selectedOption.getAttribute('data-limit') || 0);
+        
+        const actualStudioCost = Number(document.getElementById('order-studio-cost').value || 0);
+        const extraPaxCount = Number(document.getElementById('extra-pax-count').value || 0);
+        const manualOtherFee = Number(document.getElementById('manual-other-fee').value || 0);
+        const depositAmount = Number(document.getElementById('deposit-amount').value || 0);
+        const applyDiscount = document.getElementById('weekday-discount').checked;
+        const manualDiscountFee = Number(document.getElementById('manual-discount-fee').value || 0);
+
+        let topUp = 0;
+        if (actualStudioCost > studioLimit && studioLimit > 0) topUp = actualStudioCost - studioLimit;
+        else if (studioLimit === 0 && actualStudioCost > 0) topUp = actualStudioCost;
+
+        const extraPaxCost = extraPaxCount * 300;
+        const totalOtherFee = topUp + extraPaxCost + manualOtherFee;
+        const weekdayDiscountAmt = applyDiscount ? 300 : 0;
+        
+        const total = basePrice + totalOtherFee - weekdayDiscountAmt - manualDiscountFee;
+        const balance = total - depositAmount;
+
+        document.getElementById('order-price').value = total > 0 ? total : 0;
+        document.getElementById('other-fee').value = totalOtherFee;
+        
+        const balEl = document.getElementById('calculated-balance');
+        balEl.innerText = `Balance: HK$ ${balance > 0 ? balance : 0}`;
+        if (balance <= 0 && total > 0) { 
+            balEl.classList.replace('text-error', 'text-pm-green'); 
+            document.documentElement.classList.contains('dark') && balEl.classList.replace('text-pm-green', 'text-[#8DBA76]');
+            document.getElementById('payment-status').value = 'full'; 
+        } else { 
+            balEl.classList.remove('text-pm-green', 'text-[#8DBA76]');
+            balEl.classList.add('text-error'); 
+            document.getElementById('payment-status').value = depositAmount > 0 ? 'deposit' : 'unpaid'; 
+        }
+    }
+
+    async function loadDynamicPackages() {
+        const snap = await getDoc(doc(db, "Settings", "packages_config"));
+        if (snap.exists()) globalPackages = snap.data().list;
+        else globalPackages = [
+            { name: "Pawfect Outdoor", price: 2788, studioLimit: 0 }, 
+            { name: "Pawfect Studio", price: 3888, studioLimit: 1000 }, 
+            { name: "Pawfect Premium", price: 5888, studioLimit: 1000 }, 
+            { name: "Pawfect On-site", price: 2100, studioLimit: 0 }
+        ];
+        
+        const select = document.getElementById('order-package');
+        select.innerHTML = globalPackages.map(pkg => `<option value="${pkg.name}" data-price="${pkg.price}" data-limit="${pkg.studioLimit || 0}">${pkg.name} (HK$${pkg.price}${pkg.studioLimit ? ` | incl. $${pkg.studioLimit} studio` : ''})</option>`).join('');
+        
+        if(!editId) handlePackageChange(); 
+    }
+
+    // --- 日期與時間處理 ---
+    const dateInput = document.getElementById('shoot-date'); 
+    const timeInput = document.getElementById('shoot-time'); 
+    const warningEl = document.getElementById('conflict-warning');
+    
+    dateInput.addEventListener('change', async () => {
+      const selectedDate = dateInput.value; const selectedTime = timeInput.value;
+      if (selectedDate && selectedTime) {
+        const ordersSnap = await getDocs(collection(db, "Orders")); let isConflict = false;
+        ordersSnap.forEach((docSnap) => { const data = docSnap.data(); if (editId && docSnap.id === editId) return; if (data.shootDate === selectedDate && data.shootTime === selectedTime) isConflict = true; });
+        if (isConflict) warningEl.classList.remove('hidden'); else warningEl.classList.add('hidden');
+      }
+      if (selectedDate) {
+        const day = new Date(selectedDate).getDay(); 
+        const discountBox = document.getElementById('weekday-discount');
+        if (!editId || !isInitialLoad) { discountBox.checked = (day >= 1 && day <= 5); }
+        calculateTotals();
+      }
+    }); 
+    timeInput.addEventListener('change', () => { dateInput.dispatchEvent(new Event('change')) });
+
+    function attachAutoDateReader(fileInputId, dateInputId) {
+      document.getElementById(fileInputId).addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file && file.lastModified) {
+          const d = new Date(file.lastModified);
+          const yyyy = d.getFullYear(); const mm = String(d.getMonth() + 1).padStart(2, '0'); const dd = String(d.getDate()).padStart(2, '0');
+          const hh = String(d.getHours()).padStart(2, '0'); const min = String(d.getMinutes()).padStart(2, '0');
+          document.getElementById(dateInputId).value = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+        }
+      });
+    }
+    attachAutoDateReader('deposit-receipt-file', 'deposit-date'); 
+    attachAutoDateReader('balance-receipt-file', 'balance-date');
+
+    // --- 寵物區塊處理 ---
+    let petBlockCount = 0; const petsContainer = document.getElementById('pets-container');
+    function addPetBlock(petData = null) {
+      const blockId = petBlockCount++; const div = document.createElement('div'); 
+      div.className = "pet-block bg-gray-50 dark:bg-[#1A211D] p-5 rounded-[16px] relative border border-gray-100 dark:border-pm-dark-border shadow-sm"; 
+      div.innerHTML = `
+        ${blockId > 0 ? `<button type="button" onclick="this.closest('.pet-block').remove()" class="absolute top-3 right-3 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 w-8 h-8 rounded-full flex items-center justify-center transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>` : ''}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="${blockId > 0 ? 'pr-8' : ''}"><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Pet Name *</label><input type="text" class="form-input pet-name-input" value="${petData?.name || ''}" required></div>
+          <div>
+            <label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Type</label>
+            <select class="form-input pet-type-input appearance-none">
+              <option value="狗" ${petData?.type==='狗'?'selected':''}>Dog (狗)</option>
+              <option value="貓" ${petData?.type==='貓'?'selected':''}>Cat (貓)</option>
+              <option value="兔" ${petData?.type==='兔'?'selected':''}>Rabbit (兔)</option>
+              <option value="其他" ${petData?.type==='野生'?'selected':''}>Others (其他)</option>
+            </select>
+          </div>
+          <div class="md:col-span-2"><label class="block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">Breed (e.g. Shiba)</label><input type="text" class="form-input pet-breed-input" value="${petData?.breed || ''}"></div>
+          <div class="md:col-span-2">
+            <div class="flex items-center gap-4 mt-2">
+              <img class="pet-preview w-16 h-16 rounded-full object-cover ring-2 ring-white dark:ring-[#121714] shadow-sm" src="${petData?.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop'}" style="${petData?.photoUrl ? 'display:block;' : 'display:none;'}">
+              <input type="file" accept="image/*" class="pet-photo-input text-xs text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-white dark:file:bg-[#121714] file:text-pm-oak file:font-medium file:shadow-sm cursor-pointer border-0 p-0 hover:file:bg-gray-50 dark:hover:file:bg-pm-dark-border transition-colors">
+              <input type="hidden" class="pet-existing-photo" value="${petData?.photoUrl || ''}">
+            </div>
+          </div>
+        </div>`;
+      const fileInput = div.querySelector('.pet-photo-input'); const preview = div.querySelector('.pet-preview');
+      fileInput.addEventListener('change', (e) => { const file = e.target.files[0]; if(file) { preview.src = URL.createObjectURL(file); preview.style.display = "block"; } });
+      petsContainer.appendChild(div);
+      lucide.createIcons(); // 渲染新加入嘅 Icon
+    }
+    document.getElementById('btn-add-pet').addEventListener('click', () => addPetBlock());
+
+    // --- 標籤處理 ---
+    let availableTags = []; let selectedTagNames = [];
+    async function loadTags() {
+      const snap = await getDoc(doc(db, "Settings", "tags_config"));
+      if (snap.exists() && snap.data().list) availableTags = snap.data().list;
+      const container = document.getElementById('tags-selector-container');
+      if (availableTags.length === 0) return container.innerHTML = '<span class="text-sm text-gray-400">No tags configured</span>';
+      container.innerHTML = availableTags.map((tag, i) => `
+        <div class="relative inline-block">
+          <input type="checkbox" id="tag-${i}" class="tag-checkbox" value="${tag.name}" data-color="${tag.color}" ${selectedTagNames.includes(tag.name)?'checked':''}>
+          <label for="tag-${i}" class="tag-label inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold bg-white dark:bg-[#121714] ${tag.color} shadow-sm">${tag.name}</label>
+        </div>`).join('');
+    }
+
+    async function init() {
+      await loadDynamicPackages();
+      if (editId) {
+        document.getElementById('page-title').innerText = "Edit Booking";
+        const snap = await getDoc(doc(db, "Orders", editId));
+        if (snap.exists()) {
+          const d = snap.data();
+          if (d.pets && d.pets.length > 0) d.pets.forEach(p => addPetBlock(p)); else addPetBlock();
+          
+          document.getElementById('shoot-date').value = d.shootDate || ""; 
+          document.getElementById('shoot-time').value = d.shootTime || "";
+          document.getElementById('shoot-location').value = d.shootLocation || ""; 
+          document.getElementById('order-studio').value = d.studio || "";
+          document.getElementById('order-package').value = d.package || ""; 
+          document.getElementById('order-studio-cost').value = d.actualStudioCost || "";
+          document.getElementById('extra-pax-count').value = d.extraPaxCount || 0; 
+          document.getElementById('kids-count').value = d.kidsCount || 0;
+          document.getElementById('manual-other-fee').value = d.manualOtherFee || 0;
+          document.getElementById('manual-discount-fee').value = d.manualDiscountFee || 0;
+          document.getElementById('order-price').value = d.price || ""; 
+          document.getElementById('deposit-amount').value = d.depositAmount || "";
+          document.getElementById('other-fee').value = d.otherFee || ""; 
+          document.getElementById('order-notes').value = d.notes || "";
+          document.getElementById('payment-status').value = d.paymentStatus || "unpaid"; 
+          document.getElementById('order-platform').value = d.platform || "";
+          document.getElementById('deposit-date').value = (d.depositDate || "").replace(' ', 'T'); 
+          document.getElementById('balance-date').value = (d.balanceDate || "").replace(' ', 'T');
+          document.getElementById('order-product').value = d.product || ""; 
+          document.getElementById('submission-date').value = d.submissionDate || "";
+          document.getElementById('weekday-discount').checked = (d.discount === 300);
+
+          if (d.depositReceiptUrl) {
+            document.getElementById('existing-deposit-url').value = d.depositReceiptUrl;
+            document.getElementById('preview-deposit-link').href = d.depositReceiptUrl;
+            document.getElementById('preview-deposit-link').classList.remove('hidden');
+          }
+          if (d.balanceReceiptUrl) {
+            document.getElementById('existing-balance-url').value = d.balanceReceiptUrl;
+            document.getElementById('preview-balance-link').href = d.balanceReceiptUrl;
+            document.getElementById('preview-balance-link').classList.remove('hidden');
+          }
+
+          if (d.tags) selectedTagNames = d.tags.map(t => t.name);
+          if (d.clientId) {
+            editClientId = d.clientId; const cSnap = await getDoc(doc(db, "Clients", editClientId));
+            if(cSnap.exists()) { 
+                const c = cSnap.data(); 
+                document.getElementById('client-name').value = c.name || ""; 
+                document.getElementById('client-phone').value = c.phone || ""; 
+                document.getElementById('client-email').value = c.email || ""; 
+                document.getElementById('client-instagram').value = c.instagram || ""; 
+                document.getElementById('client-address').value = c.address || ""; 
+            }
+          }
+          isInitialLoad = false;
+          calculateTotals();
+        }
+      } else { addPetBlock(); isInitialLoad = false; }
+      loadTags();
+    }
+    init();
+
+    // --- 儲存表單與檔案上傳 ---
+    const submitBtn = document.getElementById('btn-submit');
+    const submitText = document.getElementById('submit-text');
+    document.getElementById('order-form').addEventListener('submit', async (e) => {
+      e.preventDefault(); 
+      submitText.innerText = "Uploading data..."; 
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+      
+      try {
+        const checkedTags = []; document.querySelectorAll('.tag-checkbox:checked').forEach(cb => { checkedTags.push({ name: cb.value, color: cb.getAttribute('data-color') }); });
+        const clientPayload = { name: document.getElementById('client-name').value.trim(), phone: document.getElementById('client-phone').value.trim(), email: document.getElementById('client-email').value.trim(), instagram: document.getElementById('client-instagram').value.trim(), address: document.getElementById('client-address').value.trim(), updatedAt: new Date() };
+
+        const petsArray = [];
+        for (let block of document.querySelectorAll('.pet-block')) {
+          const file = block.querySelector('.pet-photo-input').files[0]; let photoUrl = block.querySelector('.pet-existing-photo').value;
+          if (file) { const fileRef = ref(storage, `pets/${Date.now()}_${file.name}`); await uploadBytes(fileRef, file); photoUrl = await getDownloadURL(fileRef); }
+          petsArray.push({ name: block.querySelector('.pet-name-input').value.trim(), type: block.querySelector('.pet-type-input').value, breed: block.querySelector('.pet-breed-input').value.trim(), photoUrl: photoUrl });
+        }
+
+        let depositReceiptUrl = document.getElementById('existing-deposit-url').value; 
+        let balanceReceiptUrl = document.getElementById('existing-balance-url').value;
+        
+        const depFile = document.getElementById('deposit-receipt-file').files[0]; 
+        if (depFile) { 
+            const depRef = ref(storage, `receipts/${Date.now()}_dep_${depFile.name}`); 
+            await uploadBytes(depRef, depFile); 
+            depositReceiptUrl = await getDownloadURL(depRef); 
+        }
+        
+        const balFile = document.getElementById('balance-receipt-file').files[0]; 
+        if (balFile) { 
+            const balRef = ref(storage, `receipts/${Date.now()}_bal_${balFile.name}`); 
+            await uploadBytes(balRef, balFile); 
+            balanceReceiptUrl = await getDownloadURL(balRef); 
+        }
+
+        const isDiscount = document.getElementById('weekday-discount').checked;
+
+        const orderData = {
+          pets: petsArray, 
+          shootDate: document.getElementById('shoot-date').value, 
+          shootTime: document.getElementById('shoot-time').value,
+          shootLocation: document.getElementById('shoot-location').value.trim(), 
+          package: document.getElementById('order-package').value,
+          actualStudioCost: Number(document.getElementById('order-studio-cost').value || 0), 
+          extraPaxCount: Number(document.getElementById('extra-pax-count').value || 0), 
+          kidsCount: Number(document.getElementById('kids-count').value || 0), 
+          manualOtherFee: Number(document.getElementById('manual-other-fee').value || 0),
+          manualDiscountFee: Number(document.getElementById('manual-discount-fee').value || 0),
+          price: Number(document.getElementById('order-price').value || 0), 
+          depositAmount: Number(document.getElementById('deposit-amount').value || 0), 
+          otherFee: Number(document.getElementById('other-fee').value || 0), 
+          discount: isDiscount ? 300 : 0,
+          notes: document.getElementById('order-notes').value.trim(), 
+          paymentStatus: document.getElementById('payment-status').value, 
+          tags: checkedTags, 
+          depositReceiptUrl, 
+          balanceReceiptUrl, 
+          platform: document.getElementById('order-platform').value, 
+          studio: document.getElementById('order-studio').value.trim(),
+          depositDate: document.getElementById('deposit-date').value.replace('T', ' '), 
+          balanceDate: document.getElementById('balance-date').value.replace('T', ' '), 
+          product: document.getElementById('order-product').value.trim(), 
+          submissionDate: document.getElementById('submission-date').value, 
+          updatedAt: new Date()
+        };
+
+        if (editId && editClientId) { 
+            await updateDoc(doc(db, "Clients", editClientId), clientPayload); 
+            await updateDoc(doc(db, "Orders", editId), orderData); 
+        } else {
+          let nextInvoiceNum = 1361; const q = query(collection(db, "Orders"), orderBy("invoiceNumber", "desc"), limit(1)); const numSnap = await getDocs(q);
+          if (!numSnap.empty && numSnap.docs[0].data().invoiceNumber) nextInvoiceNum = numSnap.docs[0].data().invoiceNumber + 1;
+          orderData.invoiceNumber = nextInvoiceNum; orderData.displayId = String(nextInvoiceNum).padStart(7, '0');
+          clientPayload.createdAt = new Date(); const clientRef = await addDoc(collection(db, "Clients"), clientPayload);
+          orderData.clientId = clientRef.id; orderData.status = "col-new"; orderData.createdAt = new Date();
+          await setDoc(doc(db, "Orders", orderData.displayId), orderData);
+        }
+        window.location.href = 'index.html';
+      } catch (error) { 
+          console.error(error);
+          submitText.innerText = "Save Failed"; 
+          submitBtn.classList.replace("bg-pm-green", "bg-red-500"); 
+          submitBtn.classList.replace("dark:bg-pm-oak", "dark:bg-red-500");
+          submitBtn.disabled = false; 
+          submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+          setTimeout(() => { 
+            submitText.innerText = "Save Booking"; 
+            submitBtn.classList.replace("bg-red-500", "bg-pm-green"); 
+            submitBtn.classList.replace("dark:bg-red-500", "dark:bg-pm-oak");
+          }, 3000); 
+      }
+    });
+  </script>
+</body>
+</html>        <div class="flex items-center justify-between mb-4">
           <h3 class="font-bold text-lg text-primary flex items-center gap-2"><span class="material-symbols-outlined">pets</span> 寵物資料</h3>
           <button type="button" id="btn-add-pet" class="text-sm font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg hover:bg-primary/20 transition-colors">+ 新增寵物</button>
         </div>
