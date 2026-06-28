@@ -1,68 +1,115 @@
 <!DOCTYPE html>
-<html class="dark" lang="zh-Hant">
+<html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
   <title>我的預約紀錄 | Pawfect Memories</title>
+  
+  <script>
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+  
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@400;500;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   
   <script id="tailwind-config">
-    tailwind.config = { darkMode: 'class', theme: { extend: { colors: { "surface-container-high": "#2a2a2a", "surface": "#131313", "primary": "#4edea3", "surface-container-low": "#1c1b1b", "outline": "#86948a", "on-surface-variant": "#bbcabf", "on-surface": "#e5e2e1", "error": "#ffb4ab" }, fontFamily: { headline: ['Manrope'], body: ['Inter'], cursive: ['Dancing Script'] } } } }
+    tailwind.config = { 
+      darkMode: 'class',
+      theme: { 
+        extend: { 
+          colors: { 
+            "pm-green": "#244018",       
+            "pm-oak": "#C4905E",         
+            "pm-cream": "#FAFAFA",       
+            "pm-dark-bg": "#0B0E0C",       
+            "pm-dark-surface": "#121714",  
+            "pm-dark-border": "#1E2621",
+            "error": "#EF4444"
+          }, 
+          fontFamily: { 
+            serif: ['"Playfair Display"', 'serif'], 
+            sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] 
+          },
+          boxShadow: {
+            'taste': '0 10px 40px -10px rgba(0, 0, 0, 0.08)',
+            'taste-dark': '0 10px 40px -10px rgba(0, 0, 0, 0.5)'
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        } 
+      } 
+    }
   </script>
   <style>
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    body { min-height: 100dvh; }
-    input[type="tel"] { width: 100%; border-radius: 0.5rem; border: 1px solid #3c4a42; background-color: #2a2a2a; color: #e5e2e1; padding: 1rem; outline: none; transition: border-color 0.2s; font-size: 1.125rem; letter-spacing: 2px; text-align: center;}
-    input[type="tel"]:focus { border-color: #4edea3; box-shadow: 0 0 0 1px #4edea3; }
+    body { min-height: 100dvh; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
+    
+    input[type="tel"] { 
+        font-family: 'Inter', sans-serif; 
+        letter-spacing: 0.15em; 
+        text-align: center; 
+    }
+    input[type="tel"]::placeholder {
+        letter-spacing: normal;
+        font-family: 'Noto Sans HK', sans-serif;
+    }
   </style>
 </head>
-<body class="bg-surface text-on-surface font-body selection:bg-primary/30 flex flex-col items-center">
+<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex flex-col items-center">
 
-  <header class="w-full h-20 flex justify-center items-center px-6 mt-8 mb-4">
-    <div class="flex flex-col items-center select-none">
-      <h1 class="font-cursive text-3xl text-on-surface leading-none">Pawfect Memories</h1>
-      <span class="text-[10px] text-primary font-bold tracking-[0.3em] uppercase mt-1">Client Portal</span>
+  <header class="w-full pt-10 pb-6 px-6 flex justify-center items-center max-w-2xl mx-auto z-10">
+    <div class="flex flex-col items-center text-center select-none">
+      <h1 class="font-serif text-3xl md:text-4xl text-pm-green dark:text-[#D1E2C7] font-bold tracking-tight mb-1">Pawfect Memories</h1>
+      <span class="text-[9px] text-pm-oak font-bold tracking-[0.3em] uppercase">Client Portal</span>
     </div>
   </header>
 
-  <main class="w-full max-w-lg px-6 flex-1 flex flex-col">
+  <main class="w-full max-w-xl px-5 md:px-8 flex-1 flex flex-col relative">
     
-    <div id="login-section" class="flex-1 flex flex-col justify-center pb-32">
-      <div class="bg-surface-container-low p-8 rounded-2xl border border-white/5 shadow-2xl text-center space-y-6">
-        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2 text-primary">
-          <span class="material-symbols-outlined text-3xl">badge</span>
-        </div>
-        <div>
-          <h2 class="text-2xl font-headline font-bold text-on-surface mb-2">查詢預約紀錄</h2>
-          <p class="text-sm text-on-surface-variant">請輸入您預約時登記的聯絡電話號碼</p>
+    <div id="login-section" class="flex-1 flex flex-col justify-center pb-32 transition-all duration-500">
+      <div class="bg-white dark:bg-pm-dark-surface p-8 md:p-10 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 text-center space-y-8 animate-fade-in-up">
+        
+        <div class="space-y-3">
+          <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">查詢預約紀錄</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400">請輸入您預約時登記的聯絡電話號碼</p>
         </div>
         
-        <div id="debug-msg" class="hidden bg-error/10 text-error text-xs p-3 rounded-lg text-left font-bold border border-error/20"></div>
+        <div id="debug-msg" class="hidden bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-sm p-4 rounded-xl text-left font-medium border border-red-100 dark:border-red-500/20 flex items-start gap-2"></div>
 
-        <div class="space-y-6 pt-4">
+        <div class="space-y-6 pt-2">
           <div>
-            <input type="tel" id="phone-input" placeholder="例如: 98765432" autocomplete="tel" onkeypress="if(event.key === 'Enter') document.getElementById('btn-submit').click();">
+            <input type="tel" id="phone-input" placeholder="例如: 98765432" autocomplete="tel" class="w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-900 dark:text-white rounded-2xl px-6 py-4 outline-none focus:border-pm-oak focus:ring-2 focus:ring-pm-oak/20 transition-all shadow-inner dark:shadow-none text-lg font-medium" onkeypress="if(event.key === 'Enter') document.getElementById('btn-submit').click();">
           </div>
-          <button type="button" id="btn-submit" class="w-full bg-primary text-[#003824] font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all text-lg flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined">search</span> 搜尋我的預約
+          <button type="button" id="btn-submit" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold tracking-wide py-4 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all text-lg flex items-center justify-center gap-2">
+            <i data-lucide="search" class="w-5 h-5"></i> 搜尋我的預約
           </button>
         </div>
       </div>
     </div>
 
-    <div id="list-section" class="hidden w-full pb-20 space-y-6">
-      <div class="flex items-center justify-between mb-6">
+    <div id="list-section" class="hidden w-full pb-24 pt-4 space-y-8">
+      <div class="flex items-center justify-between border-b border-gray-200/60 dark:border-pm-dark-border pb-6">
         <div>
-          <h2 class="text-2xl font-headline font-bold text-on-surface">歡迎回來，<span id="display-client-name" class="text-primary"></span>！</h2>
-          <p class="text-sm text-on-surface-variant mt-1">您共有 <span id="display-order-count" class="font-bold text-white">0</span> 筆預約紀錄</p>
+          <h2 class="font-serif text-2xl font-bold text-gray-900 dark:text-white">歡迎回來，<span id="display-client-name" class="text-pm-oak"></span></h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">您共有 <span id="display-order-count" class="font-bold text-gray-900 dark:text-white">0</span> 筆預約紀錄</p>
         </div>
-        <button onclick="logout()" class="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center text-on-surface-variant hover:text-white transition-colors">
-          <span class="material-symbols-outlined">logout</span>
+        <button onclick="logout()" class="w-10 h-10 bg-white dark:bg-pm-dark-surface rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 border border-gray-200/60 dark:border-white/5 shadow-sm transition-colors" title="登出">
+          <i data-lucide="log-out" class="w-5 h-5 ml-1"></i>
         </button>
       </div>
-      <div id="orders-container" class="space-y-4"></div>
+      
+      <div id="orders-container" class="space-y-5"></div>
     </div>
 
   </main>
@@ -75,12 +122,23 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    lucide.createIcons();
+
+    // 支援從 tracker.html 傳入的 URL 參數進行自動登入
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlPhone = urlParams.get('phone');
+    if (urlPhone) {
+        sessionStorage.setItem('client_phone', urlPhone);
+        // 清除 URL 上的號碼，保持乾淨
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     const statusMap = {
-      "col-new": { text: "🆕 新預約", color: "text-on-surface" },
-      "col-basic-edit": { text: "🎨 基本修輯中", color: "text-[#ffb95f]" },
-      "col-pick-photos": { text: "📸 等待揀相", color: "text-[#ffb95f]" },
-      "col-final-retouch": { text: "✨ 精修中", color: "text-primary" },
-      "col-completed": { text: "✅ 已完成", color: "text-primary" }
+      "col-new": { text: "新預約", color: "text-gray-500 dark:text-gray-400", icon: "clock" },
+      "col-basic-edit": { text: "基本修輯中", color: "text-pm-oak", icon: "sliders" },
+      "col-pick-photos": { text: "等待揀相", color: "text-blue-500 dark:text-blue-400", icon: "image" },
+      "col-final-retouch": { text: "精修中", color: "text-purple-500 dark:text-purple-400", icon: "wand-2" },
+      "col-completed": { text: "已完成", color: "text-pm-green dark:text-[#8DBA76]", icon: "check-circle" }
     };
 
     const submitBtn = document.getElementById('btn-submit');
@@ -88,27 +146,29 @@
     const debugMsg = document.getElementById('debug-msg');
 
     function showError(msg) {
-        debugMsg.innerHTML = `<span class="material-symbols-outlined text-[16px] align-middle">error</span> ${msg}`;
+        debugMsg.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 shrink-0"></i> <span>${msg}</span>`;
         debugMsg.classList.remove('hidden');
+        lucide.createIcons();
         resetButton();
     }
 
-    // 自動登入
+    // 自動登入檢查
     const savedPhone = sessionStorage.getItem('client_phone');
     if(savedPhone) {
         phoneInput.value = savedPhone;
         setTimeout(() => { submitBtn.click(); }, 300);
     }
 
-    // 🚨 終極物理防禦：改用 Click Event 🚨
     submitBtn.addEventListener('click', async () => {
       debugMsg.classList.add('hidden');
       
       const phoneVal = phoneInput.value.replace(/[\s-]/g, '');
       if(!phoneVal) { showError("請輸入電話號碼"); return; }
       
-      submitBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> 搜尋中...`;
+      submitBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> 搜尋中...`;
+      submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
       submitBtn.disabled = true;
+      lucide.createIcons();
 
       try {
         const qClient = query(collection(db, "Clients"), where("phone", "==", phoneVal));
@@ -131,68 +191,88 @@
         }
 
         if (orders.length === 0) {
-          showError("搵到你嘅檔案，但目前冇任何預約單！");
+          showError("找到您的檔案，但目前沒有任何預約單紀錄。");
           return;
         }
 
+        // 按日期排序 (最新嘅喺最上)
         orders.sort((a, b) => {
             const dateA = new Date(a.shootDate || '1970-01-01').getTime() || 0;
             const dateB = new Date(b.shootDate || '1970-01-01').getTime() || 0;
             return dateB - dateA;
         });
 
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('list-section').classList.remove('hidden');
-        document.getElementById('display-client-name').innerText = clientName;
-        document.getElementById('display-order-count').innerText = orders.length;
+        // 轉場動畫處理
+        const loginSec = document.getElementById('login-section');
+        const listSec = document.getElementById('list-section');
+        
+        loginSec.style.opacity = '0';
+        loginSec.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            loginSec.classList.add('hidden');
+            listSec.classList.remove('hidden');
+            listSec.classList.add('animate-fade-in-up');
+            
+            document.getElementById('display-client-name').innerText = clientName;
+            document.getElementById('display-order-count').innerText = orders.length;
 
-        const container = document.getElementById('orders-container');
-        container.innerHTML = orders.map(order => {
-            let pets = order.pets || [];
-            if (pets.length === 0 && order.petName) pets = [{ name: order.petName, photoUrl: order.photoUrl }];
-            let petsStr = pets.length > 0 ? pets.map(p => p.name).join(' & ') : '未知寵物';
-            let statusInfo = statusMap[order.status] || { text: "處理中", color: "text-gray-400" };
+            const container = document.getElementById('orders-container');
+            container.innerHTML = orders.map(order => {
+                let pets = order.pets || [];
+                if (pets.length === 0 && order.petName) pets = [{ name: order.petName, photoUrl: order.photoUrl }];
+                let petsStr = pets.length > 0 ? pets.map(p => p.name).join(' & ') : '未知寵物';
+                let statusInfo = statusMap[order.status] || { text: "處理中", color: "text-gray-400", icon: "activity" };
+                
+                // 頭像處理 (重疊設計)
+                let avatarsHTML = '';
+                if (pets.length === 0) {
+                    avatarsHTML = `<img class="w-14 h-14 rounded-full object-cover ring-2 ring-white dark:ring-[#121714] shrink-0 bg-gray-50 dark:bg-pm-dark-surface" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop">`;
+                } else {
+                    pets.slice(0, 3).forEach((p, j) => {
+                        const zIndex = 30 - (j * 10);
+                        const marginClass = j > 0 ? '-ml-5' : '';
+                        const imgSrc = p.photoUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
+                        avatarsHTML += `<img class="w-14 h-14 rounded-full object-cover ring-2 ring-white dark:ring-[#121714] relative shrink-0 bg-gray-50 dark:bg-pm-dark-surface shadow-sm ${marginClass}" style="z-index:${zIndex};" src="${imgSrc}">`;
+                    });
+                }
+                
+                return `
+                <div class="bg-white dark:bg-pm-dark-surface p-6 rounded-[20px] border border-gray-200/60 dark:border-white/5 hover:border-pm-oak/40 dark:hover:border-pm-oak/40 hover:shadow-taste dark:hover:shadow-taste-dark transition-all cursor-pointer relative overflow-hidden group" onclick="window.location.href='tracker.html?id=${order.id}'">
+                  
+                  <div class="absolute right-5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-400 group-hover:bg-pm-oak group-hover:text-white transition-all transform group-hover:translate-x-1">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                  </div>
+                  
+                  <div class="flex items-center justify-between mb-5 pr-10">
+                    <span class="text-[10px] font-bold tracking-[0.2em] uppercase bg-gray-100 dark:bg-[#1A211D] text-gray-500 dark:text-gray-400 px-3 py-1 rounded-full">Booking #${order.id}</span>
+                    <span class="text-xs font-bold ${statusInfo.color} flex items-center gap-1.5 bg-gray-50 dark:bg-transparent px-2 py-0.5 rounded-md"><i data-lucide="${statusInfo.icon}" class="w-3.5 h-3.5"></i> ${statusInfo.text}</span>
+                  </div>
+                  
+                  <div class="flex items-center gap-5 pr-10">
+                    <div class="flex items-center shrink-0 pl-1">${avatarsHTML}</div>
+                    <div class="overflow-hidden">
+                      <h3 class="text-xl font-serif font-bold text-gray-900 dark:text-white mb-1.5 truncate leading-none">${petsStr}</h3>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${order.shootDate || '日期未定'} ${order.shootTime || ''}</p>
+                    </div>
+                  </div>
+                </div>`;
+            }).join('');
             
-            let avatarsHTML = '';
-            if (pets.length === 0) {
-                avatarsHTML = `<img class="w-14 h-14 rounded-full object-cover border-2 border-[#1c1b1b] shrink-0 bg-surface-container-high" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop">`;
-            } else {
-                pets.slice(0, 3).forEach((p, j) => {
-                    const zIndex = 30 - (j * 10);
-                    const marginClass = j > 0 ? '-ml-5' : '';
-                    const imgSrc = p.photoUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
-                    avatarsHTML += `<img class="w-14 h-14 rounded-full object-cover border-2 border-[#1c1b1b] relative shrink-0 bg-surface-container-high shadow-md ${marginClass}" style="z-index:${zIndex};" src="${imgSrc}">`;
-                });
-            }
-            
-            return `
-            <div class="bg-surface-container-low p-5 rounded-xl border border-white/5 hover:border-primary/50 transition-all cursor-pointer relative overflow-hidden group" onclick="window.location.href='tracker.html?id=${order.id}'">
-              <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span class="material-symbols-outlined text-primary text-3xl">chevron_right</span>
-              </div>
-              <div class="flex items-center justify-between mb-4 pr-8">
-                <span class="text-[10px] font-bold tracking-wider uppercase bg-surface-container-high px-2 py-1 rounded text-outline">單號 #${order.id}</span>
-                <span class="text-sm font-bold ${statusInfo.color}">${statusInfo.text}</span>
-              </div>
-              <div class="flex items-center gap-4 mb-4 pr-8">
-                <div class="flex items-center shrink-0 pl-1">${avatarsHTML}</div>
-                <div class="overflow-hidden">
-                  <h3 class="text-xl font-headline font-bold text-white mb-1 truncate">${petsStr}</h3>
-                  <p class="text-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">calendar_month</span> ${order.shootDate || '日期未定'} ${order.shootTime || ''}</p>
-                </div>
-              </div>
-            </div>`;
-        }).join('');
+            lucide.createIcons();
+        }, 400);
 
       } catch (error) {
         console.error(error);
-        showError("系統發生錯誤，請截圖聯絡我們。(Error: " + error.message + ")");
+        showError("系統連線發生錯誤，請稍後再試。");
       }
     });
 
     function resetButton() {
-        submitBtn.innerHTML = `<span class="material-symbols-outlined">search</span> 搜尋我的預約`;
+        submitBtn.innerHTML = `<i data-lucide="search" class="w-5 h-5"></i> 搜尋我的預約`;
         submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+        lucide.createIcons();
     }
 
     window.logout = function() {
