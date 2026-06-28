@@ -6,7 +6,6 @@
   <title>登入 | Pawfect Memories Admin</title>
   
   <script>
-    // 自動跟隨系統或用戶偏好設定 Dark Mode
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
     }
@@ -22,35 +21,16 @@
       theme: { 
         extend: { 
           colors: { 
-            "pm-green": "#244018",       
-            "pm-oak": "#C4905E",         
-            "pm-cream": "#FAFAFA",       
-            "pm-dark-bg": "#0B0E0C",       
-            "pm-dark-surface": "#121714",  
-            "pm-dark-border": "#1E2621"
+            "pm-green": "#244018", "pm-oak": "#C4905E", "pm-cream": "#FAFAFA", "pm-dark-bg": "#0B0E0C", "pm-dark-surface": "#121714", "pm-dark-border": "#1E2621"
           }, 
-          fontFamily: { 
-            serif: ['"Playfair Display"', 'serif'], 
-            sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] 
-          },
-          boxShadow: {
-            'taste': '0 20px 40px -10px rgba(0, 0, 0, 0.08)',
-            'taste-dark': '0 20px 40px -10px rgba(0, 0, 0, 0.6)'
-          },
-          animation: {
-            'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-            'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both'
-          },
+          fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] },
+          boxShadow: { 'taste': '0 20px 40px -10px rgba(0, 0, 0, 0.08)', 'taste-dark': '0 20px 40px -10px rgba(0, 0, 0, 0.6)' },
+          animation: { 'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards', 'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both' },
           keyframes: {
-            fadeInUp: {
-              '0%': { opacity: '0', transform: 'translateY(20px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' }
-            },
+            fadeInUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
             shake: {
-              '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
-              '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-              '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
-              '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+              '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' }, '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+              '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' }, '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
             }
           }
         } 
@@ -60,42 +40,14 @@
   <style>
     body { transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
-    
-    /* 隱藏 Number input 箭咀 */
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
-
-    /* 登入專用 Input 美化 */
-    .login-input {
-        background-color: #F9FAFB !important; /* bg-gray-50 */
-        border: 1px solid transparent !important;
-        transition: all 0.3s ease;
-    }
-    .dark .login-input {
-        background-color: #1A211D !important;
-    }
-    .login-input:focus {
-        background-color: #FFFFFF !important;
-        border-color: #C4905E !important;
-        box-shadow: 0 0 0 3px rgba(196, 144, 94, 0.1) !important;
-        outline: none;
-    }
-    .dark .login-input:focus {
-        background-color: #121714 !important;
-    }
-    
-    /* PIN 碼字元間距 */
-    input[type="password"] {
-        letter-spacing: 0.5em;
-        font-family: 'Inter', sans-serif;
-    }
-    input[type="password"]::placeholder {
-        letter-spacing: normal;
-        font-family: 'Noto Sans HK', sans-serif;
-        font-weight: 400;
-        font-size: 1rem;
-    }
+    .login-input { background-color: #F9FAFB !important; border: 1px solid transparent !important; transition: all 0.3s ease; }
+    .dark .login-input { background-color: #1A211D !important; }
+    .login-input:focus { background-color: #FFFFFF !important; border-color: #C4905E !important; box-shadow: 0 0 0 3px rgba(196, 144, 94, 0.1) !important; outline: none; }
+    .dark .login-input:focus { background-color: #121714 !important; }
+    input[type="password"] { letter-spacing: 0.5em; font-family: 'Inter', sans-serif; }
+    input[type="password"]::placeholder { letter-spacing: normal; font-family: 'Noto Sans HK', sans-serif; font-weight: 400; font-size: 1rem; }
   </style>
 </head>
 <body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans flex flex-col items-center justify-center min-h-screen relative selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white">
@@ -120,7 +72,7 @@
           <input type="password" id="pin" placeholder="輸入管理員 PIN 碼" autocomplete="current-password" inputmode="numeric" class="login-input w-full rounded-2xl px-4 py-4 text-center font-bold text-2xl text-gray-900 dark:text-white placeholder:text-gray-400" onkeypress="if(event.key === 'Enter') checkLogin();">
         </div>
         
-        <button onclick="checkLogin()" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold text-lg py-4 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 group">
+        <button id="btn-login" onclick="checkLogin()" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold text-lg py-4 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 group">
           進入系統 <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
         </button>
       </div>
@@ -135,7 +87,6 @@
   <script>
     lucide.createIcons();
 
-    // 暗黑模式切換
     window.toggleDarkMode = function() {
       const htmlEl = document.documentElement;
       if (htmlEl.classList.contains('dark')) {
@@ -152,29 +103,32 @@
       const pin = pinInput.value;
       const errText = document.getElementById('err');
       const card = document.getElementById('login-card');
+      const loginBtn = document.getElementById('btn-login');
 
-      // 重置動畫與錯誤提示
       card.classList.remove('animate-shake');
       errText.classList.remove('opacity-100');
       errText.classList.add('opacity-0');
 
-      if (pin === '0124') { // 👈 預設密碼
-        // 成功：按鈕特效與跳轉
+      if (pin === '0124') { 
+        // 寫入授權
         sessionStorage.setItem('pm_admin_logged', 'true');
-        document.querySelector('button').innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> 載入中...`;
-        lucide.createIcons();
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 400); // 畀少少時間播載入動畫
-      } else {
-        // 失敗：觸發震動動畫與顯示紅字
-        pinInput.value = ''; // 清空密碼
-        pinInput.focus();
         
-        // 觸發重新繪製以重置 CSS 動畫
+        // 按鈕視覺改變
+        if(loginBtn) {
+            loginBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> 載入中...`;
+            lucide.createIcons();
+            loginBtn.classList.add('opacity-80', 'cursor-not-allowed');
+        }
+        
+        // 強制跳轉 (用 replace 避免禁 Back 掣返轉頭)
+        setTimeout(() => {
+            window.location.replace('index.html'); 
+        }, 400); 
+      } else {
+        pinInput.value = ''; 
+        pinInput.focus();
         void card.offsetWidth; 
         card.classList.add('animate-shake');
-        
         errText.classList.remove('opacity-0');
         errText.classList.add('opacity-100');
       }
