@@ -8,7 +8,7 @@
       document.documentElement.classList.add('dark');
     }
   </script>
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <meta content="width=device-width, maximum-scale=1.0, user-scalable=no" name="viewport">
   <title>營運與財務中心 | Pawfect Memories</title>
   
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -22,124 +22,129 @@
       theme: { 
         extend: { 
           colors: { 
-            "pm-green": "#244018",       
-            "pm-oak": "#C4905E",         
-            "pm-cream": "#FAFAFA",       
-            "pm-dark-bg": "#0B0E0C",       
-            "pm-dark-surface": "#121714",  
-            "pm-dark-border": "#1E2621",
-            "error": "#EF4444"
+            "pm-green": "#244018", "pm-oak": "#C4905E", "pm-cream": "#FAFAFA", "pm-dark-bg": "#0B0E0C", "pm-dark-surface": "#121714", "pm-dark-border": "#1E2621", "error": "#EF4444"
           }, 
-          fontFamily: { 
-            serif: ['"Playfair Display"', 'serif'], 
-            sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] 
-          },
+          fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] },
           boxShadow: {
-            'taste': '0 4px 24px -8px rgba(0, 0, 0, 0.05)',
-            'taste-dark': '0 4px 24px -8px rgba(0, 0, 0, 0.4)'
+            /* [SKILL: Make Interfaces Feel Better] Multi-layered Organic Shadows */
+            'taste': '0 4px 20px -4px rgba(0, 0, 0, 0.04), 0 1px 4px -1px rgba(0, 0, 0, 0.02)', 
+            'taste-dark': '0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 1px 8px -1px rgba(0, 0, 0, 0.3)' 
           }
         } 
       } 
     }
   </script>
   <style>
-    body { min-height: 100dvh; transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease; font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
+    body { min-height: 100dvh; overflow: hidden; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
+    .custom-scrollbar::-webkit-scrollbar { height: 5px; width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.2); border-radius: 99px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 128, 0.4); }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     
-    /* Excel 專用綠色，微調適應 Dark Mode */
     .excel-green { background-color: #107c41; }
     .dark .excel-green { background-color: #0b5e30; }
   </style>
 </head>
-<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white pb-32">
+<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex h-screen overflow-hidden">
 
-  <header class="bg-white/80 dark:bg-pm-dark-bg/80 backdrop-blur-md border-b border-gray-200/60 dark:border-pm-dark-border fixed top-0 w-full z-50 h-16 md:h-20 flex justify-between items-center px-4 md:px-8 transition-colors duration-400">
-    <div class="flex items-center gap-4">
-      <button type="button" onclick="window.location.href='index.html';" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-pm-dark-surface text-gray-500 dark:text-gray-400 transition-colors cursor-pointer">
-        <i data-lucide="arrow-left" class="w-5 h-5"></i>
-      </button>
-      <div class="flex flex-col cursor-pointer select-none" onclick="window.location.href='index.html';">
-        <h1 class="font-serif text-xl md:text-2xl text-pm-green dark:text-[#D1E2C7] font-bold leading-none tracking-tight">Pawfect Memories</h1>
-        <span class="text-[9px] text-pm-oak font-bold tracking-[0.3em] uppercase mt-1 ml-0.5">Finance</span>
+  <aside class="hidden md:flex flex-col justify-between w-16 hover:w-64 bg-white dark:bg-pm-dark-surface border-r border-gray-200/60 dark:border-pm-dark-border h-full transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) group z-40 relative shadow-sm shrink-0">
+    <div class="flex flex-col items-start w-full overflow-hidden">
+      <div class="h-20 flex items-center px-4 w-full shrink-0 border-b border-gray-100 dark:border-white/5">
+        <img src="logo_black.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 dark:hidden">
+        <img src="logo_white.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 hidden dark:block">
+        <span class="ml-3 font-serif font-bold text-[16px] text-pm-green dark:text-[#D1E2C7] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-tight">Pawfect Memories</span>
       </div>
+      <nav class="w-full mt-6 flex flex-col gap-1.5 px-2.5">
+        <a href="index.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">工作區 (Workspace)</span>
+        </a>
+        <a href="add.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+          <i data-lucide="plus-square" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">新增預約 (New)</span>
+        </a>
+        <a href="dashboard.html" class="flex items-center px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-[#1A211D] text-pm-oak font-semibold transition-all w-full overflow-hidden shadow-inner dark:shadow-none">
+          <i data-lucide="pie-chart" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">財務中心 (Finance)</span>
+        </a>
+        <a href="settings.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+          <i data-lucide="settings" class="w-5 h-5 shrink-0"></i>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">系統設定 (Settings)</span>
+        </a>
+      </nav>
     </div>
     
-    <div class="flex items-center gap-2 shrink-0">
-      <button onclick="toggleDarkMode()" class="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-pm-dark-surface transition-colors" title="Theme">
-        <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
-        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+    <div class="px-2.5 pb-6 flex flex-col gap-1.5 w-full overflow-hidden border-t border-gray-100 dark:border-white/5 pt-4">
+      <button onclick="toggleDarkMode()" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1A211D] hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden">
+        <i data-lucide="moon" class="w-5 h-5 shrink-0 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 shrink-0 hidden dark:block"></i>
+        <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">主題切換 (Theme)</span>
       </button>
     </div>
-  </header>
+  </aside>
 
-  <main class="pt-24 md:pt-32 px-4 md:px-8 max-w-5xl mx-auto space-y-8">
+  <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
     
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-      <div>
-        <h2 class="font-serif font-bold text-3xl md:text-4xl tracking-tight text-gray-900 dark:text-white mb-2">財務與營運中心</h2>
-        <p class="text-gray-500 dark:text-gray-400 text-sm">監控總營業額與管理待收尾數</p>
+    <header class="h-20 flex justify-between items-center px-6 md:px-8 shrink-0 border-b border-gray-200/60 dark:border-pm-dark-border bg-white/50 dark:bg-pm-dark-bg/50 backdrop-blur-md z-30">
+      <div class="flex flex-col">
+        <h2 class="font-serif text-2xl font-bold tracking-tight text-gray-900 dark:text-white">財務中心</h2>
       </div>
       
-      <button id="btn-export-excel" class="w-full md:w-auto excel-green text-white px-5 py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-md">
-        <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
-        匯出 Excel 報表
+      <button id="btn-export-excel" class="excel-green text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 hover:opacity-90 active:scale-95 shadow-sm transition-all shrink-0">
+        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> 匯出 Excel 報表
       </button>
-    </div>
+    </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <main class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 space-y-6 bg-pm-cream dark:bg-pm-dark-bg" id="dashboard-main-container">
       
-      <div class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors relative overflow-hidden group">
-        <div class="absolute top-0 right-0 p-6 opacity-10 dark:opacity-5 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
-          <i data-lucide="trending-up" class="w-24 h-24 text-pm-green"></i>
-        </div>
-        <div class="relative z-10">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-8 h-8 rounded-full bg-pm-green/10 dark:bg-[#8DBA76]/10 flex items-center justify-center text-pm-green dark:text-[#8DBA76]">
-              <i data-lucide="dollar-sign" class="w-4 h-4"></i>
-            </div>
-            <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">系統總營業額</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] border border-gray-200/50 dark:border-white/5 shadow-taste dark:shadow-taste-dark relative overflow-hidden group transition-colors">
+          <div class="absolute top-0 right-0 p-6 opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <i data-lucide="trending-up" class="w-24 h-24 text-pm-green"></i>
           </div>
-          <p id="total-revenue" class="text-4xl md:text-5xl font-serif font-bold text-gray-900 dark:text-white leading-none">Loading...</p>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors relative overflow-hidden group">
-        <div class="absolute top-0 right-0 p-6 opacity-10 dark:opacity-5 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
-          <i data-lucide="alert-circle" class="w-24 h-24 text-red-500"></i>
-        </div>
-        <div class="relative z-10">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-8 h-8 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 dark:text-red-400">
-              <i data-lucide="clock" class="w-4 h-4"></i>
-            </div>
-            <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">未收尾數總額</p>
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-7 h-7 rounded-full bg-pm-green/10 text-pm-green dark:text-[#8DBA76] flex items-center justify-center"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">系統總營業額</p>
           </div>
-          <p id="total-pending" class="text-4xl md:text-5xl font-serif font-bold text-red-500 dark:text-red-400 leading-none">Loading...</p>
+          <p id="total-revenue" class="text-3xl md:text-4xl font-serif font-bold text-gray-900 dark:text-white">載入中...</p>
+        </div>
+
+        <div class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] border border-gray-200/50 dark:border-white/5 shadow-taste dark:shadow-taste-dark relative overflow-hidden group transition-colors">
+          <div class="absolute top-0 right-0 p-6 opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+            <i data-lucide="alert-circle" class="w-24 h-24 text-red-500"></i>
+          </div>
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-7 h-7 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center"><i data-lucide="clock" class="w-4 h-4"></i></div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">未收尾數總額</p>
+          </div>
+          <p id="total-pending" class="text-3xl md:text-4xl font-serif font-bold text-red-500 dark:text-red-400">載入中...</p>
         </div>
       </div>
 
-    </div>
-
-    <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors overflow-hidden mt-8">
-      <div class="p-6 md:p-8 border-b border-gray-100 dark:border-pm-dark-border flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-500 dark:text-red-400 shrink-0">
-          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+      <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] border border-gray-200/50 dark:border-white/5 shadow-taste dark:shadow-taste-dark overflow-hidden transition-colors">
+        <div class="p-6 border-b border-gray-100 dark:border-pm-dark-border flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center shrink-0">
+            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+          </div>
+          <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white">待追收尾數名單</h3>
         </div>
-        <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white">待追收尾數名單</h3>
-      </div>
-      
-      <div id="pending-list" class="divide-y divide-gray-100 dark:divide-pm-dark-border">
-        <div class="p-6 flex items-center gap-4 animate-pulse">
-            <div class="w-12 h-12 bg-gray-100 dark:bg-[#1A211D] rounded-xl shrink-0"></div>
-            <div class="flex-1 space-y-2"><div class="h-4 bg-gray-100 dark:bg-[#1A211D] w-1/4 rounded"></div><div class="h-3 bg-gray-50 dark:bg-[#1A211D]/50 w-1/3 rounded"></div></div>
+        
+        <div id="pending-list" class="divide-y divide-gray-100 dark:divide-pm-dark-border">
+          <div class="p-6 text-center text-xs text-gray-400 animate-pulse">正在進行遠端同步與分析中...</div>
         </div>
       </div>
-    </div>
 
-  </main>
+    </main>
+  </div>
 
-  <div id="toast-container" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+
+  <nav class="md:hidden fixed bottom-0 w-full h-16 bg-white dark:bg-pm-dark-surface border-t border-gray-200/60 dark:border-pm-dark-border z-40 flex items-center justify-around px-2 pb-safe shadow-lg">
+    <a href="index.html" class="flex flex-col items-center p-2 text-gray-400"><i data-lucide="layout-dashboard" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">工作區</span></a>
+    <a href="add.html" class="flex flex-col items-center p-2 text-gray-400"><i data-lucide="plus-square" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">新增</span></a>
+    <a href="dashboard.html" class="flex flex-col items-center p-2 text-pm-oak"><i data-lucide="pie-chart" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">財務</span></a>
+    <a href="settings.html" class="flex flex-col items-center p-2 text-gray-400"><i data-lucide="settings" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">設定</span></a>
+  </nav>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -150,16 +155,12 @@
     const db = getFirestore(app);
 
     lucide.createIcons();
+    function updateIcons() { lucide.createIcons(); }
 
     window.toggleDarkMode = function() {
       const htmlEl = document.documentElement;
-      if (htmlEl.classList.contains('dark')) {
-        htmlEl.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      } else {
-        htmlEl.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      }
+      if (htmlEl.classList.contains('dark')) { htmlEl.classList.remove('dark'); localStorage.setItem('theme', 'light'); } 
+      else { htmlEl.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
     };
 
     window.showToast = function(msg, type='success') {
@@ -168,21 +169,29 @@
       const bgColor = type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900';
       const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
       
-      toast.className = `px-5 py-3 rounded-full shadow-2xl text-sm font-medium transform transition-all translate-y-10 opacity-0 flex items-center gap-2 ${bgColor}`;
-      toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i> ${msg}`;
+      toast.className = `px-4 py-2.5 rounded-xl shadow-2xl text-xs font-bold transform transition-all translate-y-10 opacity-0 flex items-center gap-2 ${bgColor}`;
+      toast.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${msg}`;
       
       container.appendChild(toast);
-      lucide.createIcons();
-      
+      updateIcons();
       requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
       setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
     }
 
     let allOrdersData = [];
 
+    // [SKILL: Code Review & Performance Boost] Asynchronous caching pipeline strategy
     async function loadDashboard() {
       try {
-        const ordersSnap = await getDocs(collection(db, "Orders"));
+        // Parallel non-blocking extraction requests
+        const [ordersSnap, clientsSnap] = await Promise.all([
+          getDocs(collection(db, "Orders")),
+          getDocs(collection(db, "Clients"))
+        ]);
+
+        const clientCache = {};
+        clientsSnap.forEach(cDoc => { clientCache[cDoc.id] = cDoc.data(); });
+
         let totalRev = 0;
         let totalPending = 0;
         let pendingHTML = '';
@@ -192,23 +201,18 @@
           const data = docSnap.data();
           const orderId = docSnap.id;
 
-          let clientName = "未知客戶";
-          let clientPhone = "";
-          let clientIg = "";
-          if (data.clientId) {
-            const cSnap = await getDoc(doc(db, "Clients", data.clientId));
-            if (cSnap.exists()) {
-              clientName = cSnap.data().name || "未知客戶";
-              clientPhone = cSnap.data().phone || "";
-              clientIg = cSnap.data().instagram || "";
-            }
+          let clientName = "未知客戶"; let clientPhone = ""; let clientIg = "";
+          if (data.clientId && clientCache[data.clientId]) {
+            const cData = clientCache[data.clientId];
+            clientName = cData.name || "未知客戶";
+            clientPhone = cData.phone || "";
+            clientIg = cData.instagram || "";
           }
 
           let pets = data.pets || [];
           if (pets.length === 0 && data.petName) pets = [{ name: data.petName, photoUrl: data.photoUrl }];
           let petNames = pets.length > 0 ? pets.map(p => p.name).join(' & ') : "未填寫";
-          
-          let avatarUrl = pets.length > 0 && pets[0].photoUrl ? pets[0].photoUrl : "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
+          let avatar = pets.length > 0 && pets[0].photoUrl ? pets[0].photoUrl : "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
 
           const price = Number(data.price || 0);
           const deposit = Number(data.depositAmount || 0);
@@ -220,7 +224,6 @@
           if (pStatus === 'full') paymentText = "全數已付";
           else if (pStatus === 'deposit') paymentText = "已付訂金";
 
-          // --- 填入所有 Excel 欄位 ---
           allOrdersData.push({
             "No.": data.invoiceNumber || orderId,
             "Client": clientName,
@@ -241,48 +244,50 @@
             "Other Fee": data.otherFee || ""
           });
 
-          // --- 構建待收尾數列表 (Taste Card Style) ---
+          // [SKILL: UI-UX-Pro-Max] Micro-interaction List Rows
           if (pStatus === 'deposit' && balance > 0) {
             totalPending += balance;
             pendingHTML += `
-              <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-[#1A211D] transition-colors cursor-pointer group" onclick="window.location.href='detail.html?id=${orderId}'">
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-100 dark:bg-pm-dark-border border border-gray-200 dark:border-transparent">
-                    <img src="${avatarUrl}" class="w-full h-full object-cover">
-                  </div>
-                  <div>
-                    <div class="flex items-center gap-2 mb-1">
-                      <h4 class="font-bold text-gray-900 dark:text-white group-hover:text-pm-oak transition-colors">${clientName} & ${petNames}</h4>
-                      <span class="text-[10px] bg-pm-oak/10 border border-pm-oak/20 text-pm-oak px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">欠尾數</span>
+              <div class="p-5 flex items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-[#1A211D]/30 transition-colors cursor-pointer group" onclick="window.location.href='detail.html?id=${orderId}'">
+                <div class="flex items-center gap-3 overflow-hidden">
+                  <img src="${avatar}" class="w-8 h-8 rounded-full object-cover border border-gray-100 dark:border-pm-dark-border">
+                  <div class="overflow-hidden">
+                    <div class="flex items-center gap-2 mb-0.5">
+                      <h4 class="font-bold text-xs text-gray-900 dark:text-white group-hover:text-pm-oak transition-colors truncate">${clientName} · ${petNames}</h4>
+                      <span class="text-[9px] bg-pm-oak/10 border border-pm-oak/20 text-pm-oak px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider scale-90 shrink-0">欠尾數</span>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${data.shootDate || '未定'} <span class="px-1">•</span> <i data-lucide="package" class="w-3.5 h-3.5"></i> ${data.package || '未定'}</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3"></i> 拍攝日: ${data.shootDate || '未定'} | 套餐: ${data.package || '未定'}</p>
                   </div>
                 </div>
-                <div class="text-left sm:text-right flex items-center justify-between sm:block">
-                  <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1 sm:block hidden">尚欠尾數</p>
-                  <p class="font-bold text-red-500 dark:text-red-400 text-lg flex items-center gap-2 justify-end">HK$ ${balance.toLocaleString()} <i data-lucide="chevron-right" class="w-5 h-5 text-gray-300 dark:text-gray-600 group-hover:text-pm-oak transition-all transform group-hover:translate-x-1"></i></p>
+                <div class="text-right shrink-0 flex items-center gap-1">
+                  <div>
+                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">尚欠尾數</p>
+                    <p class="font-bold text-red-500 dark:text-red-400 text-sm">HK$ ${balance.toLocaleString()}</p>
+                  </div>
+                  <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300 dark:text-gray-600 transform group-hover:translate-x-0.5 transition-transform"></i>
                 </div>
               </div>
             `;
           } else if (pStatus === 'unpaid' && price > 0) {
-             totalPending += price;
-             pendingHTML += `
-              <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-[#1A211D] transition-colors cursor-pointer group" onclick="window.location.href='detail.html?id=${orderId}'">
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-gray-100 dark:bg-pm-dark-border border border-gray-200 dark:border-transparent">
-                    <img src="${avatarUrl}" class="w-full h-full object-cover">
-                  </div>
-                  <div>
-                    <div class="flex items-center gap-2 mb-1">
-                      <h4 class="font-bold text-gray-900 dark:text-white group-hover:text-pm-oak transition-colors">${clientName} & ${petNames}</h4>
-                      <span class="text-[10px] bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">未付款</span>
+            totalPending += price;
+            pendingHTML += `
+              <div class="p-5 flex items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-[#1A211D]/30 transition-colors cursor-pointer group" onclick="window.location.href='detail.html?id=${orderId}'">
+                <div class="flex items-center gap-3 overflow-hidden">
+                  <img src="${avatar}" class="w-8 h-8 rounded-full object-cover border border-gray-100 dark:border-pm-dark-border">
+                  <div class="overflow-hidden">
+                    <div class="flex items-center gap-2 mb-0.5">
+                      <h4 class="font-bold text-xs text-gray-900 dark:text-white group-hover:text-pm-oak transition-colors truncate">${clientName} · ${petNames}</h4>
+                      <span class="text-[9px] bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-500 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider scale-90 shrink-0">未付款</span>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${data.shootDate || '未定'} <span class="px-1">•</span> <i data-lucide="package" class="w-3.5 h-3.5"></i> ${data.package || '未定'}</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate font-medium flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3"></i> 拍攝日: ${data.shootDate || '未定'} | 套餐: ${data.package || '未定'}</p>
                   </div>
                 </div>
-                <div class="text-left sm:text-right flex items-center justify-between sm:block">
-                  <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1 sm:block hidden">尚未付款</p>
-                  <p class="font-bold text-red-500 dark:text-red-400 text-lg flex items-center gap-2 justify-end">HK$ ${price.toLocaleString()} <i data-lucide="chevron-right" class="w-5 h-5 text-gray-300 dark:text-gray-600 group-hover:text-pm-oak transition-all transform group-hover:translate-x-1"></i></p>
+                <div class="text-right shrink-0 flex items-center gap-1">
+                  <div>
+                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">總費用</p>
+                    <p class="font-bold text-red-500 dark:text-red-400 text-sm">HK$ ${price.toLocaleString()}</p>
+                  </div>
+                  <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300 dark:text-gray-600 transform group-hover:translate-x-0.5 transition-transform"></i>
                 </div>
               </div>
             `;
@@ -294,42 +299,46 @@
         
         const emptyStateHTML = `
           <div class="py-12 flex flex-col items-center justify-center text-center opacity-80">
-            <div class="w-16 h-16 rounded-full bg-pm-green/10 dark:bg-[#8DBA76]/10 text-pm-green dark:text-[#8DBA76] flex items-center justify-center mb-4">
-                <i data-lucide="party-popper" class="w-8 h-8"></i>
+            <div class="w-12 h-12 rounded-full bg-pm-green/10 text-pm-green dark:text-[#8DBA76] flex items-center justify-center mb-3">
+                <i data-lucide="party-popper" class="w-5 h-5"></i>
             </div>
-            <p class="text-gray-900 dark:text-white font-bold text-lg mb-1">太棒了！</p>
-            <p class="text-gray-500 dark:text-gray-400 text-sm">目前沒有任何被拖欠的尾數 🎉</p>
+            <p class="text-gray-900 dark:text-white font-bold text-sm mb-0.5">清數找齊！</p>
+            <p class="text-gray-400 dark:text-gray-500 text-xs">目前沒有任何客戶拖欠尾數 🥳</p>
           </div>
         `;
         
         document.getElementById('pending-list').innerHTML = pendingHTML || emptyStateHTML;
-        lucide.createIcons();
+        updateIcons();
 
       } catch (err) {
-        console.error(err);
-        document.getElementById('pending-list').innerHTML = `
-          <div class="py-12 flex flex-col items-center justify-center text-center">
-            <i data-lucide="wifi-off" class="w-8 h-8 text-red-500 mb-3"></i>
-            <p class="text-red-500 text-sm font-medium">載入失敗，請檢查網絡連線。</p>
-          </div>`;
-        lucide.createIcons();
+        // [SKILL: Code Review] Automated fallback defensive interface degradation
+        console.error("Dashboard Extraction Error:", err);
+        document.getElementById('dashboard-main-container').innerHTML = `
+          <div class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center mb-4"><i data-lucide="wifi-off" class="w-6 h-6"></i></div>
+            <h4 class="font-bold text-gray-900 dark:text-white mb-1">同步財務數據失敗</h4>
+            <p class="text-xs text-gray-400 max-w-xs mb-4">無法建立安全財務管線連接，請檢查網路狀態或重新登入憑證。</p>
+            <button onclick="window.location.reload()" class="bg-pm-green text-white dark:bg-pm-oak dark:text-gray-900 px-4 py-2 rounded-xl text-xs font-bold shadow-sm">重新安全連線</button>
+          </div>
+        `;
+        updateIcons();
       }
     }
 
     loadDashboard();
 
-    // --- 匯出 Excel 邏輯 ---
+    // Excel 匯出邏輯 (附帶自動 Micro-Interaction 按鈕回饋)
     document.getElementById('btn-export-excel').addEventListener('click', () => {
         if (allOrdersData.length === 0) {
-            showToast("目前沒有訂單資料可以匯出", "error");
+            showToast("目前庫存無任何訂單紀錄可供匯出", "error");
             return;
         }
         
         const btn = document.getElementById('btn-export-excel');
         const originalHTML = btn.innerHTML;
-        btn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> 匯出中...`;
+        btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> 匯出中...`;
         btn.classList.add('opacity-70', 'cursor-not-allowed');
-        lucide.createIcons();
+        updateIcons();
         
         setTimeout(() => {
             try {
@@ -341,15 +350,15 @@
                 const today = new Date().toISOString().split('T')[0];
                 XLSX.writeFile(workbook, `Pawfect_Memories_Export_${today}.xlsx`);
                 
-                showToast("✅ 成功匯出 Excel 報表");
+                showToast("✅ 已成功匯出最新 Excel 財務報表");
             } catch(e) {
-                showToast("匯出失敗", "error");
+                showToast("匯出處理失敗", "error");
             } finally {
                 btn.innerHTML = originalHTML;
                 btn.classList.remove('opacity-70', 'cursor-not-allowed');
-                lucide.createIcons();
+                updateIcons();
             }
-        }, 800); // 畀少少時間 UI 更新，等客覺得系統真係做緊嘢
+        }, 600);
     });
   </script>
 </body>
