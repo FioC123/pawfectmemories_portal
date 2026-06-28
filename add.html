@@ -2,7 +2,7 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <script>if(!sessionStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
+  <script>if(!localStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
   <script>
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -39,7 +39,6 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.2); border-radius: 99px; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     
-    /* [SKILL: Web Design Guidelines] Seamless Hidden Inputs */
     .taste-input {
         background-color: #F9FAFB !important;
         border: 1px solid transparent !important;
@@ -68,7 +67,6 @@
         padding-right: 2.5rem;
     }
     
-    /* [SKILL: Emil Kowalski] Smooth Dynamic Row Animation */
     .pet-row-transition { animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes slideDown {
         0% { opacity: 0; transform: translateY(-10px); }
@@ -141,9 +139,29 @@
               <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">聯絡電話 *</label>
               <input type="tel" id="clientPhone" required class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white" placeholder="91234567">
             </div>
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">Instagram (IG)</label>
+              <input type="text" id="clientIg" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white" placeholder="@username">
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">電郵地址 (Email)</label>
+              <input type="email" id="clientEmail" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white" placeholder="example@email.com">
+            </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div>
+             <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">聯絡 / 寄送地址</label>
+             <input type="text" id="clientAddress" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white" placeholder="填寫詳細地址以寄送相架/相簿...">
+          </div>
+
+          <div class="border-t border-gray-100 dark:border-pm-dark-border pt-4 mt-2">
+             <label class="text-[10px] text-gray-400 font-bold uppercase mb-2 block">客戶分類標籤</label>
+             <div id="tags-container" class="flex flex-wrap gap-2 min-h-[30px]">
+                 <span class="text-xs text-gray-400 animate-pulse">載入標籤中...</span>
+             </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 border-t border-gray-100 dark:border-pm-dark-border pt-4 mt-2">
             <div>
               <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">拍攝日期</label>
               <input type="date" id="shootDate" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white">
@@ -170,7 +188,7 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-3 gap-3 bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-transparent">
+          <div class="grid grid-cols-3 gap-3 bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-transparent mt-2">
             <div>
               <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">額外同行人數/寵物</label>
               <input type="number" id="extraPaxCount" value="0" min="0" class="taste-input w-full rounded-lg text-xs font-bold text-pm-oak text-center">
@@ -225,6 +243,28 @@
               <option value="full">✅ 全數已付 (Fully Paid)</option>
             </select>
           </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-gray-100 dark:border-pm-dark-border pt-4 mt-4">
+            <div class="bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-transparent">
+              <label class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
+                <span>訂金入數紙</span>
+                <span id="deposit-status" class="text-pm-green hidden"><i data-lucide="check-circle" class="w-3 h-3"></i></span>
+              </label>
+              <input type="file" id="depositReceiptFile" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:border-0 file:text-[10px] file:font-bold file:bg-pm-oak/10 file:text-pm-oak hover:file:bg-pm-oak/20 file:rounded-lg cursor-pointer transition-all">
+              <input type="hidden" id="depositReceiptUrl">
+              <input type="hidden" id="depositDate">
+            </div>
+            <div class="bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-transparent">
+              <label class="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
+                <span>尾數入數紙</span>
+                <span id="balance-status" class="text-pm-green hidden"><i data-lucide="check-circle" class="w-3 h-3"></i></span>
+              </label>
+              <input type="file" id="balanceReceiptFile" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2.5 file:border-0 file:text-[10px] file:font-bold file:bg-pm-oak/10 file:text-pm-oak hover:file:bg-pm-oak/20 file:rounded-lg cursor-pointer transition-all">
+              <input type="hidden" id="balanceReceiptUrl">
+              <input type="hidden" id="balanceDate">
+            </div>
+          </div>
+
         </div>
 
         <div class="lg:col-span-12 bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] border border-gray-200/50 dark:border-white/5 shadow-taste dark:shadow-taste-dark space-y-4">
@@ -263,10 +303,12 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
     lucide.createIcons();
 
@@ -280,32 +322,42 @@
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       const bgColor = type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900';
-      const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
+      const icon = type === 'error' ? 'alert-triangle' : (type === 'loading' ? 'loader' : 'check-circle');
+      const spinClass = type === 'loading' ? 'animate-spin' : '';
       
       toast.className = `px-4 py-2.5 rounded-xl shadow-2xl text-xs font-bold transform transition-all translate-y-10 opacity-0 flex items-center gap-2 ${bgColor}`;
-      toast.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${msg}`;
+      toast.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5 ${spinClass}"></i> ${msg}`;
       
       container.appendChild(toast);
       lucide.createIcons();
       requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
-      setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
+      
+      if(type !== 'loading') {
+          setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
+      }
+      return toast; 
     }
 
     const urlParams = new URLSearchParams(window.location.search);
     const editId = urlParams.get('editId') || urlParams.get('id');
 
     let packageConfig = [];
+    let availableTags = [];
     let currentPets = [];
+    let selectedTags = [];
+    let originalClientId = ""; // 用來追蹤編輯模式，避免重複建立客人
 
     async function initPage() {
       try {
-        // [SKILL: Flow Parallelization] Pipeline extraction execution
-        const [snapPkg, snapOrder] = await Promise.all([
+        const [snapPkg, snapTags, snapOrder] = await Promise.all([
           getDoc(doc(db, "Settings", "packages_config")),
+          getDoc(doc(db, "Settings", "tags_config")),
           editId ? getDoc(doc(db, "Orders", editId)) : Promise.resolve(null)
         ]);
 
         packageConfig = snapPkg.exists() ? snapPkg.data().list : [];
+        availableTags = snapTags.exists() ? snapTags.data().list : [];
+        
         const selectEl = document.getElementById('package-select');
         selectEl.innerHTML = packageConfig.map(p => `<option value="${p.name}">${p.name} (HK$ ${p.price})</option>`).join('');
 
@@ -317,6 +369,8 @@
         if (snapOrder && snapOrder.exists()) {
           document.getElementById('page-title').innerText = "編輯預約檔案資料";
           const o = snapOrder.data();
+          
+          selectedTags = o.tags || [];
           
           document.getElementById('shootDate').value = o.shootDate || "";
           document.getElementById('shootTime').value = o.shootTime || "";
@@ -335,11 +389,27 @@
           document.getElementById('kidsCount').value = o.kidsCount || 0;
           document.getElementById('studio').value = o.studio || "";
 
+          if(o.depositReceiptUrl) { 
+              document.getElementById('depositReceiptUrl').value = o.depositReceiptUrl;
+              document.getElementById('depositDate').value = o.depositDate || "";
+              document.getElementById('deposit-status').classList.remove('hidden');
+          }
+          if(o.balanceReceiptUrl) { 
+              document.getElementById('balanceReceiptUrl').value = o.balanceReceiptUrl;
+              document.getElementById('balanceDate').value = o.balanceDate || "";
+              document.getElementById('balance-status').classList.remove('hidden');
+          }
+
           if (o.clientId) {
+            originalClientId = o.clientId;
             const cSnap = await getDoc(doc(db, "Clients", o.clientId));
             if (cSnap.exists()) {
-              document.getElementById('clientName').value = cSnap.data().name || "";
-              document.getElementById('clientPhone').value = cSnap.data().phone || "";
+              const cData = cSnap.data();
+              document.getElementById('clientName').value = cData.name || "";
+              document.getElementById('clientPhone').value = cData.phone || "";
+              document.getElementById('clientIg').value = cData.instagram || "";
+              document.getElementById('clientEmail').value = cData.email || "";
+              document.getElementById('clientAddress').value = cData.address || "";
             }
           }
 
@@ -348,15 +418,84 @@
               currentPets.push({ name: o.petName, type: o.petType || "", breed: o.petBreed || "", photoUrl: o.photoUrl || "" });
           }
         } else {
-          // 預設一行毛孩輸入
           currentPets = [{ name: "", type: "", breed: "", photoUrl: "" }];
         }
 
+        renderTagsSelection();
         renderPetsForm();
 
       } catch (err) {
         showToast("同步安全中心網絡出錯", "error");
       }
+    }
+
+    // 渲染動態標籤選擇區
+    function renderTagsSelection() {
+        const container = document.getElementById('tags-container');
+        if(availableTags.length === 0) {
+            container.innerHTML = `<span class="text-xs text-gray-400">請先到「系統設定」建立標籤</span>`;
+            return;
+        }
+        
+        container.innerHTML = availableTags.map(tag => {
+            const isSelected = selectedTags.some(t => t.name === tag.name);
+            const baseClass = isSelected 
+                ? 'bg-pm-oak text-white border-pm-oak shadow-sm' 
+                : 'bg-gray-50 dark:bg-[#1A211D] text-gray-500 border-gray-200 dark:border-pm-dark-border hover:border-pm-oak dark:hover:border-pm-oak';
+            return `<button type="button" onclick="toggleTag('${tag.name}')" class="${baseClass} px-3 py-1.5 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer">${tag.name}</button>`;
+        }).join('');
+    }
+
+    window.toggleTag = (name) => {
+        const idx = selectedTags.findIndex(t => t.name === name);
+        if(idx > -1) { selectedTags.splice(idx, 1); }
+        else { selectedTags.push({ name: name }); }
+        renderTagsSelection();
+    };
+
+    // Firebase Storage 上傳
+    async function uploadImageToStorage(file, path) {
+        const storageRef = ref(storage, path);
+        await uploadBytes(storageRef, file);
+        return await getDownloadURL(storageRef);
+    }
+
+    document.getElementById('depositReceiptFile').addEventListener('change', async (e) => {
+        const file = e.target.files[0]; if(!file) return;
+        const loadingToast = showToast("正在上傳訂金入數紙...", "loading");
+        try {
+            const url = await uploadImageToStorage(file, `receipts/dep_${Date.now()}_${file.name}`);
+            document.getElementById('depositReceiptUrl').value = url;
+            document.getElementById('depositDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('deposit-status').classList.remove('hidden');
+            loadingToast.remove();
+            showToast("訂金入數紙上傳成功！");
+        } catch(err) { loadingToast.remove(); showToast("上傳失敗", "error"); }
+    });
+
+    document.getElementById('balanceReceiptFile').addEventListener('change', async (e) => {
+        const file = e.target.files[0]; if(!file) return;
+        const loadingToast = showToast("正在上傳尾數入數紙...", "loading");
+        try {
+            const url = await uploadImageToStorage(file, `receipts/bal_${Date.now()}_${file.name}`);
+            document.getElementById('balanceReceiptUrl').value = url;
+            document.getElementById('balanceDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('balance-status').classList.remove('hidden');
+            loadingToast.remove();
+            showToast("尾數入數紙上傳成功！");
+        } catch(err) { loadingToast.remove(); showToast("上傳失敗", "error"); }
+    });
+
+    window.uploadPetImage = async (i, inputEl) => {
+        const file = inputEl.files[0]; if(!file) return;
+        const loadingToast = showToast("正在上傳大頭照...", "loading");
+        try {
+            const url = await uploadImageToStorage(file, `avatars/pet_${Date.now()}_${file.name}`);
+            updatePetField(i, 'photoUrl', url);
+            document.getElementById(`pet-url-${i}`).value = url;
+            loadingToast.remove();
+            showToast("大頭照上傳成功！");
+        } catch(e) { loadingToast.remove(); showToast("大頭照上傳失敗", "error"); }
     }
 
     function renderPetsForm() {
@@ -375,11 +514,18 @@
             <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">品種</label>
             <input type="text" value="${p.breed}" onchange="updatePetField(${i}, 'breed', this.value)" class="taste-input w-full rounded-lg text-xs font-medium text-gray-900 dark:text-white" placeholder="柴犬 / 哥基">
           </div>
+          
           <div class="relative">
-            <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">大頭照網址</label>
-            <input type="url" value="${p.photoUrl}" onchange="updatePetField(${i}, 'photoUrl', this.value)" class="taste-input w-full rounded-lg text-xs text-gray-500" placeholder="貼上圖片網址">
+            <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">大頭照 (網址或上傳)</label>
+            <div class="flex gap-2">
+              <input type="url" id="pet-url-${i}" value="${p.photoUrl}" onchange="updatePetField(${i}, 'photoUrl', this.value)" class="taste-input w-full rounded-lg text-xs text-gray-500" placeholder="貼上網址">
+              <label class="cursor-pointer shrink-0 bg-white dark:bg-[#121714] border border-gray-200 dark:border-pm-dark-border hover:border-pm-oak dark:hover:border-pm-oak text-gray-500 hover:text-pm-oak px-3 py-2 rounded-lg flex items-center justify-center transition-colors shadow-sm">
+                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                <input type="file" class="hidden" accept="image/*" onchange="uploadPetImage(${i}, this)">
+              </label>
+            </div>
             ${currentPets.length > 1 ? `
-            <button type="button" onclick="removePetRow(${i})" class="absolute right-2 bottom-2 text-gray-400 hover:text-red-500 transition-colors">
+            <button type="button" onclick="removePetRow(${i})" class="absolute right-0 -top-6 text-gray-400 hover:text-red-500 transition-colors">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>` : ''}
           </div>
@@ -396,7 +542,6 @@
       renderPetsForm();
     };
 
-    // [SKILL: Code Review] Defensive database structural insertion workflow
     async function submitData() {
       const name = document.getElementById('clientName').value.trim();
       const phone = document.getElementById('clientPhone').value.trim();
@@ -408,12 +553,20 @@
       lucide.createIcons();
 
       try {
-        let clientId = "";
+        const instagram = document.getElementById('clientIg').value.trim();
+        const email = document.getElementById('clientEmail').value.trim();
+        const address = document.getElementById('clientAddress').value.trim();
+
+        let clientId = originalClientId;
         const clientsRef = collection(db, "Clients");
         
-        // 簡單就地創建或配對客戶快取
-        const cSnap = await addDoc(clientsRef, { name, phone });
-        clientId = cSnap.id;
+        // [防禦修復] 編輯模式時只更新不重複新增 Client
+        if (editId && clientId) {
+            await updateDoc(doc(db, "Clients", clientId), { name, phone, instagram, email, address });
+        } else {
+            const cSnap = await addDoc(clientsRef, { name, phone, instagram, email, address });
+            clientId = cSnap.id;
+        }
 
         const extraPax = Number(document.getElementById('extraPaxCount').value || 0);
         const manualFee = Number(document.getElementById('manualOtherFee').value || 0);
@@ -421,6 +574,7 @@
 
         const orderPayload = {
           clientId,
+          tags: selectedTags, // [修復] 儲存所選的分類標籤
           shootDate: document.getElementById('shootDate').value,
           shootTime: document.getElementById('shootTime').value,
           shootLocation: document.getElementById('shootLocation').value,
@@ -439,12 +593,15 @@
           kidsCount: Number(document.getElementById('kidsCount').value || 0),
           studio: document.getElementById('studio').value,
           pets: currentPets.filter(p => p.name.trim() !== ""),
-          status: editId ? undefined : "col-new" // 只有全新單預設落新 कॉलम
+          depositReceiptUrl: document.getElementById('depositReceiptUrl').value || "",
+          depositDate: document.getElementById('depositDate').value || "",
+          balanceReceiptUrl: document.getElementById('balanceReceiptUrl').value || "",
+          balanceDate: document.getElementById('balanceDate').value || ""
         };
 
+        if (!editId) { orderPayload.status = "col-new"; }
+
         if (editId) {
-          // 編輯模式排除覆蓋原有看板進度
-          delete orderPayload.status;
           await updateDoc(doc(db, "Orders", editId), orderPayload);
           showToast("預約檔案更新成功");
         } else {
