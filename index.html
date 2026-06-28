@@ -203,6 +203,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // 定義抽屜全域 DOM 節點變數
+    const backdrop = document.getElementById('drawer-backdrop');
+    const drawer = document.getElementById('quick-drawer');
+
     lucide.createIcons();
 
     // 主題切換
@@ -239,7 +243,7 @@
 
     let allOrdersData = [];
 
-    // 開啟 Drawer
+    // 開啟 Drawer 預覽功能
     window.openDrawer = function(orderId) {
       const data = allOrdersData.find(o => o.id === orderId);
       if(!data) return;
@@ -257,7 +261,7 @@
           <div class="w-14 h-14 rounded-full overflow-hidden border border-gray-100 dark:border-pm-dark-border shadow-sm shrink-0">
             <img src="${data.avatar}" class="w-full h-full object-cover">
           </div>
-          <div class="overflow-hidden">
+          <div class="overflow-hidden flex-1">
             <h4 class="font-serif font-bold text-xl text-gray-900 dark:text-white truncate">${data.petsStr}</h4>
             <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">${data.clientName} ${data.clientPhone ? '· '+data.clientPhone : ''}</p>
           </div>
@@ -286,6 +290,7 @@
       void backdrop.offsetWidth;
       backdrop.classList.remove('opacity-0');
       drawer.classList.remove('translate-x-full');
+      lucide.createIcons();
     };
 
     window.closeDrawer = function() {
