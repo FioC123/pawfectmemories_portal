@@ -75,6 +75,13 @@
         <span class="text-[9px] text-pm-oak font-bold tracking-[0.3em] uppercase mt-1 ml-0.5">Editor</span>
       </div>
     </div>
+
+    <div class="flex items-center gap-2 shrink-0">
+      <button onclick="toggleDarkMode()" class="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-pm-dark-surface transition-colors" title="切換深淺色主題">
+        <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+      </button>
+    </div>
   </header>
 
   <main class="pt-24 md:pt-32 px-4 md:px-6 max-w-3xl mx-auto">
@@ -256,6 +263,18 @@
 
     lucide.createIcons();
 
+    // Dark Mode 切換邏輯
+    window.toggleDarkMode = function() {
+      const htmlEl = document.documentElement;
+      if (htmlEl.classList.contains('dark')) {
+        htmlEl.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        htmlEl.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    };
+
     const editId = new URLSearchParams(window.location.search).get('editId');
     let editClientId = null;
     let globalPackages = [];
@@ -368,7 +387,7 @@
     attachAutoDateReader('deposit-receipt-file', 'deposit-date'); 
     attachAutoDateReader('balance-receipt-file', 'balance-date');
 
-    // --- 寵物區塊處理 (確保只有一個版本！) ---
+    // --- 寵物區塊處理 ---
     let petBlockCount = 0; const petsContainer = document.getElementById('pets-container');
     function addPetBlock(petData = null) {
       const blockId = petBlockCount++; const div = document.createElement('div'); 
