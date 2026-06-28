@@ -12,9 +12,7 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
-  
   <script src="https://unpkg.com/lucide@latest"></script>
-  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   
   <script id="tailwind-config">
@@ -54,11 +52,10 @@
     #lightbox img { max-width: 90%; max-height: 90%; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); object-fit: contain; }
     
     #pdf-container { position: absolute; left: -9999px; top: -9999px; }
-    #invoice-template { width: 800px; background: white; color: black; padding: 50px; font-family: 'Inter', sans-serif; box-sizing: border-box; }
+    #invoice-template { width: 800px; background: white; color: black; padding: 50px; font-family: 'Inter', 'Noto Sans HK', sans-serif; box-sizing: border-box; }
     
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
 
-    /* Custom form select styling for Dark Mode compatibility */
     select.status-select {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
         background-position: right 0.5rem center;
@@ -74,7 +71,7 @@
 
   <div id="lightbox" onclick="this.style.display='none'">
     <img id="lightbox-img" src="">
-    <p class="absolute bottom-10 text-white/70 text-sm font-medium tracking-wide">Click anywhere to close</p>
+    <p class="absolute bottom-10 text-white/70 text-sm font-medium tracking-wide">點擊任何地方關閉</p>
   </div>
 
   <header class="bg-white/80 dark:bg-pm-dark-bg/80 backdrop-blur-md border-b border-gray-200/60 dark:border-pm-dark-border fixed top-0 w-full z-50 h-16 md:h-20 flex justify-between items-center px-4 md:px-8 transition-colors duration-400">
@@ -101,8 +98,8 @@
     <section class="relative flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8 mb-10">
       <div id="detail-avatars" class="flex items-center justify-center shrink-0 min-h-[128px]"></div>
       <div class="flex-1 text-center md:text-left mt-4 md:mt-0">
-        <p class="text-[10px] uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-1.5 font-bold">Booking <span id="detail-id" class="text-gray-500 dark:text-gray-400">Loading</span></p>
-        <h2 id="detail-pet-name" class="font-serif font-bold text-4xl md:text-5xl text-gray-900 dark:text-white leading-tight">Loading...</h2>
+        <p class="text-[10px] uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-1.5 font-bold">攝影訂單 <span id="detail-id" class="text-gray-500 dark:text-gray-400">載入中</span></p>
+        <h2 id="detail-pet-name" class="font-serif font-bold text-4xl md:text-5xl text-gray-900 dark:text-white leading-tight">載入中...</h2>
         <div id="detail-tags" class="flex flex-wrap justify-center md:justify-start gap-2 mt-4 min-h-[28px]"></div>
       </div>
     </section>
@@ -112,13 +109,13 @@
       <div class="lg:col-span-7 space-y-8">
         
         <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 md:p-8 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
-          <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-8 flex items-center gap-2 border-b border-gray-100 dark:border-pm-dark-border pb-4"><i data-lucide="info" class="w-5 h-5 text-pm-oak"></i> Booking Details</h3>
+          <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-8 flex items-center gap-2 border-b border-gray-100 dark:border-pm-dark-border pb-4"><i data-lucide="info" class="w-5 h-5 text-pm-oak"></i> 預約資訊</h3>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-6">
             <div class="flex items-start gap-4">
               <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="user" class="w-4 h-4"></i></div>
               <div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Client</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">客戶</p>
                 <p id="detail-client-name" class="font-semibold text-gray-900 dark:text-white text-base">-</p>
                 <p id="detail-client-phone" class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">-</p>
                 <div id="detail-client-ig" class="hidden mt-2"></div>
@@ -130,7 +127,7 @@
             <div class="flex items-start gap-4">
               <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="calendar-clock" class="w-4 h-4"></i></div>
               <div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Date & Time</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">拍攝時間</p>
                 <p id="detail-date" class="font-semibold text-gray-900 dark:text-white text-base">-</p>
               </div>
             </div>
@@ -138,7 +135,7 @@
             <div class="flex items-start gap-4">
               <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
               <div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Location / Studio</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">拍攝地點 / Studio</p>
                 <p id="detail-location" class="font-semibold text-gray-900 dark:text-white text-base">-</p>
                 <p id="detail-studio" class="text-xs text-pm-oak font-medium mt-1 hidden"></p>
               </div>
@@ -147,13 +144,13 @@
             <div class="flex items-start gap-4">
               <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="globe" class="w-4 h-4"></i></div>
               <div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Source Platform</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">來源平台</p>
                 <p id="detail-platform" class="font-semibold text-gray-900 dark:text-white text-base">-</p>
               </div>
             </div>
             
             <div class="sm:col-span-2 bg-gray-50 dark:bg-[#1A211D] p-4 rounded-xl border border-gray-100 dark:border-pm-dark-border">
-              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5"><i data-lucide="users" class="w-3 h-3"></i> Extra Pax Details</p>
+              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5"><i data-lucide="users" class="w-3 h-3"></i> 額外人數與詳情</p>
               <p id="detail-pax-info" class="text-sm text-gray-600 dark:text-gray-300 font-medium">-</p>
             </div>
 
@@ -162,19 +159,19 @@
         </div>
 
         <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 md:p-8 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
-          <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-8 flex items-center gap-2 border-b border-gray-100 dark:border-pm-dark-border pb-4"><i data-lucide="banknote" class="w-5 h-5 text-pm-oak"></i> Payment & Operations</h3>
+          <h3 class="font-serif font-bold text-xl text-gray-900 dark:text-white mb-8 flex items-center gap-2 border-b border-gray-100 dark:border-pm-dark-border pb-4"><i data-lucide="banknote" class="w-5 h-5 text-pm-oak"></i> 收費與營運細節</h3>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-6">
             
             <div class="flex items-start gap-4 sm:col-span-2">
               <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="package" class="w-4 h-4"></i></div>
-              <div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Package</p><p id="detail-package" class="font-semibold text-gray-900 dark:text-white text-base">-</p></div>
+              <div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">選擇套餐</p><p id="detail-package" class="font-semibold text-gray-900 dark:text-white text-base">-</p></div>
             </div>
 
             <div class="flex items-start gap-4">
               <div class="w-10 h-10 rounded-full bg-pm-green/10 dark:bg-[#8DBA76]/10 flex items-center justify-center text-pm-green dark:text-[#8DBA76] shrink-0 border border-pm-green/20 dark:border-[#8DBA76]/20"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
               <div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Total Fee</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">總收費</p>
                 <div class="flex items-end gap-2">
                   <p id="detail-price" class="font-bold text-xl text-pm-green dark:text-[#8DBA76] leading-none">-</p>
                 </div>
@@ -186,30 +183,30 @@
             <div class="flex items-start gap-4">
               <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 border border-gray-100 dark:border-pm-dark-border"><i data-lucide="wallet" class="w-4 h-4"></i></div>
               <div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1.5">Payment Status</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1.5">付款狀態</p>
                 <div id="detail-deposit"></div>
                 <p id="detail-balance" class="text-red-500 dark:text-red-400 font-bold text-sm mt-1.5 hidden"></p>
               </div>
             </div>
 
             <div class="space-y-2 pt-2">
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Deposit Proof</p>
-                <div id="thumb-deposit" class="w-full aspect-video bg-gray-50 dark:bg-[#1A211D] rounded-xl overflow-hidden border border-gray-100 dark:border-pm-dark-border flex items-center justify-center text-xs text-gray-400">Not Uploaded</div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">訂金證明</p>
+                <div id="thumb-deposit" class="w-full aspect-video bg-gray-50 dark:bg-[#1A211D] rounded-xl overflow-hidden border border-gray-100 dark:border-pm-dark-border flex items-center justify-center text-xs text-gray-400">未上傳</div>
                 <p id="detail-deposit-date" class="text-[10px] text-gray-500 mt-1 hidden"></p>
             </div>
             
             <div class="space-y-2 pt-2">
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Balance Proof</p>
-                <div id="thumb-balance" class="w-full aspect-video bg-gray-50 dark:bg-[#1A211D] rounded-xl overflow-hidden border border-gray-100 dark:border-pm-dark-border flex items-center justify-center text-xs text-gray-400">Not Uploaded</div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">尾數證明</p>
+                <div id="thumb-balance" class="w-full aspect-video bg-gray-50 dark:bg-[#1A211D] rounded-xl overflow-hidden border border-gray-100 dark:border-pm-dark-border flex items-center justify-center text-xs text-gray-400">未上傳</div>
                 <p id="detail-balance-date" class="text-[10px] text-gray-500 mt-1 hidden"></p>
             </div>
 
             <div class="sm:col-span-2 border-t border-gray-100 dark:border-pm-dark-border pt-6 mt-2">
               <div class="grid grid-cols-2 gap-6 mb-6">
-                <div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Physical Product</p><p id="detail-product" class="text-sm font-semibold text-gray-900 dark:text-white">-</p></div>
-                <div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Submission Date</p><p id="detail-submission-date" class="text-sm font-semibold text-gray-900 dark:text-white">-</p></div>
+                <div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">實體產品</p><p id="detail-product" class="text-sm font-semibold text-gray-900 dark:text-white">-</p></div>
+                <div><p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">交付日期</p><p id="detail-submission-date" class="text-sm font-semibold text-gray-900 dark:text-white">-</p></div>
               </div>
-              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Remarks / Special Requests</p>
+              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">特殊要求 / 備註</p>
               <div class="bg-gray-50 dark:bg-[#1A211D] p-5 rounded-xl border border-gray-100 dark:border-pm-dark-border text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap min-h-[80px]" id="detail-remarks">無</div>
             </div>
           </div>
@@ -221,46 +218,46 @@
         
         <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white">Workflow Status</h3>
-            <span id="status-msg" class="text-xs text-pm-green dark:text-[#8DBA76] font-bold tracking-wider opacity-0 transition-opacity flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Saved</span>
+            <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white">目前進度</h3>
+            <span id="status-msg" class="text-xs text-pm-green dark:text-[#8DBA76] font-bold tracking-wider opacity-0 transition-opacity flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> 已更新</span>
           </div>
           <select id="body-status-select" class="status-select w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-900 dark:text-white rounded-xl px-4 py-3.5 font-bold cursor-pointer transition-colors focus:ring-pm-oak/30 focus:border-pm-oak appearance-none">
-            <option value="col-new">🆕 New Request (新預約)</option>
-            <option value="col-basic-edit">🎨 Basic Retouch (基本修輯)</option>
-            <option value="col-pick-photos">📸 Client Selection (揀相)</option>
-            <option value="col-final-retouch">✨ Final Polish (精修)</option>
-            <option value="col-completed">✅ Delivered (完成)</option>
+            <option value="col-new">🆕 新預約</option>
+            <option value="col-basic-edit">🎨 基本修輯</option>
+            <option value="col-pick-photos">📸 揀相</option>
+            <option value="col-final-retouch">✨ 精修</option>
+            <option value="col-completed">✅ 完成</option>
           </select>
         </div>
 
         <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2"><i data-lucide="link-2" class="w-4 h-4 text-pm-oak"></i> Gallery Link</h3>
-            <span id="link-save-msg" class="text-xs text-pm-green dark:text-[#8DBA76] font-bold tracking-wider opacity-0 transition-opacity flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Saved</span>
+            <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2"><i data-lucide="link-2" class="w-4 h-4 text-pm-oak"></i> 交付相片連結</h3>
+            <span id="link-save-msg" class="text-xs text-pm-green dark:text-[#8DBA76] font-bold tracking-wider opacity-0 transition-opacity flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> 已儲存</span>
           </div>
-          <input type="url" id="detail-gallery-url" placeholder="Paste Google Drive/Pic-Time link..." class="w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-pm-oak rounded-xl px-4 py-3.5 text-sm transition-colors focus:ring-pm-oak/30">
+          <input type="url" id="detail-gallery-url" placeholder="貼上 Google Drive 連結..." class="w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-pm-oak rounded-xl px-4 py-3.5 text-sm transition-colors focus:ring-pm-oak/30">
         </div>
 
         <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
-          <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white mb-5">Quick Actions</h3>
+          <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white mb-5">一鍵聯絡與管理</h3>
           
           <button onclick="copyTrackerLink()" class="w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-700 dark:text-gray-200 py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-[#252C28] transition-all mb-5">
-            <i data-lucide="copy" class="w-4 h-4 text-pm-oak"></i> Copy Client Portal Link
+            <i data-lucide="copy" class="w-4 h-4 text-pm-oak"></i> 複製客人進度查詢連結
           </button>
 
           <div class="relative mb-5">
             <select id="wa-template-select" class="status-select w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-900 dark:text-white rounded-xl px-4 py-3.5 text-sm font-semibold appearance-none focus:ring-pm-oak/30 focus:border-pm-oak">
-              <option value="reminder">🔔 Reminder (拍攝前)</option>
-              <option value="pick_photos">📸 Selection Ready (修圖前)</option>
-              <option value="finished">🎉 Final Delivery (完成交付)</option>
-              <option value="balance">💳 Payment Request (尾數追收)</option>
+              <option value="reminder">🔔 溫馨提示 (拍攝前)</option>
+              <option value="pick_photos">📸 提醒揀相 (修圖前)</option>
+              <option value="finished">🎉 相片已起貨 (完成交付)</option>
+              <option value="balance">💳 尾數追收 (拍攝後)</option>
             </select>
           </div>
           
           <div class="grid grid-cols-2 gap-4 mb-5">
             <button id="btn-edit" class="w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border p-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-pm-oak hover:text-pm-oak text-gray-600 dark:text-gray-400 transition-all group">
               <i data-lucide="edit-3" class="w-6 h-6 group-hover:scale-110 transition-transform"></i>
-              <span class="font-semibold text-xs uppercase tracking-wider">Edit Data</span>
+              <span class="font-semibold text-xs uppercase tracking-wider">編輯資料</span>
             </button>
             <button id="btn-whatsapp" class="w-full bg-[#25D366] text-white p-4 rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all">
               <i data-lucide="message-circle" class="w-6 h-6"></i>
@@ -269,11 +266,11 @@
           </div>
           
           <button id="btn-generate-pdf" class="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold hover:opacity-90 transition-opacity shadow-md mb-5">
-            <i data-lucide="file-text" class="w-4 h-4"></i> Download Invoice (PDF)
+            <i data-lucide="file-text" class="w-4 h-4"></i> 下載 PDF 收據
           </button>
           
           <button id="btn-delete" class="w-full bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-500/20 py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold hover:bg-red-600 hover:text-white dark:hover:bg-red-500 dark:hover:text-white transition-colors">
-            <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Booking
+            <i data-lucide="trash-2" class="w-4 h-4"></i> 刪除此預約單
           </button>
         </div>
       </div>
@@ -328,11 +325,11 @@
       <div class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center mb-5">
         <i data-lucide="alert-triangle" class="w-6 h-6 text-red-500 dark:text-red-400"></i>
       </div>
-      <h3 class="text-xl font-serif font-bold text-gray-900 dark:text-white mb-2">Delete Booking?</h3>
-      <p class="text-gray-500 dark:text-gray-400 text-sm mb-8 leading-relaxed">This action cannot be undone. All data associated with this booking will be permanently removed.</p>
+      <h3 class="text-xl font-serif font-bold text-gray-900 dark:text-white mb-2">確定刪除預約？</h3>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mb-8 leading-relaxed">刪除後此訂單的所有資料將無法復原。請確認是否繼續操作。</p>
       <div class="flex justify-end gap-3">
-        <button id="modal-cancel-btn" class="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-pm-dark-border transition-colors">Cancel</button>
-        <button id="modal-confirm-btn" class="px-5 py-2.5 rounded-lg text-sm font-medium bg-red-500 hover:bg-red-600 text-white shadow-sm transition-colors active:scale-95">Delete</button>
+        <button id="modal-cancel-btn" class="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-pm-dark-border transition-colors">取消保留</button>
+        <button id="modal-confirm-btn" class="px-5 py-2.5 rounded-lg text-sm font-medium bg-red-500 hover:bg-red-600 text-white shadow-sm transition-colors active:scale-95">確認刪除</button>
       </div>
     </div>
   </div>
@@ -391,7 +388,6 @@
         document.getElementById('lightbox-img').src = url; 
         const lb = document.getElementById('lightbox');
         lb.style.display = 'flex'; 
-        // Trigger reflow for fade in
         void lb.offsetWidth;
         lb.style.opacity = '1';
     };
@@ -410,9 +406,9 @@
       const portalUrl = dirUrl + "/portal.html";
       
       navigator.clipboard.writeText(portalUrl).then(() => {
-        showToast("Client Portal Link Copied");
+        showToast("已複製客戶查詢連結");
       }).catch(err => {
-        showToast("Failed to copy link", "error");
+        showToast("複製連結失敗", "error");
       });
     };
 
@@ -420,7 +416,7 @@
       try { 
           const snap = await getDoc(doc(db, "Settings", "whatsapp_templates")); 
           if (snap.exists()) waTemplates = snap.data(); 
-          else waTemplates = { reminder: "Hi {name}! See you tomorrow!", balance: "Hi {name}! A balance of HK$ {balance} is due." }; 
+          else waTemplates = { reminder: "哈囉 {name}！聽日見！", balance: "哈囉 {name}！尾數 HK$ {balance} 未收。" }; 
       } catch (err) {}
     }
 
@@ -436,22 +432,22 @@
         orderShootDate = data.shootDate; 
         orderLocation = data.shootLocation;
 
-        document.getElementById('detail-date').innerText = (data.shootDate || "TBD") + (data.shootTime ? " " + data.shootTime : "");
-        document.getElementById('detail-location').innerText = data.shootLocation || "TBD";
-        document.getElementById('detail-package').innerText = data.package || "Not selected";
+        document.getElementById('detail-date').innerText = (data.shootDate || "待定") + (data.shootTime ? " " + data.shootTime : "");
+        document.getElementById('detail-location').innerText = data.shootLocation || "待定";
+        document.getElementById('detail-package').innerText = data.package || "未選擇";
         document.getElementById('detail-price').innerText = data.price ? `HK$ ${data.price.toLocaleString()}` : "HK$ 0";
-        document.getElementById('detail-remarks').innerText = data.notes || "None";
+        document.getElementById('detail-remarks').innerText = data.notes || "無";
         document.getElementById('detail-gallery-url').value = data.galleryUrl || "";
         
         if(data.status) document.getElementById('body-status-select').value = data.status;
 
-        document.getElementById('detail-platform').innerText = data.platform || "N/A";
-        document.getElementById('detail-product').innerText = data.product || "None";
-        document.getElementById('detail-submission-date').innerText = data.submissionDate || "TBD";
+        document.getElementById('detail-platform').innerText = data.platform || "未填寫";
+        document.getElementById('detail-product').innerText = data.product || "無";
+        document.getElementById('detail-submission-date').innerText = data.submissionDate || "待定";
         
         const extraPax = data.extraPaxCount || 0;
         const kids = data.kidsCount || 0;
-        document.getElementById('detail-pax-info').innerText = `${extraPax} extra pax/pet (+HK$${extraPax*300}) • ${kids} kid(s) under 6 (Free)`;
+        document.getElementById('detail-pax-info').innerText = `${extraPax} 位額外人數/寵物 (+HK$${extraPax*300}) • ${kids} 位 6歲以下小童 (免費)`;
 
         if (data.studio) { 
             const stdEl = document.getElementById('detail-studio'); 
@@ -460,12 +456,12 @@
         }
         if (data.otherFee > 0) { 
             const feeEl = document.getElementById('detail-other-fee'); 
-            feeEl.innerText = `Includes $${data.otherFee} surcharge`; 
+            feeEl.innerText = `含各項附加費: $${data.otherFee.toLocaleString()}`; 
             feeEl.classList.remove('hidden'); 
         }
         if (data.discount > 0) { 
             const discEl = document.getElementById('detail-discount'); 
-            discEl.innerText = `Weekday Discount -$${data.discount}`; 
+            discEl.innerText = `已扣減折扣 -$${data.discount.toLocaleString()}`; 
             discEl.classList.remove('hidden'); 
         }
 
@@ -488,12 +484,12 @@
                     <img src="${p.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop'}" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Pet ${i+1}</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">${p.name} <span class="text-gray-500 dark:text-gray-400 font-normal text-xs ml-1">(${p.type || 'N/A'}${p.breed ? ' - '+p.breed : ''})</span></p>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">寵物 ${i+1}</p>
+                    <p class="font-semibold text-gray-900 dark:text-white">${p.name} <span class="text-gray-500 dark:text-gray-400 font-normal text-xs ml-1">(${p.type || '未填'}${p.breed ? ' - '+p.breed : ''})</span></p>
                 </div>
             </div>`).join('');
         } else {
-          document.getElementById('detail-pet-name').innerText = "Unknown Pet";
+          document.getElementById('detail-pet-name').innerText = "未知寵物";
         }
         
         if (data.tags) {
@@ -507,7 +503,7 @@
             loadedClientName = c.name; 
             loadedClientPhone = c.phone;
             document.getElementById('detail-client-name').innerText = c.name; 
-            document.getElementById('detail-client-phone').innerText = c.phone || "No phone";
+            document.getElementById('detail-client-phone').innerText = c.phone || "無電話";
             
             const igEl = document.getElementById('detail-client-ig');
             if(c.instagram) { 
@@ -530,7 +526,7 @@
 
         if (data.depositDate) { 
             const dDate = document.getElementById('detail-deposit-date'); 
-            dDate.innerText = `Uploaded: ${data.depositDate}`; 
+            dDate.innerText = `上傳時間: ${data.depositDate}`; 
             dDate.classList.remove('hidden'); 
         }
         if (data.depositReceiptUrl) {
@@ -538,7 +534,7 @@
         }
         if (data.balanceDate) { 
             const bDate = document.getElementById('detail-balance-date'); 
-            bDate.innerText = `Uploaded: ${data.balanceDate}`; 
+            bDate.innerText = `上傳時間: ${data.balanceDate}`; 
             bDate.classList.remove('hidden'); 
         }
         if (data.balanceReceiptUrl) {
@@ -549,16 +545,16 @@
         const pStatus = data.paymentStatus || (data.depositPaid ? "deposit" : "unpaid");
         
         if (pStatus === 'full') {
-            depositEl.innerHTML = `<span class="flex items-center gap-1.5 text-pm-green dark:text-[#8DBA76] font-bold"><i data-lucide="check-circle" class="w-4 h-4"></i> Fully Paid</span>`;
+            depositEl.innerHTML = `<span class="flex items-center gap-1.5 text-pm-green dark:text-[#8DBA76] font-bold"><i data-lucide="check-circle" class="w-4 h-4"></i> 全數已付</span>`;
         } else if (pStatus === 'deposit') {
-          depositEl.innerHTML = `<span class="flex items-center gap-1.5 text-pm-oak font-bold"><i data-lucide="credit-card" class="w-4 h-4"></i> Deposit Paid</span>`;
+          depositEl.innerHTML = `<span class="flex items-center gap-1.5 text-pm-oak font-bold"><i data-lucide="credit-card" class="w-4 h-4"></i> 已付訂金</span>`;
           const bal = Number(data.price || 0) - Number(data.depositAmount || 0);
           if (bal > 0) { 
-              document.getElementById('detail-balance').innerText = `Balance Due: HK$ ${bal.toLocaleString()}`; 
+              document.getElementById('detail-balance').innerText = `尚欠尾數: HK$ ${bal.toLocaleString()}`; 
               document.getElementById('detail-balance').classList.remove('hidden'); 
           }
         } else {
-            depositEl.innerHTML = `<span class="flex items-center gap-1.5 text-red-500 dark:text-red-400 font-bold"><i data-lucide="x-circle" class="w-4 h-4"></i> Unpaid</span>`;
+            depositEl.innerHTML = `<span class="flex items-center gap-1.5 text-red-500 dark:text-red-400 font-bold"><i data-lucide="x-circle" class="w-4 h-4"></i> 未付款</span>`;
         }
         updateIcons();
       } catch (err) { console.error(err); }
@@ -574,7 +570,7 @@
           const msg = document.getElementById('status-msg'); 
           msg.classList.remove('opacity-0'); 
           setTimeout(() => msg.classList.add('opacity-0'), 2000); 
-      } catch (err) { showToast("Failed to update status", "error"); }
+      } catch (err) { showToast("進度更新失敗", "error"); }
     });
 
     document.getElementById('detail-gallery-url').addEventListener('change', async (e) => {
@@ -584,11 +580,11 @@
           const msg = document.getElementById('link-save-msg'); 
           msg.classList.remove('opacity-0'); 
           setTimeout(() => msg.classList.add('opacity-0'), 2000); 
-      } catch(err) { showToast("Failed to save link", "error"); }
+      } catch(err) { showToast("連結儲存失敗", "error"); }
     });
 
     document.getElementById('btn-whatsapp').addEventListener('click', () => {
-      if(!loadedClientPhone) return alert("No phone number found for this client.");
+      if(!loadedClientPhone) return alert("此客戶沒有提供電話號碼！");
       let phone = loadedClientPhone.replace(/\D/g, ''); 
       if (phone.length === 8) phone = "852" + phone;
       
@@ -597,9 +593,9 @@
       let msg = (waTemplates[templateKey] || "")
           .replace(/{name}/g, loadedClientName || "")
           .replace(/{pets}/g, loadedPetsString || "")
-          .replace(/{date}/g, orderShootDate || "TBD")
-          .replace(/{location}/g, orderLocation || "TBD")
-          .replace(/{link}/g, document.getElementById('detail-gallery-url').value.trim() || "[No Link Provided]")
+          .replace(/{date}/g, orderShootDate || "待定")
+          .replace(/{location}/g, orderLocation || "待定")
+          .replace(/{link}/g, document.getElementById('detail-gallery-url').value.trim() || "[未提供連結]")
           .replace(/{balance}/g, bal || "0");
           
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -608,7 +604,7 @@
     document.getElementById('btn-generate-pdf').addEventListener('click', () => {
       const btn = document.getElementById('btn-generate-pdf');
       const originalHTML = btn.innerHTML;
-      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> Generating...`;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> 產生中...`;
       btn.classList.add('opacity-70', 'cursor-not-allowed');
       updateIcons();
 
@@ -630,19 +626,19 @@
       let tableHtml = `<tr><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; color: #111827;"><strong>${rawData.package || "Photography Service"}</strong></td><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; text-align:right; color: #111827;">${basePrice.toLocaleString()}</td></tr>`;
       
       if(studioTopUp > 0) {
-          tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Extra Studio Fee</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${studioTopUp.toLocaleString()}</td></tr>`;
+          tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Extra Studio Fee (補地租差價)</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${studioTopUp.toLocaleString()}</td></tr>`;
       }
       if(extraPaxCost > 0) {
-          tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Extra Pax/Pet (x ${rawData.extraPaxCount})</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${extraPaxCost.toLocaleString()}</td></tr>`;
+          tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Extra Pax/Pet (額外人數/寵物 x ${rawData.extraPaxCount})</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${extraPaxCost.toLocaleString()}</td></tr>`;
       }
       if(manualOtherFee > 0) {
-          tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Other Surcharges</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${manualOtherFee.toLocaleString()}</td></tr>`;
+          tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Other Surcharges (其他附加費)</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${manualOtherFee.toLocaleString()}</td></tr>`;
       }
       if(discount > 0) {
-          tableHtml += `<tr><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; font-size: 14px; color: #4B5563;">- Discount Applied</td><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; text-align:right; font-size: 14px; color: #EF4444;">- ${discount.toLocaleString()}</td></tr>`;
+          tableHtml += `<tr><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; font-size: 14px; color: #4B5563;">- Discount Applied (折扣優惠)</td><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; text-align:right; font-size: 14px; color: #EF4444;">- ${discount.toLocaleString()}</td></tr>`;
       }
       if(dep > 0) {
-          tableHtml += `<tr><td style="padding:16px 10px; border-bottom:1px solid #111827; color: #111827;"><strong>Deposit Paid</strong></td><td style="padding:16px 10px; border-bottom:1px solid #111827; text-align:right; color:#EF4444;">- ${dep.toLocaleString()}</td></tr>`;
+          tableHtml += `<tr><td style="padding:16px 10px; border-bottom:1px solid #111827; color: #111827;"><strong>Deposit Paid (已付訂金)</strong></td><td style="padding:16px 10px; border-bottom:1px solid #111827; text-align:right; color:#EF4444;">- ${dep.toLocaleString()}</td></tr>`;
       }
       
       document.getElementById('pdf-table-body').innerHTML = tableHtml;
@@ -662,7 +658,7 @@
           btn.classList.remove('opacity-70', 'cursor-not-allowed');
           updateIcons();
         });
-      }, 500); // 畀少少時間 UI 更新
+      }, 500);
     });
 
     document.getElementById('btn-edit').addEventListener('click', () => window.location.href = `add.html?editId=${orderId}`);
@@ -689,7 +685,7 @@
         await deleteDoc(doc(db, "Orders", orderId));
         window.location.href = 'index.html'; 
       } catch(e) {
-        showToast("Failed to delete booking", "error");
+        showToast("刪除預約單失敗", "error");
       }
     });
 
