@@ -1,156 +1,217 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>預約詳情進度 | Pawfect Memories</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <title>預約進度查詢 | Pawfect Memories</title>
+  
+  <script>
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+  
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script id="tailwind-config">
+    tailwind.config = { 
+      darkMode: 'class',
+      theme: { 
+        extend: { 
+          colors: { 
+            "pm-green": "#244018",       
+            "pm-oak": "#C4905E",         
+            "pm-cream": "#FAFAFA",       
+            "pm-dark-bg": "#0B0E0C",       
+            "pm-dark-surface": "#121714",  
+            "pm-dark-border": "#1E2621",
+            "error": "#EF4444"
+          }, 
+          fontFamily: { 
+            serif: ['"Playfair Display"', 'serif'], 
+            sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] 
+          },
+          boxShadow: {
+            'taste': '0 10px 40px -10px rgba(0, 0, 0, 0.08)',
+            'taste-dark': '0 10px 40px -10px rgba(0, 0, 0, 0.5)'
+          }
+        } 
+      } 
+    }
+  </script>
   <style>
-    body { background: #131313; color: white; font-family: 'Manrope', sans-serif; }
-    .step-line { position: absolute; top: 15px; left: 16px; bottom: -15px; width: 2px; background: #2a2a2a; z-index: 0; }
-    .step-active .step-line { background: #4edea3; }
+    body { min-height: 100dvh; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
+    
+    /* 優雅嘅進度軸線條 */
+    .step-line { position: absolute; top: 24px; left: 19px; bottom: -24px; width: 2px; background: #E5E7EB; z-index: 0; transition: background 0.4s ease; }
+    .dark .step-line { background: #1E2621; }
+    .step-active .step-line { background: #C4905E; }
+    
+    /* 隱藏最後一步嘅線條 */
+    #s-5 .step-line { display: none; }
   </style>
 </head>
-<body class="p-6 md:p-12 max-w-lg mx-auto pb-24">
-  
-  <div class="text-center mb-8 relative">
-    <button id="btn-back-portal" onclick="window.location.href='portal.html'" class="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-1 text-gray-400 hover:text-white transition-colors text-sm font-bold bg-[#1c1b1b] px-3 py-1.5 rounded-xl border border-white/5">
-        <span class="material-symbols-outlined text-[18px]">arrow_back</span> 列表
+<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white pb-24">
+
+  <header class="w-full pt-8 pb-4 px-6 flex justify-between items-center max-w-2xl mx-auto">
+    <button onclick="window.location.href='portal.html'" class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-pm-dark-border text-gray-500 dark:text-gray-400 hover:text-pm-oak transition-colors shadow-sm" title="返回列表">
+      <i data-lucide="arrow-left" class="w-5 h-5"></i>
     </button>
-    <h1 class="text-3xl font-black text-[#4edea3] font-['Dancing_Script']">Pawfect Memories</h1>
-    <p class="text-gray-500 text-xs mt-1 uppercase tracking-widest">Order Details</p>
-  </div>
+    <div class="flex flex-col items-center text-center">
+      <h1 class="font-serif text-2xl text-pm-green dark:text-[#D1E2C7] font-bold tracking-tight">Pawfect Memories</h1>
+    </div>
+    <div class="w-10 h-10"></div> </header>
 
-  <div id="login-box" class="hidden space-y-4 mb-10">
-    <input type="tel" id="phone" placeholder="請輸入登記電話 (8位)" class="w-full bg-[#1c1b1b] border border-white/10 rounded-2xl px-6 py-4 text-center font-bold text-lg outline-none focus:border-[#4edea3] transition-colors">
-    <button id="btn-track" class="w-full bg-gradient-to-r from-[#4edea3] to-[#10b981] text-[#003824] font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-transform">即時查詢</button>
-  </div>
-
-  <div id="result" class="hidden space-y-6">
+  <main class="px-5 md:px-8 max-w-2xl mx-auto mt-4">
     
-    <div class="bg-[#1c1b1b] rounded-3xl p-6 border border-white/10 shadow-2xl space-y-5">
-      <div class="flex justify-between items-start gap-4">
-        <h2 id="res-pet" class="text-xl font-black text-white leading-tight">載入中...</h2>
-        <span id="res-order-id" class="text-[10px] font-bold tracking-wider uppercase bg-[#2a2a2a] px-2.5 py-1 rounded-md text-gray-400 shrink-0">單號 #------</span>
+    <div id="login-box" class="hidden space-y-6 mt-20">
+      <div class="text-center mb-8">
+        <h2 class="font-serif text-3xl text-gray-900 dark:text-white mb-2">Welcome Back</h2>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">請輸入登記電話以查詢預約進度</p>
       </div>
-      <div id="res-avatars-container" class="flex flex-wrap gap-4"></div>
-      <div id="res-breed" class="flex flex-wrap gap-1.5 pt-2 border-t border-white/5"></div>
+      <input type="tel" id="phone" placeholder="電話號碼 (8位)" class="w-full bg-white dark:bg-pm-dark-surface border border-gray-200 dark:border-pm-dark-border rounded-2xl px-6 py-4 text-center font-medium text-lg outline-none focus:border-pm-oak focus:ring-2 focus:ring-pm-oak/20 transition-all shadow-sm dark:shadow-none">
+      <button id="btn-track" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold tracking-wide py-4 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all text-lg flex items-center justify-center gap-2">
+        <i data-lucide="search" class="w-5 h-5"></i> 查詢進度
+      </button>
     </div>
 
-    <div class="bg-[#1c1b1b] rounded-3xl p-6 border border-white/10 shadow-2xl space-y-4">
-      <h3 class="text-xs font-bold uppercase tracking-widest text-[#4edea3] border-b border-white/5 pb-2 flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-[16px]">info</span> 拍攝與項目詳細資訊
-      </h3>
+    <div id="result" class="hidden space-y-8 animate-[fadeIn_0.5s_ease-out]">
       
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-4 text-sm">
-        <div class="space-y-0.5">
-          <p class="text-[10px] text-gray-500 font-bold uppercase">選擇套餐</p>
-          <p id="res-package" class="font-bold text-white">-</p>
+      <div class="text-center mt-6 mb-10">
+        <span id="res-order-id" class="inline-block text-[10px] font-bold tracking-[0.2em] uppercase bg-gray-100 dark:bg-pm-dark-surface border border-gray-200 dark:border-pm-dark-border text-gray-500 dark:text-gray-400 px-3 py-1 rounded-full mb-4">單號 #------</span>
+        <h2 id="res-pet" class="font-serif text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight mb-8">載入中...</h2>
+        <div id="res-avatars-container" class="flex flex-wrap justify-center gap-6"></div>
+        <div id="res-breed" class="flex flex-wrap justify-center gap-2 mt-6"></div>
+      </div>
+
+      <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 md:p-8 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-pm-oak border-b border-gray-100 dark:border-pm-dark-border pb-4 flex items-center gap-2 mb-6">
+          <i data-lucide="info" class="w-4 h-4"></i> 拍攝詳細資訊
+        </h3>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-6 text-sm">
+          <div class="space-y-1">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">選擇套餐</p>
+            <p id="res-package" class="font-medium text-gray-900 dark:text-white">-</p>
+          </div>
+          <div class="space-y-1">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">拍攝時間</p>
+            <p id="res-date" class="font-medium text-gray-900 dark:text-white">-</p>
+          </div>
+          <div class="space-y-1 sm:col-span-2">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">拍攝地點 / 影樓</p>
+            <p id="res-location" class="font-medium text-gray-900 dark:text-white">-</p>
+            <p id="res-studio" class="text-xs text-pm-oak mt-1 hidden"></p>
+          </div>
+          
+          <div id="res-pax-block" class="space-y-1 sm:col-span-2 border-t border-gray-100 dark:border-pm-dark-border pt-5 hidden">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">額外拍攝人數及寵物</p>
+            <p id="res-pax-info" class="text-sm font-medium text-gray-600 dark:text-gray-300">-</p>
+          </div>
+
+          <div id="res-submission-block" class="space-y-1 sm:col-span-2 border-t border-gray-100 dark:border-pm-dark-border pt-5 hidden">
+            <p class="text-[10px] text-pm-green dark:text-[#8DBA76] font-bold uppercase tracking-wider flex items-center gap-1"><i data-lucide="calendar-check" class="w-3 h-3"></i> 預計交付日期</p>
+            <p id="res-submission-date" class="font-bold text-gray-900 dark:text-white text-base">-</p>
+          </div>
+
+          <div id="res-product-block" class="space-y-1 sm:col-span-2 border-t border-gray-100 dark:border-pm-dark-border pt-5 hidden">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">包含實體產品</p>
+            <p id="res-product" class="font-medium text-pm-oak flex items-center gap-1.5"><i data-lucide="book-open" class="w-4 h-4"></i> -</p>
+          </div>
+
+          <div id="res-notes-block" class="space-y-2 sm:col-span-2 border-t border-gray-100 dark:border-pm-dark-border pt-5 hidden">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">備註 / 特殊要求</p>
+            <div id="res-notes" class="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-[#1A211D] p-4 rounded-xl border border-gray-100 dark:border-pm-dark-border whitespace-pre-wrap leading-relaxed">-</div>
+          </div>
         </div>
-        <div class="space-y-0.5">
-          <p class="text-[10px] text-gray-500 font-bold uppercase">拍攝時間</p>
-          <p id="res-date" class="font-bold text-white">-</p>
+      </div>
+
+      <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 md:p-8 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 transition-colors">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-pm-oak border-b border-gray-100 dark:border-pm-dark-border pb-4 mb-8 flex items-center gap-2">
+          <i data-lucide="activity" class="w-4 h-4"></i> 目前工作進度
+        </h3>
+        
+        <div id="stepper" class="space-y-8 pl-2">
+          <div class="flex gap-5 relative" id="s-1">
+              <div class="step-line"></div>
+              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="clock" class="w-4 h-4 text-gray-400"></i></div>
+              <div class="pt-2"><p class="font-bold text-gray-400 s-title transition-colors">新預約</p><p class="text-xs text-gray-400 mt-1">已收到您的預約申請</p></div>
+          </div>
+          <div class="flex gap-5 relative" id="s-2">
+              <div class="step-line"></div>
+              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="sliders" class="w-4 h-4 text-gray-400"></i></div>
+              <div class="pt-2"><p class="font-bold text-gray-400 s-title transition-colors">基本修輯</p><p class="text-xs text-gray-400 mt-1">正在處理光暗及色調優化</p></div>
+          </div>
+          <div class="flex gap-5 relative" id="s-3">
+              <div class="step-line"></div>
+              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="image" class="w-4 h-4 text-gray-400"></i></div>
+              <div class="pt-2"><p class="font-bold text-gray-400 s-title transition-colors">揀相</p><p class="text-xs text-gray-400 mt-1">相片已備妥，請挑選精修相片</p></div>
+          </div>
+          <div class="flex gap-5 relative" id="s-4">
+              <div class="step-line"></div>
+              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="wand-2" class="w-4 h-4 text-gray-400"></i></div>
+              <div class="pt-2"><p class="font-bold text-gray-400 s-title transition-colors">精修</p><p class="text-xs text-gray-400 mt-1">正在進行精細人像/寵物修飾</p></div>
+          </div>
+          <div class="flex gap-5 relative" id="s-5">
+              <div class="step-line"></div>
+              <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon border-2 border-white dark:border-pm-dark-surface transition-colors"><i data-lucide="check" class="w-4 h-4 text-gray-400"></i></div>
+              <div class="pt-2"><p class="font-bold text-gray-400 s-title transition-colors">完成</p><p class="text-xs text-gray-400 mt-1">相片已全數交付，感謝耐心等待</p></div>
+          </div>
         </div>
-        <div class="space-y-0.5 sm:col-span-2">
-          <p class="text-[10px] text-gray-500 font-bold uppercase">拍攝地點 / 影樓</p>
-          <p id="res-location" class="font-bold text-white">-</p>
-          <p id="res-studio" class="text-xs text-gray-400 hidden mt-0.5"></p>
+
+        <div id="gallery-box" class="mt-10 pt-8 border-t border-gray-100 dark:border-pm-dark-border hidden">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-pm-green/10 dark:bg-[#8DBA76]/10 mb-3 text-pm-green dark:text-[#8DBA76]">
+                <i data-lucide="party-popper" class="w-6 h-6"></i>
+              </div>
+              <p class="text-sm font-bold text-gray-900 dark:text-white">您的相片已準備好！</p>
+            </div>
+            
+            <a id="gallery-link" href="#" target="_blank" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] py-4 rounded-xl flex items-center justify-center gap-2 font-bold shadow-lg hover:shadow-xl active:scale-95 transition-all mb-4">
+              <i data-lucide="cloud-download" class="w-5 h-5"></i> 前往雲端相簿
+            </a>
+            
+            <div class="flex items-center gap-2">
+              <input type="text" id="gallery-url-text" readonly class="bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border rounded-xl px-4 py-3 text-xs text-gray-500 w-full outline-none">
+              <button onclick="copyGalleryLink()" class="bg-gray-100 dark:bg-pm-dark-border p-3 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex shrink-0 active:scale-95" title="複製連結">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+              </button>
+            </div>
+        </div>
+      </div>
+
+      <div id="finance-card" class="rounded-[24px] p-6 shadow-taste dark:shadow-taste-dark relative overflow-hidden transition-colors bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-white/5">
+        <div class="flex justify-between items-start mb-4 relative z-10">
+          <div>
+            <p id="finance-title" class="text-[10px] uppercase font-bold tracking-widest flex items-center gap-1.5 text-gray-400"><i data-lucide="receipt" class="w-3 h-3"></i> 財務狀態</p>
+            <p id="res-finance" class="text-sm font-bold mt-1.5 text-gray-900 dark:text-white"></p>
+          </div>
+          <div class="text-right">
+            <p id="res-balance-label" class="text-[10px] uppercase font-bold tracking-widest text-gray-400"></p>
+            <p id="res-balance" class="text-2xl font-serif font-bold leading-none mt-1"></p>
+          </div>
         </div>
         
-        <div id="res-pax-block" class="space-y-0.5 sm:col-span-2 border-t border-white/5 pt-3 hidden">
-          <p class="text-[10px] text-gray-500 font-bold uppercase">額外拍攝人數及寵物</p>
-          <p id="res-pax-info" class="text-sm text-gray-300">-</p>
-        </div>
-
-        <div id="res-submission-block" class="space-y-0.5 sm:col-span-2 border-t border-white/5 pt-3 hidden">
-          <p class="text-[10px] text-[#ffb95f] font-bold uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">event_available</span> 預計交付日期</p>
-          <p id="res-submission-date" class="font-bold text-white">-</p>
-        </div>
-
-        <div id="res-product-block" class="space-y-0.5 sm:col-span-2 border-t border-white/5 pt-3 hidden">
-          <p class="text-[10px] text-gray-500 font-bold uppercase">包含實體產品</p>
-          <p id="res-product" class="font-bold text-[#ffb95f] flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">auto_stories</span> -</p>
-        </div>
-
-        <div id="res-notes-block" class="space-y-1.5 sm:col-span-2 border-t border-white/5 pt-3 hidden">
-          <p class="text-[10px] text-gray-500 font-bold uppercase">備註 / 特殊要求</p>
-          <div id="res-notes" class="text-sm text-gray-300 bg-[#2a2a2a] p-3 rounded-lg whitespace-pre-wrap leading-relaxed">-</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-[#1c1b1b] rounded-3xl p-6 border border-white/10 shadow-2xl">
-      <h3 class="text-xs font-bold uppercase tracking-widest text-[#4edea3] border-b border-white/5 pb-3 mb-5 flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-[16px]">analytics</span> 目前工作進度
-      </h3>
-      
-      <div id="stepper" class="space-y-6">
-        <div class="flex gap-4 relative" id="s-1">
-            <div class="step-line"></div>
-            <div class="w-8 h-8 rounded-full bg-[#2a2a2a] flex items-center justify-center z-10 s-icon"><span class="material-symbols-outlined text-sm">schedule</span></div>
-            <div><p class="font-bold text-sm text-gray-500">新預約</p><p class="text-[10px] text-gray-500">已收到您的預約申請</p></div>
-        </div>
-        <div class="flex gap-4 relative" id="s-2">
-            <div class="step-line"></div>
-            <div class="w-8 h-8 rounded-full bg-[#2a2a2a] flex items-center justify-center z-10 s-icon"><span class="material-symbols-outlined text-sm">auto_fix_high</span></div>
-            <div><p class="font-bold text-sm text-gray-500">基本修輯</p><p class="text-[10px] text-gray-500">正在處理光暗及色調優化</p></div>
-        </div>
-        <div class="flex gap-4 relative" id="s-3">
-            <div class="step-line"></div>
-            <div class="w-8 h-8 rounded-full bg-[#2a2a2a] flex items-center justify-center z-10 s-icon"><span class="material-symbols-outlined text-sm">photo_library</span></div>
-            <div><p class="font-bold text-sm text-gray-500">揀相</p><p class="text-[10px] text-gray-500">相片已備妥，請挑選精修相片</p></div>
-        </div>
-        <div class="flex gap-4 relative" id="s-4">
-            <div class="step-line"></div>
-            <div class="w-8 h-8 rounded-full bg-[#2a2a2a] flex items-center justify-center z-10 s-icon"><span class="material-symbols-outlined text-sm">brush</span></div>
-            <div><p class="font-bold text-sm text-gray-500">精修</p><p class="text-[10px] text-gray-500">正在進行精細人像/寵物修飾</p></div>
-        </div>
-        <div class="flex gap-4 relative" id="s-5">
-            <div class="w-8 h-8 rounded-full bg-[#2a2a2a] flex items-center justify-center z-10 s-icon"><span class="material-symbols-outlined text-sm">check_circle</span></div>
-            <div><p class="font-bold text-sm text-gray-500">完成</p><p class="text-[10px] text-gray-500">相片已全數交付，感謝您的耐心等待</p></div>
-        </div>
-      </div>
-
-      <div id="gallery-box" class="mt-8 pt-6 border-t border-white/5 hidden">
-          <p class="text-xs text-[#4edea3] font-bold mb-3 text-center">🎉 您的相片已準備好！</p>
-          <a id="gallery-link" href="#" target="_blank" class="w-full bg-[#4edea3]/10 text-[#4edea3] py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-sm border border-[#4edea3]/30 hover:bg-[#4edea3]/20 transition-colors">
-            <span class="material-symbols-outlined text-lg">cloud_download</span> 前往雲端相簿
-          </a>
-          <div class="mt-3 flex items-center gap-2">
-            <input type="text" id="gallery-url-text" readonly class="bg-black/20 border border-white/10 rounded-lg px-3 py-2.5 text-[10px] text-gray-400 w-full outline-none">
-            <button onclick="copyGalleryLink()" class="bg-white/10 p-2.5 rounded-lg text-white hover:bg-white/20 transition-colors flex shrink-0 active:scale-95" title="複製連結">
-              <span class="material-symbols-outlined text-sm">content_copy</span>
-            </button>
+        <div id="finance-breakdown" class="hidden relative z-10 pt-4 mt-2 border-t border-gray-100 dark:border-pm-dark-border">
+          <div class="flex justify-between text-xs mb-2 text-gray-500 dark:text-gray-400">
+            <span>總收費 (Total)</span>
+            <span id="breakdown-total" class="font-bold text-gray-900 dark:text-white"></span>
           </div>
+          <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+            <span id="breakdown-label-secondary"></span>
+            <span id="breakdown-amount-secondary" class="font-bold"></span>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div id="finance-card" class="rounded-2xl p-5 shadow-lg relative overflow-hidden">
-      <div class="flex justify-between items-start mb-4 relative z-10">
-        <div>
-          <p id="finance-title" class="text-[10px] uppercase font-bold tracking-widest"></p>
-          <p id="res-finance" class="text-sm font-bold mt-0.5 text-white"></p>
-        </div>
-        <div class="text-right">
-          <p id="res-balance-label" class="text-[10px] uppercase font-bold tracking-widest text-gray-400 opacity-80"></p>
-          <p id="res-balance" class="text-xl font-black leading-none mt-0.5"></p>
-        </div>
-      </div>
-      
-      <div id="finance-breakdown" class="hidden relative z-10 pt-3 border-t border-current/20">
-        <div class="flex justify-between text-xs mb-1 text-gray-400">
-          <span>總收費 (Total)</span>
-          <span id="breakdown-total" class="font-bold text-white"></span>
-        </div>
-        <div class="flex justify-between text-xs text-gray-400">
-          <span id="breakdown-label-secondary"></span>
-          <span id="breakdown-amount-secondary" class="font-bold"></span>
-        </div>
-      </div>
     </div>
-  </div>
+  </main>
+
+  <div id="toast-container" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -160,48 +221,93 @@
     const db = getFirestore(app); 
     const stepMap = { "col-new": 1, "col-basic-edit": 2, "col-pick-photos": 3, "col-final-retouch": 4, "col-completed": 5 };
 
+    lucide.createIcons();
+
+    window.toggleDarkMode = function() {
+      const htmlEl = document.documentElement;
+      if (htmlEl.classList.contains('dark')) {
+        htmlEl.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        htmlEl.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    };
+
+    // Toast Notification (取代原來的 alert)
+    window.showToast = function(msg, type='success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgColor = type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900';
+      const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
+      
+      toast.className = `px-5 py-3 rounded-full shadow-2xl text-sm font-medium transform transition-all translate-y-10 opacity-0 flex items-center gap-2 ${bgColor}`;
+      toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i> ${msg}`;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+      
+      requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
+      setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
     window.copyGalleryLink = () => {
       const linkInput = document.getElementById('gallery-url-text');
-      navigator.clipboard.writeText(linkInput.value).then(() => { alert("✅ 已成功複製相簿連結！"); }).catch(err => alert("複製失敗，請手動複製。"));
+      navigator.clipboard.writeText(linkInput.value).then(() => { 
+          showToast("已成功複製相簿連結"); 
+      }).catch(err => {
+          showToast("複製失敗，請手動複製", "error");
+      });
     };
 
     const urlParams = new URLSearchParams(window.location.search);
     const targetOrderId = urlParams.get('id');
 
-    if (!targetOrderId) { window.location.href = 'portal.html'; } else { loadOrderData(targetOrderId); }
+    if (!targetOrderId) { 
+        // 隱藏查詢結果，顯示自訂 Login Box (呢度已經唔會再彈走，而係顯示輸入框)
+        document.getElementById('login-box').classList.remove('hidden');
+    } else { 
+        loadOrderData(targetOrderId); 
+    }
 
     document.getElementById('btn-track').onclick = () => {
       const phone = document.getElementById('phone').value.trim(); 
-      if(phone.length < 8) return alert("請輸入正確號碼");
+      if(phone.length < 8) return showToast("請輸入正確嘅 8 位數字號碼", "error");
+      // 假設 portal.html 有處理 phone 嘅邏輯，保留原有跳轉
       window.location.href = `portal.html?phone=${phone}`;
     };
 
     async function loadOrderData(orderId) {
       try {
         const snap = await getDoc(doc(db, "Orders", orderId));
-        if(!snap.exists()) { alert("找不到此單據！"); window.location.href = 'portal.html'; return; }
+        if(!snap.exists()) { 
+            showToast("找不到此單據！", "error"); 
+            setTimeout(() => window.location.href = 'portal.html', 1500); 
+            return; 
+        }
         
         const d = snap.data();
         
         let pets = d.pets || [];
         if (pets.length === 0 && d.petName) { pets = [{ name: d.petName, breed: d.petBreed || '', photoUrl: d.photoUrl }]; }
         
-        document.getElementById('res-order-id').innerText = `單號 #${orderId}`;
+        document.getElementById('res-order-id').innerText = `Booking #${orderId}`;
         let petNames = pets.length > 0 ? pets.map(p=>p.name).join(' & ') : '未知寵物';
-        document.getElementById('res-pet').innerText = `${petNames} 的專屬拍攝`;
+        document.getElementById('res-pet').innerText = `${petNames}`;
         
+        // 頭像設計優化
         let avatarsHTML = '';
         if (pets.length === 0) {
-            avatarsHTML = `<div class="flex flex-col items-center gap-1.5 w-16"><img class="w-16 h-16 rounded-full object-cover border-2 border-white/10 shrink-0 bg-[#2a2a2a]" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop"></div>`;
+            avatarsHTML = `<div class="flex flex-col items-center gap-2"><div class="w-24 h-24 rounded-full overflow-hidden ring-4 ring-white dark:ring-pm-dark-surface bg-gray-50 dark:bg-[#1A211D] shadow-lg"><img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop"></div></div>`;
         } else {
             pets.forEach((p) => {
                 const imgSrc = p.photoUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
-                avatarsHTML += `<div class="flex flex-col items-center gap-1.5 w-16"><img class="w-16 h-16 rounded-full object-cover border-2 border-white/10 shrink-0 bg-[#2a2a2a] shadow-md" src="${imgSrc}"><span class="text-[10px] text-gray-300 font-bold truncate w-full text-center">${p.name}</span></div>`;
+                avatarsHTML += `<div class="flex flex-col items-center gap-3"><div class="w-24 h-24 rounded-full overflow-hidden ring-4 ring-white dark:ring-pm-dark-surface bg-gray-50 dark:bg-[#1A211D] shadow-lg"><img class="w-full h-full object-cover" src="${imgSrc}"></div><span class="text-xs text-gray-500 font-bold uppercase tracking-widest">${p.name}</span></div>`;
             });
         }
         document.getElementById('res-avatars-container').innerHTML = avatarsHTML;
 
-        let breedsHTML = pets.length > 0 ? pets.map(p => { const b = p.breed || '未填寫品種'; return `<span class="bg-[#2a2a2a] text-gray-400 text-[10px] px-2 py-1 rounded-md font-bold">${b}</span>`; }).join('') : '-';
+        let breedsHTML = pets.length > 0 ? pets.map(p => { const b = p.breed || '未填寫品種'; return `<span class="bg-gray-100 dark:bg-pm-dark-surface border border-gray-200 dark:border-pm-dark-border text-gray-600 dark:text-gray-400 text-[10px] px-3 py-1 rounded-full font-semibold shadow-sm">${b}</span>`; }).join('') : '';
         document.getElementById('res-breed').innerHTML = breedsHTML;
 
 
@@ -224,7 +330,7 @@
         }
 
         if(d.product) {
-            document.getElementById('res-product').innerHTML = `<span class="material-symbols-outlined text-[16px]">auto_stories</span> ${d.product}`;
+            document.getElementById('res-product').innerHTML = d.product;
             document.getElementById('res-product-block').classList.remove('hidden');
         }
 
@@ -233,29 +339,46 @@
             document.getElementById('res-notes-block').classList.remove('hidden');
         }
         
+        // 進度條邏輯與 UI 更新
         const cLv = stepMap[d.status] || 1;
+        
+        // Reset all steps
         ['s-1','s-2','s-3','s-4','s-5'].forEach(sId => {
             const el = document.getElementById(sId); el.classList.remove('step-active');
-            const icon = el.querySelector('.s-icon'); icon.classList.replace('bg-[#4edea3]', 'bg-[#2a2a2a]'); icon.classList.remove('text-[#003824]');
-            el.querySelector('p').classList.replace('text-white', 'text-gray-500');
+            const icon = el.querySelector('.s-icon'); 
+            icon.classList.remove('bg-pm-oak', 'border-pm-oak');
+            icon.classList.add('bg-gray-100', 'dark:bg-[#1A211D]', 'border-white', 'dark:border-pm-dark-surface');
+            icon.querySelector('i').classList.replace('text-white', 'text-gray-400');
+            el.querySelector('.s-title').classList.replace('text-gray-900', 'text-gray-400');
+            el.querySelector('.s-title').classList.remove('dark:text-white');
         });
 
+        // Activate steps up to current
         ['s-1','s-2','s-3','s-4','s-5'].forEach((sId, i) => {
           const el = document.getElementById(sId); const icon = el.querySelector('.s-icon');
-          if(i < cLv) { el.classList.add('step-active'); icon.classList.replace('bg-[#2a2a2a]','bg-[#4edea3]'); icon.classList.add('text-[#003824]'); el.querySelector('p').classList.replace('text-gray-500','text-white'); }
+          if(i < cLv) { 
+              el.classList.add('step-active'); 
+              icon.classList.remove('bg-gray-100', 'dark:bg-[#1A211D]', 'border-white', 'dark:border-pm-dark-surface');
+              icon.classList.add('bg-pm-oak', 'border-pm-oak'); 
+              icon.querySelector('i').classList.replace('text-gray-400', 'text-white'); 
+              el.querySelector('.s-title').classList.replace('text-gray-400', 'text-gray-900');
+              el.querySelector('.s-title').classList.add('dark:text-white');
+          }
         });
 
         if(cLv >= 3 && d.galleryUrl) { 
-            document.getElementById('gallery-box').classList.remove('hidden'); document.getElementById('gallery-link').href = d.galleryUrl; document.getElementById('gallery-url-text').value = d.galleryUrl;
+            document.getElementById('gallery-box').classList.remove('hidden'); 
+            document.getElementById('gallery-link').href = d.galleryUrl; 
+            document.getElementById('gallery-url-text').value = d.galleryUrl;
         }
         
+        // 財務卡片邏輯
         const pStat = d.paymentStatus || 'unpaid';
         const price = Number(d.price || 0);
         const dep = d.depositAmount ? Number(d.depositAmount) : Math.floor(price / 2);
         const bal = price - dep;
 
         const fCard = document.getElementById('finance-card');
-        const fTitle = document.getElementById('finance-title');
         const fStat = document.getElementById('res-finance');
         const fBal = document.getElementById('res-balance');
         const fBalLabel = document.getElementById('res-balance-label');
@@ -265,37 +388,45 @@
         const bLabelSec = document.getElementById('breakdown-label-secondary');
         const bAmtSec = document.getElementById('breakdown-amount-secondary');
 
+        // Taste: 更優雅嘅顏色設定，唔用刺眼嘅漸變背景
         if (pStat === 'full' || (pStat === 'deposit' && bal <= 0)) {
-            fCard.className = "bg-[#4edea3]/5 rounded-2xl p-5 border border-[#4edea3]/20 text-[#4edea3] shadow-lg";
-            fTitle.innerText = "財務狀態"; fStat.innerText = "全數已付 ✅";
+            // Full Paid - Soft Green Border
+            fCard.classList.add('border-pm-green/30', 'dark:border-[#8DBA76]/30');
+            fStat.innerHTML = `<span class="flex items-center gap-1 text-pm-green dark:text-[#8DBA76]"><i data-lucide="check-circle" class="w-4 h-4"></i> 全數已付</span>`;
             fBal.innerText = ""; fBalLabel.innerText = ""; fBreakdown.classList.add('hidden');
         } else if (pStat === 'deposit') {
-            fCard.className = "bg-[#ffb95f]/5 rounded-2xl p-5 border border-[#ffb95f]/20 text-[#ffb95f] shadow-lg";
-            fTitle.innerText = "財務狀態"; fStat.innerText = "已付訂金，等待拍攝";
+            // Deposit - Soft Oak Border
+            fCard.classList.add('border-pm-oak/40');
+            fStat.innerHTML = `<span class="flex items-center gap-1 text-pm-oak"><i data-lucide="check-circle" class="w-4 h-4"></i> 已付訂金，等待拍攝</span>`;
             fBalLabel.innerText = "尚欠尾數";
-            fBal.innerText = `HK$ ${bal}`;
+            fBal.innerText = `HK$ ${bal.toLocaleString()}`;
+            fBal.className = "text-2xl font-serif font-bold leading-none mt-1 text-gray-900 dark:text-white";
             
-            bTotal.innerText = `HK$ ${price}`;
+            bTotal.innerText = `HK$ ${price.toLocaleString()}`;
             bLabelSec.innerText = "已付訂金 (Deposit)";
-            bAmtSec.className = "font-bold text-[#ffb95f]";
-            bAmtSec.innerText = `- HK$ ${d.depositAmount || dep}`;
+            bAmtSec.className = "font-bold text-pm-oak";
+            bAmtSec.innerText = `- HK$ ${(d.depositAmount || dep).toLocaleString()}`;
             fBreakdown.classList.remove('hidden');
         } else {
-            fCard.className = "bg-[#ffb4ab]/5 rounded-2xl p-5 border border-[#ffb4ab]/20 text-[#ffb4ab] shadow-lg";
-            fTitle.innerText = "財務狀態"; fStat.innerText = "尚未付款 ❌";
+            // Unpaid - Soft Red Border
+            fCard.classList.add('border-red-500/30');
+            fStat.innerHTML = `<span class="flex items-center gap-1 text-red-500 dark:text-red-400"><i data-lucide="x-circle" class="w-4 h-4"></i> 尚未付款</span>`;
             fBalLabel.innerText = "需付訂金";
-            fBal.innerText = `HK$ ${dep}`; 
+            fBal.innerText = `HK$ ${dep.toLocaleString()}`; 
+            fBal.className = "text-2xl font-serif font-bold leading-none mt-1 text-red-500 dark:text-red-400";
             
-            bTotal.innerText = `HK$ ${price}`;
+            bTotal.innerText = `HK$ ${price.toLocaleString()}`;
             bLabelSec.innerText = "預計訂金 (50%)";
-            bAmtSec.className = "font-bold text-[#ffb4ab]";
-            bAmtSec.innerText = `HK$ ${dep}`;
+            bAmtSec.className = "font-bold text-red-500 dark:text-red-400";
+            bAmtSec.innerText = `HK$ ${dep.toLocaleString()}`;
             fBreakdown.classList.remove('hidden');
         }
         
         document.getElementById('result').classList.remove('hidden');
+        lucide.createIcons(); // 重新渲染剛才 JS 生成嘅圖標
       } catch (err) {
-          console.error(err); alert("讀取資料失敗，請稍後再試！");
+          console.error(err); 
+          showToast("讀取資料失敗，請稍後再試！", "error");
       }
     }
   </script>
