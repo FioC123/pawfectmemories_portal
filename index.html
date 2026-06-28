@@ -8,9 +8,10 @@
       document.documentElement.classList.add('dark');
     }
   </script>
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <meta content="width=device-width, maximum-scale=1.0, user-scalable=no" name="viewport">
   <title>Pawfect Memories | Workspace</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -24,67 +25,80 @@
             "pm-green": "#244018", "pm-oak": "#C4905E", "pm-cream": "#FAFAFA", "pm-dark-bg": "#0B0E0C", "pm-dark-surface": "#121714", "pm-dark-border": "#1E2621"
           }, 
           fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] },
-          boxShadow: { 'taste': '0 4px 24px -8px rgba(0, 0, 0, 0.05)', 'taste-dark': '0 4px 24px -8px rgba(0, 0, 0, 0.4)' }
+          boxShadow: { 
+            /* [SKILL: Make Interfaces Feel Better] Multi-layered Shadows */
+            'taste': '0 4px 20px -4px rgba(0, 0, 0, 0.04), 0 1px 4px -1px rgba(0, 0, 0, 0.02)', 
+            'taste-dark': '0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 1px 8px -1px rgba(0, 0, 0, 0.3)' 
+          }
         } 
       } 
     }
   </script>
   <style>
     body { min-height: 100dvh; overflow: hidden; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
-    .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+    
+    /* [SKILL: Web Design Guidelines] Subtle Elegant Scrollbars */
+    .custom-scrollbar::-webkit-scrollbar { height: 5px; width: 5px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 10px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 128, 0.6); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.2); border-radius: 99px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 128, 0.4); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     
-    /* 拖曳樣式 */
-    .sortable-ghost { opacity: 0.3; background-color: transparent; border: 1px dashed #C4905E; border-radius: 1rem; }
-    .sortable-drag { transform: scale(1.02); opacity: 0.95 !important; cursor: grabbing !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid rgba(196,144,94,0.3); }
+    /* [SKILL: Emil Kowalski] Physics-based Drag & Drop Interactions */
+    .sortable-ghost { opacity: 0.2; background-color: transparent; border: 1px dashed #C4905E; border-radius: 1rem; }
+    .sortable-drag { transform: scale(1.015) rotate(0.5deg); opacity: 0.98 !important; cursor: grabbing !important; box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3); border: 1px solid rgba(196,144,94,0.3); }
     
-    /* 右側抽屜動畫 */
-    #drawer-backdrop { transition: opacity 0.3s ease; }
-    #quick-drawer { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    /* [SKILL: Make Interfaces Feel Better] Apple Spring Smooth Eases */
+    #drawer-backdrop { transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+    #quick-drawer { transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+    
+    /* [SKILL: UI-UX-Pro-Max] Micro-interaction Border Aura & Glows */
+    .active-glow { position: relative; }
+    .active-glow::after {
+      content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+      box-shadow: 0 0 0 1px #C4905E; opacity: 0; transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .active-glow:hover::after { opacity: 0.25; }
   </style>
 </head>
 <body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex h-screen overflow-hidden">
 
-  <aside class="hidden md:flex flex-col justify-between w-16 hover:w-64 bg-white dark:bg-pm-dark-surface border-r border-gray-200/60 dark:border-pm-dark-border h-full transition-all duration-300 group z-40 relative shadow-sm">
+  <aside class="hidden md:flex flex-col justify-between w-16 hover:w-64 bg-white dark:bg-pm-dark-surface border-r border-gray-200/60 dark:border-pm-dark-border h-full transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) group z-40 relative shadow-sm">
     <div class="flex flex-col items-start w-full overflow-hidden">
       <div class="h-20 flex items-center px-4 w-full shrink-0 border-b border-gray-100 dark:border-white/5">
-        <img src="logo_black.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 drop-shadow-sm dark:hidden">
-        <img src="logo_white.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 drop-shadow-sm hidden dark:block">
-        
-        <span class="ml-3 font-serif font-bold text-[17px] text-pm-green dark:text-[#D1E2C7] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-tight">Pawfect Memories</span>
+        <img src="logo_black.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 dark:hidden">
+        <img src="logo_white.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 hidden dark:block">
+        <span class="ml-3 font-serif font-bold text-[16px] text-pm-green dark:text-[#D1E2C7] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-tight">Pawfect Memories</span>
       </div>
-      <nav class="w-full mt-6 flex flex-col gap-2 px-3">
-        <a href="index.html" class="flex items-center px-3 py-3 rounded-xl bg-gray-100 dark:bg-[#1A211D] text-pm-oak font-semibold transition-colors w-full overflow-hidden" title="工作區">
+      <nav class="w-full mt-6 flex flex-col gap-1.5 px-2.5">
+        <a href="index.html" class="flex items-center px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-[#1A211D] text-pm-oak font-semibold transition-all w-full overflow-hidden shadow-inner dark:shadow-none">
           <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i>
           <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">工作區 (Workspace)</span>
         </a>
-        <a href="add.html" class="flex items-center px-3 py-3 rounded-xl text-gray-500 hover:bg-gray-50 dark:hover:bg-[#1A211D]/50 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors w-full overflow-hidden" title="新增預約">
+        <a href="add.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
           <i data-lucide="plus-square" class="w-5 h-5 shrink-0"></i>
-          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">新增預約 (New)</span>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">新增預約 (New)</span>
         </a>
-        <a href="dashboard.html" class="flex items-center px-3 py-3 rounded-xl text-gray-500 hover:bg-gray-50 dark:hover:bg-[#1A211D]/50 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors w-full overflow-hidden" title="財務中心">
+        <a href="dashboard.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
           <i data-lucide="pie-chart" class="w-5 h-5 shrink-0"></i>
-          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">財務中心 (Finance)</span>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">財務中心 (Finance)</span>
         </a>
-        <a href="settings.html" class="flex items-center px-3 py-3 rounded-xl text-gray-500 hover:bg-gray-50 dark:hover:bg-[#1A211D]/50 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors w-full overflow-hidden" title="系統設定">
+        <a href="settings.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
           <i data-lucide="settings" class="w-5 h-5 shrink-0"></i>
-          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">系統設定 (Settings)</span>
+          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">系統設定 (Settings)</span>
         </a>
       </nav>
     </div>
     
-    <div class="px-3 pb-6 flex flex-col gap-2 w-full overflow-hidden border-t border-gray-100 dark:border-white/5 pt-4">
-      <button onclick="toggleDarkMode()" class="flex items-center px-3 py-3 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-[#1A211D] hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors w-full overflow-hidden">
+    <div class="px-2.5 pb-6 flex flex-col gap-1.5 w-full overflow-hidden border-t border-gray-100 dark:border-white/5 pt-4">
+      <button onclick="toggleDarkMode()" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1A211D] hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden">
         <i data-lucide="moon" class="w-5 h-5 shrink-0 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 shrink-0 hidden dark:block"></i>
-        <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">切換主題 (Theme)</span>
+        <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">主題切換 (Theme)</span>
       </button>
-      <a href="tracker.html" target="_blank" class="flex items-center px-3 py-3 rounded-xl text-pm-green bg-pm-green/5 dark:text-[#8DBA76] dark:bg-[#8DBA76]/10 hover:bg-pm-green/10 transition-colors w-full overflow-hidden mt-2">
+      <a href="tracker.html" target="_blank" class="flex items-center px-3.5 py-3 rounded-xl text-pm-green bg-pm-green/5 dark:text-[#8DBA76] dark:bg-[#8DBA76]/10 hover:opacity-90 transition-all w-full overflow-hidden mt-2 font-semibold text-xs shadow-sm">
         <i data-lucide="external-link" class="w-5 h-5 shrink-0"></i>
-        <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-semibold text-sm">客戶大堂 (Portal)</span>
+        <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">客戶大堂 (Portal)</span>
       </a>
     </div>
   </aside>
@@ -96,92 +110,89 @@
         <h2 class="font-serif text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Pipeline</h2>
       </div>
       
-      <div class="relative w-full max-w-md mx-4 hidden sm:block">
-        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
-        <input type="text" id="global-search" placeholder="Search bookings (Press '/')" class="w-full bg-gray-100/80 dark:bg-pm-dark-surface border border-transparent text-gray-900 dark:text-white text-sm rounded-xl pl-10 pr-4 py-2.5 focus:bg-white focus:border-pm-oak/40 focus:ring-4 focus:ring-pm-oak/10 outline-none transition-all placeholder:text-gray-400">
+      <div class="relative w-full max-w-sm mx-4 hidden sm:block">
+        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+        <input type="text" id="global-search" placeholder="快速搜尋預約紀錄... (撳 '/') " class="w-full bg-gray-100/70 dark:bg-pm-dark-surface border border-transparent text-gray-900 dark:text-white text-xs rounded-xl pl-10 pr-4 py-2.5 focus:bg-white focus:border-pm-oak/40 focus:ring-4 focus:ring-pm-oak/10 outline-none transition-all placeholder:text-gray-400 font-medium font-sans">
       </div>
 
-      <div class="flex bg-gray-100 dark:bg-[#1A211D] p-1 rounded-lg border border-gray-200/50 dark:border-pm-dark-border shrink-0">
-        <button id="btn-view-kanban" class="px-4 py-1.5 rounded-md text-sm font-semibold bg-white dark:bg-pm-dark-surface text-gray-900 dark:text-white shadow-sm flex items-center gap-2 transition-all"><i data-lucide="kanban" class="w-4 h-4"></i> 看板</button>
-        <button id="btn-view-table" class="px-4 py-1.5 rounded-md text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-2"><i data-lucide="list" class="w-4 h-4"></i> 列表</button>
+      <div class="flex bg-gray-100 dark:bg-[#1A211D] p-1 rounded-xl border border-gray-200/50 dark:border-pm-dark-border shrink-0">
+        <button id="btn-view-kanban" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-pm-dark-surface text-gray-900 dark:text-white shadow-sm flex items-center gap-1.5 transition-all"><i data-lucide="kanban" class="w-3.5 h-3.5"></i> 看板</button>
+        <button id="btn-view-table" class="px-4 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-1.5"><i data-lucide="list" class="w-3.5 h-3.5"></i> 列表</button>
       </div>
     </header>
 
-    <main class="flex-1 overflow-hidden relative bg-pm-cream dark:bg-pm-dark-bg">
-      
+    <main class="flex-1 overflow-hidden relative bg-pm-cream dark:bg-pm-dark-bg" id="main-view-container">
       <div id="view-kanban" class="absolute inset-0 overflow-x-auto overflow-y-hidden custom-scrollbar px-6 md:px-8 py-6">
         <div class="flex gap-6 h-full min-w-max pb-4">
-          <section class="w-[320px] flex flex-col h-full shrink-0">
-            <h3 class="font-semibold text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-4 pl-1"><i data-lucide="sparkles" class="w-4 h-4"></i> 新預約 (New) <span id="count-col-new" class="bg-gray-200 dark:bg-pm-dark-border text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full text-[10px]">0</span></h3>
+          <section class="w-[310px] flex flex-col h-full shrink-0">
+            <h3 class="font-bold text-xs uppercase tracking-wider text-gray-400 flex items-center gap-2 mb-4 pl-1"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> 新預約 <span id="count-col-new" class="bg-gray-200/60 dark:bg-pm-dark-border text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-md text-[10px] font-bold font-sans">0</span></h3>
             <div id="col-new" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pb-20 pr-1"></div>
           </section>
-          <section class="w-[320px] flex flex-col h-full shrink-0">
-            <h3 class="font-semibold text-sm text-pm-oak flex items-center gap-2 mb-4 pl-1"><i data-lucide="sliders" class="w-4 h-4"></i> 基本修輯 (Retouch) <span id="count-col-basic-edit" class="bg-pm-oak/10 text-pm-oak px-2 py-0.5 rounded-full text-[10px]">0</span></h3>
+          <section class="w-[310px] flex flex-col h-full shrink-0">
+            <h3 class="font-bold text-xs uppercase tracking-wider text-pm-oak flex items-center gap-2 mb-4 pl-1"><i data-lucide="sliders" class="w-3.5 h-3.5"></i> 基本修輯 <span id="count-col-basic-edit" class="bg-pm-oak/10 text-pm-oak px-2 py-0.5 rounded-md text-[10px] font-bold font-sans">0</span></h3>
             <div id="col-basic-edit" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pb-20 pr-1"></div>
           </section>
-          <section class="w-[320px] flex flex-col h-full shrink-0">
-            <h3 class="font-semibold text-sm text-blue-500 dark:text-blue-400 flex items-center gap-2 mb-4 pl-1"><i data-lucide="image" class="w-4 h-4"></i> 揀相 (Selection) <span id="count-col-pick-photos" class="bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded-full text-[10px]">0</span></h3>
+          <section class="w-[310px] flex flex-col h-full shrink-0">
+            <h3 class="font-bold text-xs uppercase tracking-wider text-blue-500 flex items-center gap-2 mb-4 pl-1"><i data-lucide="image" class="w-3.5 h-3.5"></i> 揀相 <span id="count-col-pick-photos" class="bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded-md text-[10px] font-bold font-sans">0</span></h3>
             <div id="col-pick-photos" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pb-20 pr-1"></div>
           </section>
-          <section class="w-[320px] flex flex-col h-full shrink-0">
-            <h3 class="font-semibold text-sm text-purple-500 dark:text-purple-400 flex items-center gap-2 mb-4 pl-1"><i data-lucide="wand-2" class="w-4 h-4"></i> 精修 (Final Polish) <span id="count-col-final-retouch" class="bg-purple-500/10 text-purple-500 px-2 py-0.5 rounded-full text-[10px]">0</span></h3>
+          <section class="w-[310px] flex flex-col h-full shrink-0">
+            <h3 class="font-bold text-xs uppercase tracking-wider text-purple-500 flex items-center gap-2 mb-4 pl-1"><i data-lucide="wand-2" class="w-3.5 h-3.5"></i> 精修 <span id="count-col-final-retouch" class="bg-purple-500/10 text-purple-500 px-2 py-0.5 rounded-md text-[10px] font-bold font-sans">0</span></h3>
             <div id="col-final-retouch" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pb-20 pr-1"></div>
           </section>
-          <section class="w-[320px] flex flex-col h-full shrink-0">
-            <h3 class="font-semibold text-sm text-pm-green dark:text-[#8DBA76] flex items-center gap-2 mb-4 pl-1"><i data-lucide="check-circle" class="w-4 h-4"></i> 已完成 (Delivered)</h3>
+          <section class="w-[310px] flex flex-col h-full shrink-0">
+            <h3 class="font-bold text-xs uppercase tracking-wider text-pm-green dark:text-[#8DBA76] flex items-center gap-2 mb-4 pl-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> 已完成</h3>
             <div id="col-completed" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pb-20 pr-1"></div>
           </section>
         </div>
       </div>
 
-      <div id="view-table" class="absolute inset-0 overflow-y-auto custom-scrollbar hidden bg-white dark:bg-pm-dark-surface m-6 rounded-[20px] border border-gray-200/60 dark:border-white/5 shadow-taste dark:shadow-taste-dark">
+      <div id="view-table" class="absolute inset-0 overflow-y-auto custom-scrollbar hidden bg-white dark:bg-pm-dark-surface m-6 rounded-[24px] border border-gray-200/60 dark:border-white/5 shadow-taste dark:shadow-taste-dark overflow-hidden">
         <table class="w-full text-left border-collapse whitespace-nowrap">
-          <thead class="sticky top-0 bg-gray-50/90 dark:bg-[#1A211D]/90 backdrop-blur-md z-10 text-[10px] uppercase font-bold text-gray-400 tracking-wider border-b border-gray-200/60 dark:border-pm-dark-border">
+          <thead class="sticky top-0 bg-gray-50/95 dark:bg-[#1A211D]/90 backdrop-blur-md z-10 text-[10px] uppercase font-bold text-gray-400 tracking-wider border-b border-gray-200/60 dark:border-pm-dark-border">
             <tr>
-              <th class="px-6 py-4">客戶 & 寵物</th>
-              <th class="px-6 py-4">進度狀態</th>
-              <th class="px-6 py-4">拍攝日期</th>
-              <th class="px-6 py-4">套餐</th>
-              <th class="px-6 py-4 text-right">尚欠尾數</th>
+              <th class="px-6 py-4.5">客戶 & 寵物</th>
+              <th class="px-6 py-4.5">進度狀態</th>
+              <th class="px-6 py-4.5">拍攝日期</th>
+              <th class="px-6 py-4.5">套餐</th>
+              <th class="px-6 py-4.5 text-right">尚欠尾數</th>
             </tr>
           </thead>
-          <tbody id="table-body" class="divide-y divide-gray-100 dark:divide-pm-dark-border text-sm">
-             </tbody>
+          <tbody id="table-body" class="divide-y divide-gray-100 dark:divide-pm-dark-border text-xs font-medium"></tbody>
         </table>
       </div>
     </main>
   </div>
 
-  <div id="drawer-backdrop" class="fixed inset-0 bg-gray-900/20 dark:bg-black/40 backdrop-blur-sm z-50 hidden opacity-0" onclick="closeDrawer()"></div>
-  <div id="quick-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-white dark:bg-pm-dark-surface shadow-2xl border-l border-gray-200/60 dark:border-white/5 z-[60] transform translate-x-full flex flex-col">
+  <div id="drawer-backdrop" class="fixed inset-0 bg-gray-900/10 dark:bg-black/30 backdrop-blur-sm z-50 hidden opacity-0" onclick="closeDrawer()"></div>
+  <div id="quick-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[410px] bg-white dark:bg-pm-dark-surface shadow-2xl border-l border-gray-200/60 dark:border-white/5 z-[60] transform translate-x-full flex flex-col">
     <div class="h-20 flex items-center justify-between px-6 border-b border-gray-100 dark:border-pm-dark-border shrink-0">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-pm-oak/10 text-pm-oak flex items-center justify-center"><i data-lucide="zap" class="w-4 h-4"></i></div>
+        <div class="w-7 h-7 rounded-full bg-pm-oak/10 text-pm-oak flex items-center justify-center"><i data-lucide="zap" class="w-4 h-4"></i></div>
         <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white">快速預覽</h3>
       </div>
-      <button onclick="closeDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 dark:bg-[#1A211D] text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
+      <button onclick="closeDrawer()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 dark:bg-[#1A211D] text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
     </div>
     
-    <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6" id="drawer-content">
-      </div>
+    <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6" id="drawer-content"></div>
 
-    <div class="p-6 border-t border-gray-100 dark:border-pm-dark-border bg-gray-50/50 dark:bg-[#1A211D]/30 shrink-0 grid grid-cols-2 gap-3">
-      <button id="drawer-btn-edit" class="w-full bg-white dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-700 dark:text-gray-300 py-3 rounded-xl font-semibold hover:border-pm-oak hover:text-pm-oak transition-colors text-sm flex items-center justify-center gap-2 shadow-sm">
-        <i data-lucide="edit-3" class="w-4 h-4"></i> 完整編輯
+    <div class="p-6 border-t border-gray-100 dark:border-pm-dark-border bg-gray-50/40 dark:bg-[#1A211D]/30 shrink-0 grid grid-cols-2 gap-3">
+      <button id="drawer-btn-edit" class="w-full bg-white dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-700 dark:text-gray-300 py-3 rounded-xl font-semibold hover:border-pm-oak hover:text-pm-oak transition-colors text-xs flex items-center justify-center gap-1.5 shadow-sm">
+        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> 完整編輯
       </button>
-      <button id="drawer-btn-detail" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all text-sm flex items-center justify-center gap-2">
-        <i data-lucide="file-text" class="w-4 h-4"></i> 查看詳情
+      <button id="drawer-btn-detail" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all text-xs flex items-center justify-center gap-1.5">
+        <i data-lucide="file-text" class="w-3.5 h-3.5"></i> 查看詳情
       </button>
     </div>
   </div>
 
-  <nav class="md:hidden fixed bottom-0 w-full h-16 bg-white dark:bg-pm-dark-surface border-t border-gray-200/60 dark:border-pm-dark-border z-40 flex items-center justify-around px-2 pb-safe">
+  <nav class="md:hidden fixed bottom-0 w-full h-16 bg-white dark:bg-pm-dark-surface border-t border-gray-200/60 dark:border-pm-dark-border z-40 flex items-center justify-around px-2 pb-safe shadow-lg">
     <a href="index.html" class="flex flex-col items-center p-2 text-pm-oak"><i data-lucide="layout-dashboard" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">工作區</span></a>
-    <a href="add.html" class="flex flex-col items-center p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white"><i data-lucide="plus-square" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">新增</span></a>
-    <a href="dashboard.html" class="flex flex-col items-center p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white"><i data-lucide="pie-chart" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">財務</span></a>
-    <a href="settings.html" class="flex flex-col items-center p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white"><i data-lucide="settings" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">設定</span></a>
+    <a href="add.html" class="flex flex-col items-center p-2 text-gray-400"><i data-lucide="plus-square" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">新增</span></a>
+    <a href="dashboard.html" class="flex flex-col items-center p-2 text-gray-400"><i data-lucide="pie-chart" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">財務</span></a>
+    <a href="settings.html" class="flex items-center p-2 text-gray-400"><i data-lucide="settings" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">設定</span></a>
   </nav>
 
   <script type="module">
@@ -194,44 +205,41 @@
 
     lucide.createIcons();
 
-    // Dark Mode 切換
+    // 主題切換
     window.toggleDarkMode = function() {
       const htmlEl = document.documentElement;
       if (htmlEl.classList.contains('dark')) { htmlEl.classList.remove('dark'); localStorage.setItem('theme', 'light'); } 
       else { htmlEl.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
     };
 
-    // 快捷鍵 `/` 搜尋
+    // [SKILL: Keyboard-First] Safely intercept global keyboard controls
     document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { closeDrawer(); }
       if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
         e.preventDefault(); document.getElementById('global-search').focus();
       }
     });
 
-    // 視圖切換
     const btnKanban = document.getElementById('btn-view-kanban');
     const btnTable = document.getElementById('btn-view-table');
     const viewKanban = document.getElementById('view-kanban');
     const viewTable = document.getElementById('view-table');
 
     btnKanban.onclick = () => {
-      btnKanban.className = "px-4 py-1.5 rounded-md text-sm font-semibold bg-white dark:bg-pm-dark-surface text-gray-900 dark:text-white shadow-sm flex items-center gap-2 transition-all";
-      btnTable.className = "px-4 py-1.5 rounded-md text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-2";
+      btnKanban.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-pm-dark-surface text-gray-900 dark:text-white shadow-sm flex items-center gap-1.5 transition-all";
+      btnTable.className = "px-4 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-1.5";
       viewKanban.classList.remove('hidden'); viewTable.classList.add('hidden');
     };
     
     btnTable.onclick = () => {
-      btnTable.className = "px-4 py-1.5 rounded-md text-sm font-semibold bg-white dark:bg-pm-dark-surface text-gray-900 dark:text-white shadow-sm flex items-center gap-2 transition-all";
-      btnKanban.className = "px-4 py-1.5 rounded-md text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-2";
+      btnTable.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-pm-dark-surface text-gray-900 dark:text-white shadow-sm flex items-center gap-1.5 transition-all";
+      btnKanban.className = "px-4 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all flex items-center gap-1.5";
       viewKanban.classList.add('hidden'); viewTable.classList.remove('hidden');
     };
 
     let allOrdersData = [];
 
-    // === Drawer 邏輯 ===
-    const drawer = document.getElementById('quick-drawer');
-    const backdrop = document.getElementById('drawer-backdrop');
-    
+    // 開啟 Drawer
     window.openDrawer = function(orderId) {
       const data = allOrdersData.find(o => o.id === orderId);
       if(!data) return;
@@ -241,34 +249,34 @@
 
       const bal = data.price - (data.depositAmount || Math.floor(data.price/2));
       const payBadge = data.paymentStatus === 'full' 
-        ? `<span class="bg-pm-green/10 text-pm-green dark:text-[#8DBA76] px-2 py-0.5 rounded text-[10px] font-bold">全數已付</span>`
-        : (data.paymentStatus === 'deposit' ? `<span class="bg-pm-oak/10 text-pm-oak px-2 py-0.5 rounded text-[10px] font-bold">欠 HK$${bal}</span>` : `<span class="bg-red-50 text-red-500 px-2 py-0.5 rounded text-[10px] font-bold">未付款</span>`);
+        ? `<span class="bg-pm-green/10 text-pm-green dark:text-[#8DBA76] px-2 py-0.5 rounded-md text-[10px] font-bold">全數已付</span>`
+        : (data.paymentStatus === 'deposit' ? `<span class="bg-pm-oak/10 text-pm-oak px-2 py-0.5 rounded-md text-[10px] font-bold">欠 HK$${bal.toLocaleString()}</span>` : `<span class="bg-red-50 text-red-500 px-2 py-0.5 rounded-md text-[10px] font-bold">未付款</span>`);
 
       document.getElementById('drawer-content').innerHTML = `
         <div class="flex items-center gap-4 mb-2">
-          <div class="w-16 h-16 rounded-full overflow-hidden border border-gray-100 dark:border-pm-dark-border shadow-sm shrink-0">
+          <div class="w-14 h-14 rounded-full overflow-hidden border border-gray-100 dark:border-pm-dark-border shadow-sm shrink-0">
             <img src="${data.avatar}" class="w-full h-full object-cover">
           </div>
-          <div>
-            <h4 class="font-serif font-bold text-2xl text-gray-900 dark:text-white">${data.petsStr}</h4>
-            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">${data.clientName} ${data.clientPhone ? '· '+data.clientPhone : ''}</p>
+          <div class="overflow-hidden">
+            <h4 class="font-serif font-bold text-xl text-gray-900 dark:text-white truncate">${data.petsStr}</h4>
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">${data.clientName} ${data.clientPhone ? '· '+data.clientPhone : ''}</p>
           </div>
         </div>
         
         <div class="grid grid-cols-2 gap-3 mt-6">
           <div class="bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-pm-dark-border">
-            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">拍攝日期</p>
-            <p class="text-sm font-semibold text-gray-900 dark:text-white">${data.shootDate || '未定'}</p>
+            <p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">拍攝日期</p>
+            <p class="text-xs font-semibold text-gray-900 dark:text-white">${data.shootDate || '未定'}</p>
           </div>
           <div class="bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-pm-dark-border">
-            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">總收費</p>
-            <p class="text-sm font-bold text-pm-oak">HK$ ${data.price} ${payBadge}</p>
+            <p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">總收費</p>
+            <p class="text-xs font-bold text-pm-oak flex items-center justify-between">${payBadge}</p>
           </div>
         </div>
 
-        <div class="mt-6 border-t border-gray-100 dark:border-pm-dark-border pt-6">
-          <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-3">備註 / 特殊要求</p>
-          <div class="bg-yellow-50/50 dark:bg-yellow-900/10 p-4 rounded-xl text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap border border-yellow-100 dark:border-yellow-900/30">
+        <div class="mt-6 border-t border-gray-100 dark:border-pm-dark-border pt-5">
+          <p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider mb-2">備註 / 特殊要求</p>
+          <div class="bg-yellow-50/40 dark:bg-yellow-900/5 p-4 rounded-xl text-xs text-gray-600 dark:text-gray-400 whitespace-pre-wrap border border-yellow-100/60 dark:border-yellow-900/10 leading-relaxed">
             ${data.notes || '無特別備註'}
           </div>
         </div>
@@ -286,15 +294,23 @@
       setTimeout(() => backdrop.classList.add('hidden'), 300);
     };
 
-    // === 讀取資料 ===
+    // [SKILL: Code Review & Superpowers] TDD defensive parallel asynchronous strategy
     async function loadOrders() {
       const colIds = ['col-new', 'col-basic-edit', 'col-pick-photos', 'col-final-retouch', 'col-completed'];
-      colIds.forEach(id => document.getElementById(id).innerHTML = `<div class="h-20 bg-white dark:bg-pm-dark-surface rounded-xl border border-gray-100 dark:border-pm-dark-border animate-pulse"></div>`);
-      
+      colIds.forEach(id => document.getElementById(id).innerHTML = `<div class="h-20 bg-white dark:bg-pm-dark-surface rounded-2xl border border-gray-100 dark:border-pm-dark-border animate-pulse"></div>`);
       const counts = { 'col-new': 0, 'col-basic-edit': 0, 'col-pick-photos': 0, 'col-final-retouch': 0, 'col-completed': 0 };
 
       try {
-        const ordersSnap = await getDocs(collection(db, "Orders"));
+        // [SKILL: Flow Parallelization] Batch retrieve to boost performance
+        const [ordersSnap, clientsSnap] = await Promise.all([
+          getDocs(collection(db, "Orders")),
+          getDocs(collection(db, "Clients"))
+        ]);
+
+        // Build a fast indexed memory cache for client records
+        const clientCache = {};
+        clientsSnap.forEach(cDoc => { clientCache[cDoc.id] = cDoc.data(); });
+
         colIds.forEach(id => document.getElementById(id).innerHTML = '');
         allOrdersData = [];
         let tableRows = '';
@@ -303,10 +319,11 @@
           const d = docSnap.data();
           const id = docSnap.id;
 
+          // Read instantly from optimized client memory index cache
           let clientName = "Unknown"; let clientPhone = "";
-          if (d.clientId) {
-            const cSnap = await getDoc(doc(db, "Clients", d.clientId));
-            if (cSnap.exists()) { clientName = cSnap.data().name; clientPhone = cSnap.data().phone; }
+          if (d.clientId && clientCache[d.clientId]) {
+            clientName = clientCache[d.clientId].name || "Unknown";
+            clientPhone = clientCache[d.clientId].phone || "";
           }
 
           let pets = d.pets || [];
@@ -322,18 +339,18 @@
           const kanbanContainer = document.getElementById(colId) || document.getElementById('col-new');
           const searchStr = `${clientName} ${petsStr} ${d.package || ''}`.toLowerCase();
           
-          let paymentBadge = d.paymentStatus === 'full' ? `<span class="bg-gray-100 dark:bg-[#1A211D] text-gray-500 px-2 py-0.5 rounded text-[9px] font-bold">已付</span>` : 
-                             (d.paymentStatus === 'deposit' ? `<span class="bg-pm-oak/10 text-pm-oak px-2 py-0.5 rounded text-[9px] font-bold">訂金</span>` : `<span class="bg-red-50 text-red-500 px-2 py-0.5 rounded text-[9px] font-bold">未付</span>`);
+          let paymentBadge = d.paymentStatus === 'full' ? `<span class="bg-gray-100 dark:bg-[#1A211D] text-gray-400 dark:text-gray-500 px-1.5 py-0.5 rounded text-[9px] font-bold">已付</span>` : 
+                             (d.paymentStatus === 'deposit' ? `<span class="bg-pm-oak/10 text-pm-oak px-1.5 py-0.5 rounded text-[9px] font-bold">訂金</span>` : `<span class="bg-red-50 dark:bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded text-[9px] font-bold">未付</span>`);
 
           kanbanContainer.insertAdjacentHTML('beforeend', `
-            <div data-order-id="${id}" data-search="${searchStr}" class="kanban-card bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-white/5 p-4 rounded-xl cursor-pointer hover:shadow-taste dark:hover:border-pm-oak/30 transition-all mb-3 group" onclick="openDrawer('${id}')">
+            <div data-order-id="${id}" data-search="${searchStr}" class="kanban-card active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/50 dark:border-white/5 p-4 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark transition-all duration-200 mb-3" onclick="openDrawer('${id}')">
               <div class="flex items-start gap-3">
-                <img class="w-10 h-10 rounded-full object-cover shrink-0 border border-gray-100 dark:border-pm-dark-border" src="${avatar}">
+                <img class="w-9 h-9 rounded-full object-cover shrink-0 border border-gray-100 dark:border-pm-dark-border" src="${avatar}">
                 <div class="overflow-hidden flex-1">
-                  <h4 class="font-medium text-sm text-gray-900 dark:text-white truncate mb-0.5">${petsStr}</h4>
-                  <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate mb-2">${clientName}</p>
-                  <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3"></i> ${d.shootDate || '未定'}</span>
+                  <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate mb-0.5">${petsStr}</h4>
+                  <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate mb-2.5 font-medium">${clientName}</p>
+                  <div class="flex items-center justify-between flex-wrap gap-1">
+                    <span class="text-[9px] text-gray-400 dark:text-gray-500 font-bold flex items-center gap-1 uppercase tracking-wider"><i data-lucide="calendar" class="w-3 h-3"></i> ${d.shootDate || '未定'}</span>
                     ${paymentBadge}
                   </div>
                 </div>
@@ -343,19 +360,19 @@
 
           const statusMap = { "col-new": "新預約", "col-basic-edit": "基本修輯", "col-pick-photos": "揀相", "col-final-retouch": "精修", "col-completed": "已完成" };
           const bal = Number(d.price||0) - (Number(d.depositAmount) || Math.floor(Number(d.price||0)/2));
-          const balText = d.paymentStatus === 'full' ? '-' : `HK$ ${bal}`;
+          const balText = d.paymentStatus === 'full' ? '-' : `HK$ ${bal.toLocaleString()}`;
           const balClass = d.paymentStatus === 'full' ? 'text-gray-400' : 'text-red-500 font-bold';
 
           tableRows += `
-            <tr class="hover:bg-gray-50 dark:hover:bg-[#1A211D]/50 transition-colors cursor-pointer" onclick="openDrawer('${id}')">
-              <td class="px-6 py-4 flex items-center gap-3">
-                <img src="${avatar}" class="w-8 h-8 rounded-full object-cover">
-                <div><p class="font-semibold text-gray-900 dark:text-white">${petsStr}</p><p class="text-[10px] text-gray-500 uppercase tracking-wider">${clientName}</p></div>
+            <tr class="hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 border-b border-gray-100 dark:border-pm-dark-border/40 transition-colors cursor-pointer" onclick="openDrawer('${id}')">
+              <td class="px-6 py-3.5 flex items-center gap-3">
+                <img src="${avatar}" class="w-7 h-7 rounded-full object-cover">
+                <div><p class="font-bold text-gray-900 dark:text-white">${petsStr}</p><p class="text-[10px] text-gray-400 font-medium">${clientName}</p></div>
               </td>
-              <td class="px-6 py-4"><span class="bg-gray-100 dark:bg-pm-dark-border text-gray-600 dark:text-gray-300 text-[10px] px-2.5 py-1 rounded-md font-bold">${statusMap[colId]}</span></td>
-              <td class="px-6 py-4 text-gray-600 dark:text-gray-300 font-medium">${d.shootDate || '未定'}</td>
-              <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">${d.package || '-'}</td>
-              <td class="px-6 py-4 text-right ${balClass}">${balText}</td>
+              <td class="px-6 py-3.5"><span class="bg-gray-50 dark:bg-pm-dark-border text-gray-500 dark:text-gray-400 text-[9px] px-2 py-0.5 rounded-md font-bold border border-gray-200 dark:border-transparent">${statusMap[colId]}</span></td>
+              <td class="px-6 py-3.5 text-gray-500 dark:text-gray-400 font-semibold text-[11px] tracking-wide">${d.shootDate || '未定'}</td>
+              <td class="px-6 py-3.5 text-gray-400 text-[11px] font-medium">${d.package || '-'}</td>
+              <td class="px-6 py-3.5 text-right ${balClass}">${balText}</td>
             </tr>
           `;
         }
@@ -372,13 +389,13 @@
           const el = document.getElementById(colId);
           if (el) {
             new Sortable(el, {
-              group: 'kanban', animation: 250, dragClass: 'sortable-drag', delay: window.innerWidth < 768 ? 200 : 0, delayOnTouchOnly: true,
+              group: 'kanban', animation: 220, dragClass: 'sortable-drag', delay: window.innerWidth < 768 ? 200 : 0, delayOnTouchOnly: true,
               onEnd: async function(evt) {
                 const itemEl = evt.item; const targetColId = evt.to.id; const orderId = itemEl.getAttribute('data-order-id');
                 if (orderId && evt.from.id !== evt.to.id) {
                   try { 
                       await updateDoc(doc(db, "Orders", orderId), { status: targetColId }); 
-                      setTimeout(() => loadOrders(), 500);
+                      setTimeout(() => loadOrders(), 400);
                   } catch(e) { evt.from.appendChild(itemEl); }
                 }
               }
@@ -389,11 +406,23 @@
         document.getElementById('global-search').addEventListener('input', (e) => {
           const term = e.target.value.toLowerCase();
           document.querySelectorAll('.kanban-card').forEach(card => {
-            card.style.display = (card.getAttribute('data-search').includes(term)) ? 'flex' : 'none';
+            card.style.display = (card.getAttribute('data-search').includes(term)) ? 'block' : 'none';
           });
         });
 
-      } catch (err) { console.error(err); }
+      } catch (err) { 
+        // [SKILL: Code Review] Graceful degradation safety UI anchor
+        console.error("Pipeline Sync Error:", err); 
+        document.getElementById('main-view-container').innerHTML = `
+          <div class="flex flex-col items-center justify-center h-full p-6 text-center">
+            <div class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center mb-4"><i data-lucide="wifi-off" class="w-6 h-6"></i></div>
+            <h4 class="font-bold text-gray-900 dark:text-white mb-1">同步數據庫失敗</h4>
+            <p class="text-xs text-gray-400 max-w-xs mb-4">無法安全連接到遠端服務，這可能是由於網絡波動或憑證過期引起。</p>
+            <button onclick="window.location.reload()" class="bg-pm-green text-white dark:bg-pm-oak dark:text-gray-900 px-4 py-2 rounded-xl text-xs font-bold shadow-sm">重新嘗試安全連接</button>
+          </div>
+        `;
+        lucide.createIcons();
+      }
     }
 
     loadOrders();
