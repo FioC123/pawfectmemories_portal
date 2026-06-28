@@ -52,8 +52,10 @@
   <aside class="hidden md:flex flex-col justify-between w-16 hover:w-64 bg-white dark:bg-pm-dark-surface border-r border-gray-200/60 dark:border-pm-dark-border h-full transition-all duration-300 group z-40 relative shadow-sm">
     <div class="flex flex-col items-start w-full overflow-hidden">
       <div class="h-20 flex items-center px-4 w-full shrink-0 border-b border-gray-100 dark:border-white/5">
-        <div class="w-8 h-8 rounded-lg bg-pm-green dark:bg-pm-oak flex items-center justify-center text-white shrink-0 shadow-sm"><i data-lucide="leaf" class="w-5 h-5"></i></div>
-        <span class="ml-4 font-serif font-bold text-lg text-pm-green dark:text-[#D1E2C7] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Pawfect</span>
+        <img src="logo_black.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 drop-shadow-sm dark:hidden">
+        <img src="logo_white.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 drop-shadow-sm hidden dark:block">
+        
+        <span class="ml-3 font-serif font-bold text-[17px] text-pm-green dark:text-[#D1E2C7] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-tight">Pawfect Memories</span>
       </div>
       <nav class="w-full mt-6 flex flex-col gap-2 px-3">
         <a href="index.html" class="flex items-center px-3 py-3 rounded-xl bg-gray-100 dark:bg-[#1A211D] text-pm-oak font-semibold transition-colors w-full overflow-hidden" title="工作區">
@@ -206,7 +208,7 @@
       }
     });
 
-    // 視圖切換 (Kanban vs Table)
+    // 視圖切換
     const btnKanban = document.getElementById('btn-view-kanban');
     const btnTable = document.getElementById('btn-view-table');
     const viewKanban = document.getElementById('view-kanban');
@@ -224,7 +226,7 @@
       viewKanban.classList.add('hidden'); viewTable.classList.remove('hidden');
     };
 
-    let allOrdersData = []; // 用於 Drawer 快速讀取
+    let allOrdersData = [];
 
     // === Drawer 邏輯 ===
     const drawer = document.getElementById('quick-drawer');
@@ -234,11 +236,9 @@
       const data = allOrdersData.find(o => o.id === orderId);
       if(!data) return;
 
-      // 更新 Footer 連結
       document.getElementById('drawer-btn-edit').onclick = () => window.location.href = `add.html?editId=${orderId}`;
       document.getElementById('drawer-btn-detail').onclick = () => window.location.href = `detail.html?id=${orderId}`;
 
-      // 構建 Drawer 內容
       const bal = data.price - (data.depositAmount || Math.floor(data.price/2));
       const payBadge = data.paymentStatus === 'full' 
         ? `<span class="bg-pm-green/10 text-pm-green dark:text-[#8DBA76] px-2 py-0.5 rounded text-[10px] font-bold">全數已付</span>`
@@ -274,7 +274,6 @@
         </div>
       `;
 
-      // 顯示 Drawer
       backdrop.classList.remove('hidden');
       void backdrop.offsetWidth;
       backdrop.classList.remove('opacity-0');
@@ -287,7 +286,7 @@
       setTimeout(() => backdrop.classList.add('hidden'), 300);
     };
 
-    // === 讀取資料與渲染 ===
+    // === 讀取資料 ===
     async function loadOrders() {
       const colIds = ['col-new', 'col-basic-edit', 'col-pick-photos', 'col-final-retouch', 'col-completed'];
       colIds.forEach(id => document.getElementById(id).innerHTML = `<div class="h-20 bg-white dark:bg-pm-dark-surface rounded-xl border border-gray-100 dark:border-pm-dark-border animate-pulse"></div>`);
@@ -318,10 +317,8 @@
           const colId = d.status || 'col-new';
           if(counts[colId] !== undefined) counts[colId]++;
 
-          // 儲存落 Array 畀 Drawer 用
           allOrdersData.push({ id, ...d, clientName, clientPhone, petsStr, avatar });
 
-          // --- 渲染 Kanban Card ---
           const kanbanContainer = document.getElementById(colId) || document.getElementById('col-new');
           const searchStr = `${clientName} ${petsStr} ${d.package || ''}`.toLowerCase();
           
@@ -344,7 +341,6 @@
             </div>
           `);
 
-          // --- 渲染 Table Row ---
           const statusMap = { "col-new": "新預約", "col-basic-edit": "基本修輯", "col-pick-photos": "揀相", "col-final-retouch": "精修", "col-completed": "已完成" };
           const bal = Number(d.price||0) - (Number(d.depositAmount) || Math.floor(Number(d.price||0)/2));
           const balText = d.paymentStatus === 'full' ? '-' : `HK$ ${bal}`;
@@ -364,7 +360,6 @@
           `;
         }
 
-        // 更新 Counts
         colIds.forEach(id => {
             const countEl = document.getElementById(`count-${id}`);
             if(countEl) countEl.innerText = counts[id];
@@ -373,7 +368,6 @@
         document.getElementById('table-body').innerHTML = tableRows;
         lucide.createIcons();
 
-        // SortableJS (拖拽)
         colIds.forEach(colId => {
           const el = document.getElementById(colId);
           if (el) {
@@ -384,7 +378,6 @@
                 if (orderId && evt.from.id !== evt.to.id) {
                   try { 
                       await updateDoc(doc(db, "Orders", orderId), { status: targetColId }); 
-                      // 懶人做法：重新整理數據保持一致
                       setTimeout(() => loadOrders(), 500);
                   } catch(e) { evt.from.appendChild(itemEl); }
                 }
@@ -393,7 +386,6 @@
           }
         });
 
-        // 搜尋邏輯
         document.getElementById('global-search').addEventListener('input', (e) => {
           const term = e.target.value.toLowerCase();
           document.querySelectorAll('.kanban-card').forEach(card => {
