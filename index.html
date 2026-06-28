@@ -12,31 +12,29 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script id="tailwind-config">
     tailwind.config = { 
       darkMode: 'class',
       theme: { 
         extend: { 
           colors: { 
-            "pm-green": "#244018",       /* 更深沉內斂嘅綠色 (Taste) */
-            "pm-oak": "#C4905E",         /* 降低飽和度嘅橡木色 */
-            "pm-cream": "#FAFAFA",       /* 更乾淨嘅 Vercel-like 淺灰白 */
+            "pm-green": "#244018",       
+            "pm-oak": "#C4905E",         
+            "pm-cream": "#FAFAFA",       
             "pm-accent": "#E8B4B8",
             "whatsapp": "#25D366",
-            "pm-dark-bg": "#0B0E0C",       /* Taste: 極深邃嘅暗森林底色 */
-            "pm-dark-surface": "#121714",  /* 微微升起嘅卡片色 */
-            "pm-dark-border": "#1E2621"    /* 極微弱嘅邊框色 */
+            "pm-dark-bg": "#0B0E0C",       
+            "pm-dark-surface": "#121714",  
+            "pm-dark-border": "#1E2621"    
           }, 
           fontFamily: { 
             serif: ['"Playfair Display"', 'serif'], 
-            sans: ['"Inter"', 'sans-serif'] /* Frontend Design: Inter 提供最佳 UI 閱讀性 */
+            sans: ['"Inter"', 'sans-serif'] 
           },
           boxShadow: {
-            'taste': '0 4px 24px -8px rgba(0, 0, 0, 0.05)', /* 極柔和陰影 */
+            'taste': '0 4px 24px -8px rgba(0, 0, 0, 0.05)', 
             'taste-dark': '0 4px 24px -8px rgba(0, 0, 0, 0.4)'
           }
         } 
@@ -44,10 +42,37 @@
     }
   </script>
   <style>
-    .no-scrollbar::-webkit-scrollbar { display: none; }
     body { min-height: 100dvh; overflow: hidden; transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease; font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
     
-    /* Taste: 微交互效果與精緻邊框 */
+    /* 隱藏預設捲軸 (保留畀其他唔需要捲軸嘅組件用) */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    
+    /* 🔥 全新高級感自訂捲軸 (Custom Scrollbar) 🔥 */
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 8px; /* 向橫捲軸嘅高度 */
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 10px;
+    }
+    /* Light Mode 捲軸顏色 */
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.4); /* 柔和半透明灰色 */
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(107, 114, 128, 0.7); /* Mouse Hover 加深 */
+    }
+    /* Dark Mode 捲軸顏色 */
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(75, 85, 99, 0.4);
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(156, 163, 175, 0.7);
+    }
+
     .sortable-ghost { opacity: 0.3; background-color: transparent; border: 1px dashed #C4905E; border-radius: 0.75rem; }
     .dark .sortable-ghost { border-color: #C4905E; }
     .sortable-drag { transform: scale(1.02); opacity: 0.95 !important; cursor: grabbing !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid rgba(196,144,94,0.3); }
@@ -55,7 +80,6 @@
     @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
     .animate-pulse-soft { animation: pulse-soft 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 
-    /* Lucide Icon Default Alignment */
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
   </style>
 </head>
@@ -118,7 +142,7 @@
     </div>
 
     <div class="flex-1 min-h-0 relative">
-      <div id="view-kanban" class="w-full h-full overflow-x-auto no-scrollbar block">
+      <div id="view-kanban" class="w-full h-full overflow-x-auto custom-scrollbar block pb-3">
         <div class="flex gap-5 h-full min-w-max pb-4">
           <section class="w-[320px] flex flex-col h-full shrink-0">
             <h3 class="font-medium text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-4 pl-1"><i data-lucide="sparkles" class="w-4 h-4"></i> New Request</h3>
@@ -190,10 +214,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 初始化 Lucide Icons
     lucide.createIcons();
     
-    // 輔助函數：每次動態更新 DOM 後重新加載 Icons
     function updateIcons() {
       lucide.createIcons();
     }
@@ -416,7 +438,6 @@
           const container = document.getElementById(colId) || document.getElementById('col-new');
           const searchStr = `${clientName} ${displayName} ${data.package || ''}`.toLowerCase();
 
-          /* Taste: Card Design - Hairline border, extreme subtle shadows, clean typography */
           container.insertAdjacentHTML('beforeend', `
             <div data-order-id="${orderId}" data-search="${searchStr}" class="kanban-card bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-white/5 p-4 rounded-xl flex items-center justify-between cursor-pointer hover:shadow-taste dark:hover:border-pm-oak/30 transition-all mb-3 group">
               <div onclick="window.location.href='detail.html?id=${orderId}'" class="flex items-center gap-3 flex-1 overflow-hidden">
@@ -448,7 +469,7 @@
         document.getElementById('stat-revenue').innerText = "HK$ " + totalRev.toLocaleString(); 
         
         checkEmptyStates();
-        updateIcons(); // 注入完 HTML，渲染 Lucide Icons
+        updateIcons(); 
 
         const searchInput = document.getElementById('global-search');
         if (searchInput) {
@@ -507,7 +528,6 @@
       const header = document.getElementById('list-date-header');
       const events = eventsByDate[dateStr] || [];
       
-      // Formatting date nicely
       const dateObj = new Date(dateStr);
       header.innerText = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }); 
       header.classList.remove('hidden');
