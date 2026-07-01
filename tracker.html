@@ -25,7 +25,6 @@
           }, 
           fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] },
           boxShadow: {
-            /* [SKILL: Make Interfaces Feel Better] Organic Dynamic Shadows */
             'taste': '0 10px 40px -10px rgba(0, 0, 0, 0.04), 0 1px 4px -1px rgba(0, 0, 0, 0.02)',
             'taste-dark': '0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 1px 8px -1px rgba(0, 0, 0, 0.3)'
           }
@@ -38,13 +37,11 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     
-    /* [SKILL: UI-UX-Pro-Max] Continuous Flow Stepper Line */
     .step-line { position: absolute; top: 24px; left: 19px; bottom: -24px; width: 2px; background: #E5E7EB; z-index: 0; transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     .dark .step-line { background: #1E2621; }
     .step-active .step-line { background: #C4905E; }
     #s-5 .step-line { display: none; }
 
-    /* [SKILL: Web Design Guidelines] Input Aesthetics */
     .taste-input {
         background-color: #FFFFFF !important;
         border: 1px solid #E5E7EB !important;
@@ -57,7 +54,6 @@
         outline: none;
     }
 
-    /* [SKILL: UI-UX-Pro-Max] Micro-interaction Border Aura */
     .active-glow { position: relative; }
     .active-glow::after {
       content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
@@ -246,8 +242,8 @@
 
     lucide.createIcons();
 
-    // 狀態記憶暫存器，確保返回按鈕極之聰明
     let multipleFoundOrders = []; 
+    let currentClientName = "客戶"; // 用來儲存查到的主人名
 
     window.showToast = function(msg, type='success') {
       const container = document.getElementById('toast-container');
@@ -285,15 +281,12 @@
         findOrdersByPhone(targetPhone); 
     }
 
-    // 頂部導航返回鍵高階控制
     window.handleHeaderBack = () => {
         const resultVisible = !document.getElementById('result').classList.contains('hidden');
         if (resultVisible && multipleFoundOrders.length > 1) {
-            // 如果他是多單持有者，從單據詳情返回時，退回多單列表大堂
             document.getElementById('result').classList.add('hidden');
             document.getElementById('multi-orders-box').classList.remove('hidden');
         } else {
-            // 單張持有者或在大堂，直接返回搜尋初始化
             window.location.href = 'tracker.html';
         }
     };
@@ -307,7 +300,6 @@
       findOrdersByPhone(phone);
     };
 
-    // [SKILL: Multi-Order Management Architecture] 究極多單分流配對流
     async function findOrdersByPhone(phoneNum) {
       try {
         const [ordersSnap, clientsSnap] = await Promise.all([
@@ -320,6 +312,7 @@
           const cData = cDoc.data();
           if (cData.phone && cData.phone.trim() === phoneNum.trim()) {
             matchedClientIds.push(cDoc.id);
+            if(cData.name) currentClientName = cData.name; // 儲存主人名稱
           }
         });
 
@@ -329,7 +322,6 @@
           return;
         }
 
-        // 掃描並抓出所有屬於該客人的活躍訂單
         multipleFoundOrders = [];
         ordersSnap.forEach(oDoc => {
           const oData = oDoc.data();
@@ -344,15 +336,12 @@
           return;
         }
 
-        // [核心分流判斷] 
         document.getElementById('login-box').classList.add('hidden');
         resetButton();
 
         if (multipleFoundOrders.length === 1) {
-            // 只有一單：直接開展詳情
             loadOrderData(multipleFoundOrders[0].id);
         } else {
-            // 有多過一單：順滑彈出 Bento 風歷史清單選擇器
             renderMultiOrdersSelection();
         }
 
@@ -368,7 +357,7 @@
       if (btnText) btnText.innerText = "查詢檔案進度";
     }
 
-    // 渲染多單選擇介面
+    // 渲染多單選擇介面 (修正主人名與同行生靈字眼)
     function renderMultiOrdersSelection() {
         const listContainer = document.getElementById('multi-orders-list');
         
@@ -382,7 +371,7 @@
                  <div class="flex items-center gap-3 overflow-hidden">
                     <div class="w-8 h-8 rounded-full bg-pm-oak/10 text-pm-oak flex items-center justify-center shrink-0"><i data-lucide="camera" class="w-4 h-4"></i></div>
                     <div class="overflow-hidden">
-                       <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate mb-0.5">${petNames} 嘅專屬檔案</h4>
+                       <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate mb-0.5">${currentClientName} 的預約檔案：${petNames}</h4>
                        <p class="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wider">套餐: ${order.package || '未定'} | 拍攝日期: ${order.shootDate || '待定'}</p>
                     </div>
                  </div>
@@ -398,13 +387,11 @@
         lucide.createIcons();
     }
 
-    // 當用家喺多單大堂撳咗其中一單
     window.selectActiveOrder = (orderId) => {
         document.getElementById('multi-orders-box').classList.add('hidden');
         loadOrderData(orderId);
     };
 
-    // 加載訂單詳細進度核心
     async function loadOrderData(orderId) {
       try {
         const snap = await getDoc(doc(db, "Orders", orderId));
@@ -443,7 +430,8 @@
         if(d.studio) { document.getElementById('res-studio').innerText = `Studio: ${d.studio}`; document.getElementById('res-studio').classList.remove('hidden'); }
         
         if(d.extraPaxCount > 0 || d.kidsCount > 0) {
-            const extraStr = d.extraPaxCount > 0 ? `額外同行生靈 x${d.extraPaxCount}` : '';
+            // [修正] 修改為更清晰精確的字眼
+            const extraStr = d.extraPaxCount > 0 ? `額外人數/寵物 x${d.extraPaxCount}` : '';
             const kidsStr = d.kidsCount > 0 ? `免費小童 x${d.kidsCount}` : '';
             document.getElementById('res-pax-info').innerText = [extraStr, kidsStr].filter(Boolean).join(' ｜ ');
             document.getElementById('res-pax-block').classList.remove('hidden');
@@ -464,7 +452,6 @@
             document.getElementById('res-notes-block').classList.remove('hidden');
         }
         
-        // Stepper 同步
         const cLv = stepMap[d.status] || 1;
         
         ['s-1','s-2','s-3','s-4','s-5'].forEach(sId => {
@@ -508,7 +495,6 @@
         const bLabelSec = document.getElementById('breakdown-label-secondary');
         const bAmtSec = document.getElementById('breakdown-amount-secondary');
 
-        // 清空前一次的財務卡 Border Style 預防殘留
         fCard.className = "rounded-[24px] p-6 shadow-taste dark:shadow-taste-dark relative overflow-hidden transition-colors bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-white/5";
 
         if (pStat === 'full' || (pStat === 'deposit' && bal <= 0)) {
