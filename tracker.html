@@ -69,8 +69,8 @@
       <i data-lucide="arrow-left" class="w-5 h-5"></i>
     </button>
     <div class="flex flex-col items-center text-center">
-      <img src="logo_black.png" alt="Pawfect Memories" class="w-8 h-8 object-contain dark:hidden">
-      <img src="logo_white.png" alt="Pawfect Memories" class="w-8 h-8 object-contain hidden dark:block">
+      <img src="logo_black.png" alt="Pawfect Memories" class="h-10 sm:h-12 w-auto object-contain dark:hidden">
+      <img src="logo_white.png" alt="Pawfect Memories" class="h-10 sm:h-12 w-auto object-contain hidden dark:block">
     </div>
     <div class="w-10 h-10"></div>
   </header>
@@ -243,7 +243,7 @@
     lucide.createIcons();
 
     let multipleFoundOrders = []; 
-    let currentClientName = "客戶"; // 用來儲存查到的主人名
+    let currentClientName = "客戶"; 
 
     window.showToast = function(msg, type='success') {
       const container = document.getElementById('toast-container');
@@ -312,7 +312,7 @@
           const cData = cDoc.data();
           if (cData.phone && cData.phone.trim() === phoneNum.trim()) {
             matchedClientIds.push(cDoc.id);
-            if(cData.name) currentClientName = cData.name; // 儲存主人名稱
+            if(cData.name) currentClientName = cData.name; 
           }
         });
 
@@ -357,7 +357,6 @@
       if (btnText) btnText.innerText = "查詢檔案進度";
     }
 
-    // 渲染多單選擇介面 (修正主人名與同行生靈字眼)
     function renderMultiOrdersSelection() {
         const listContainer = document.getElementById('multi-orders-list');
         
@@ -430,7 +429,6 @@
         if(d.studio) { document.getElementById('res-studio').innerText = `Studio: ${d.studio}`; document.getElementById('res-studio').classList.remove('hidden'); }
         
         if(d.extraPaxCount > 0 || d.kidsCount > 0) {
-            // [修正] 修改為更清晰精確的字眼
             const extraStr = d.extraPaxCount > 0 ? `額外人數/寵物 x${d.extraPaxCount}` : '';
             const kidsStr = d.kidsCount > 0 ? `免費小童 x${d.kidsCount}` : '';
             document.getElementById('res-pax-info').innerText = [extraStr, kidsStr].filter(Boolean).join(' ｜ ');
