@@ -149,6 +149,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { renderPetAvatars, DENSE_AVATAR_LIMIT } from "./pets-avatars.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
@@ -179,24 +180,6 @@
     }
 
     let allOrdersData = [];
-    const DEFAULT_PET_PHOTO = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
-
-    function escAttr(value) {
-      return String(value ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
-    function petPhotoSrc(pet) {
-      const url = pet && typeof pet.photoUrl === "string" ? pet.photoUrl.trim() : "";
-      return url || DEFAULT_PET_PHOTO;
-    }
-
-    function renderPetAvatars(pets) {
-      const list = pets && pets.length ? pets : [{ name: "", photoUrl: "" }];
-      if (list.length === 1) {
-        return `<img src="${escAttr(petPhotoSrc(list[0]))}" alt="${escAttr(list[0].name || "")}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-100 dark:border-pm-dark-border">`;
-      }
-      return `<div class="flex items-center shrink-0">${list.map((p, i) => `<img src="${escAttr(petPhotoSrc(p))}" alt="${escAttr(p.name || "")}" title="${escAttr(p.name || "")}" class="w-8 h-8 rounded-full object-cover relative shrink-0 ring-2 ring-white dark:ring-pm-dark-surface ${i > 0 ? "-ml-2.5" : ""}" style="z-index:${list.length - i};">`).join("")}</div>`;
-    }
 
     // [SKILL: Code Review & Performance Boost] Asynchronous caching pipeline strategy
     async function loadDashboard() {
@@ -230,7 +213,7 @@
           let pets = data.pets || [];
           if (pets.length === 0 && data.petName) pets = [{ name: data.petName, photoUrl: data.photoUrl }];
           let petNames = pets.length > 0 ? pets.map(p => p.name).join(' & ') : "未填寫";
-          const avatarsHTML = renderPetAvatars(pets);
+          const avatarsHTML = renderPetAvatars(pets, { sizeClass: "w-8 h-8", singleClass: "border border-gray-100 dark:border-pm-dark-border", overlapClass: "-ml-2.5", maxVisible: DENSE_AVATAR_LIMIT });
 
           const price = Number(data.price || 0);
           const deposit = Number(data.depositAmount || 0);

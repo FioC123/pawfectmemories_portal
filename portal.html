@@ -117,6 +117,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { renderPetAvatars } from "./pets-avatars.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
@@ -224,19 +225,12 @@
                 let petsStr = pets.length > 0 ? pets.map(p => p.name).join(' & ') : '未知寵物';
                 let statusInfo = statusMap[order.status] || { text: "處理中", color: "text-gray-400", icon: "activity" };
                 
-                // 頭像處理 (重疊設計)
-                let avatarsHTML = '';
-                if (pets.length === 0) {
-                    avatarsHTML = `<img class="w-14 h-14 rounded-full object-cover ring-2 ring-white dark:ring-[#121714] shrink-0 bg-gray-50 dark:bg-pm-dark-surface" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop">`;
-                } else {
-                    const esc = (v) => String(v ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-                    pets.forEach((p, j) => {
-                        const zIndex = pets.length - j;
-                        const marginClass = j > 0 ? '-ml-5' : '';
-                        const imgSrc = (p.photoUrl && String(p.photoUrl).trim()) || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
-                        avatarsHTML += `<img class="w-14 h-14 rounded-full object-cover ring-2 ring-white dark:ring-[#121714] relative shrink-0 bg-gray-50 dark:bg-pm-dark-surface shadow-sm ${marginClass}" style="z-index:${zIndex};" src="${esc(imgSrc)}" alt="${esc(p.name || '')}">`;
-                    });
-                }
+                const avatarsHTML = renderPetAvatars(pets, {
+                    sizeClass: "w-14 h-14 bg-gray-50 dark:bg-pm-dark-surface",
+                    singleClass: "ring-2 ring-white dark:ring-[#121714]",
+                    overlapClass: "-ml-5",
+                    ringClass: "ring-2 ring-white dark:ring-[#121714] shadow-sm"
+                });
                 
                 return `
                 <div class="bg-white dark:bg-pm-dark-surface p-6 rounded-[20px] border border-gray-200/60 dark:border-white/5 hover:border-pm-oak/40 dark:hover:border-pm-oak/40 hover:shadow-taste dark:hover:shadow-taste-dark transition-all cursor-pointer relative overflow-hidden group" onclick="window.location.href='tracker.html?id=${order.id}'">

@@ -198,6 +198,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { renderPetAvatars, escAttr, petPhotoSrc, DENSE_AVATAR_LIMIT } from "./pets-avatars.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
@@ -242,32 +243,13 @@
     };
 
     let allOrdersData = [];
-    const DEFAULT_PET_PHOTO = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
-
-    function escAttr(value) {
-      return String(value ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
-    function petPhotoSrc(pet) {
-      const url = pet && typeof pet.photoUrl === "string" ? pet.photoUrl.trim() : "";
-      return url || DEFAULT_PET_PHOTO;
-    }
-
-    // One pet keeps a single circle. Two or more stack, each using its own photoUrl.
-    function renderPetAvatars(pets, { sizeClass, singleClass = "", overlapClass = "-ml-3" }) {
-      const list = pets && pets.length ? pets : [{ name: "", photoUrl: "" }];
-      if (list.length === 1) {
-        return `<img src="${escAttr(petPhotoSrc(list[0]))}" alt="${escAttr(list[0].name || "")}" class="${sizeClass} rounded-full object-cover shrink-0 ${singleClass}">`;
-      }
-      return `<div class="flex items-center shrink-0">${list.map((p, i) => `<img src="${escAttr(petPhotoSrc(p))}" alt="${escAttr(p.name || "")}" title="${escAttr(p.name || "")}" class="${sizeClass} rounded-full object-cover relative shrink-0 ring-2 ring-white dark:ring-pm-dark-surface ${i > 0 ? overlapClass : ""}" style="z-index:${list.length - i};">`).join("")}</div>`;
-    }
 
     function renderDrawerAvatars(pets) {
       const list = pets && pets.length ? pets : [{ name: "", photoUrl: "" }];
       if (list.length === 1) {
         return `<div class="w-14 h-14 rounded-full overflow-hidden border border-gray-100 dark:border-pm-dark-border shadow-sm shrink-0"><img src="${escAttr(petPhotoSrc(list[0]))}" alt="${escAttr(list[0].name || "")}" class="w-full h-full object-cover"></div>`;
       }
-      return renderPetAvatars(list, { sizeClass: "w-14 h-14 shadow-sm", overlapClass: "-ml-5" });
+      return renderPetAvatars(list, { sizeClass: "w-14 h-14 shadow-sm", overlapClass: "-ml-5", maxVisible: DENSE_AVATAR_LIMIT });
     }
 
     // 開啟 Drawer 預覽功能
@@ -359,8 +341,8 @@
           let pets = d.pets || [];
           if (pets.length === 0 && d.petName) pets = [{ name: d.petName, photoUrl: d.photoUrl }];
           let petsStr = pets.length > 0 ? pets.map(p => p.name).join(' & ') : "Unknown Pet";
-          const kanbanAvatars = renderPetAvatars(pets, { sizeClass: "w-9 h-9", singleClass: "border border-gray-100 dark:border-pm-dark-border", overlapClass: "-ml-3" });
-          const tableAvatars = renderPetAvatars(pets, { sizeClass: "w-7 h-7", overlapClass: "-ml-2" });
+          const kanbanAvatars = renderPetAvatars(pets, { sizeClass: "w-9 h-9", singleClass: "border border-gray-100 dark:border-pm-dark-border", overlapClass: "-ml-3", maxVisible: DENSE_AVATAR_LIMIT });
+          const tableAvatars = renderPetAvatars(pets, { sizeClass: "w-7 h-7", overlapClass: "-ml-2", maxVisible: DENSE_AVATAR_LIMIT });
 
           const colId = d.status || 'col-new';
           if(counts[colId] !== undefined) counts[colId]++;
