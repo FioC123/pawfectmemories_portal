@@ -75,6 +75,6 @@ test("receipt uses the stored overage and falls back for older orders", () => {
 });
 
 test("package menu shows the included rental and leaves other packages unchanged", () => {
-  assert.equal(packageOptionLabel(studio), "Pawfect Studio (HK$ 3888 · 已包地租 1500)");
+  assert.equal(packageOptionLabel(studio), "Pawfect Studio (HK$ 3888 · 已包租金 1500)");
   assert.equal(packageOptionLabel(outdoor), "Pawfect Outdoor (HK$ 2788)");
 });

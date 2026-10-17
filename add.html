@@ -253,9 +253,9 @@
 
           <div class="grid grid-cols-2 gap-4 border-t border-gray-100 dark:border-pm-dark-border pt-3">
             <div>
-              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block" for="extraStudioFee">額外 studio 費用</label>
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block" for="extraStudioFee">額外 Studio 費用</label>
               <input type="number" id="extraStudioFee" value="0" min="0" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white">
-              <p id="extra-studio-hint" class="text-[10px] text-gray-400 mt-1 leading-snug">只填超出已包地租的金額</p>
+              <p id="extra-studio-hint" class="text-[10px] text-gray-400 mt-1 leading-snug">只填超出已包租金的金額</p>
             </div>
             <div>
               <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block" for="manualOtherFee">附加費項目金額</label>
@@ -424,18 +424,18 @@
       if (!pkg) {
         note.textContent = "";
         note.classList.add('hidden');
-        hint.textContent = "只填超出已包地租的金額；未包地租的套餐則填整筆影樓費。";
+        hint.textContent = "只填超出已包租金的金額；未包租金的套餐則填整筆影樓費。";
         return;
       }
       const included = includedStudioLimit(pkg);
       if (included > 0) {
-        note.textContent = `此套餐已包影樓租金 ${hkd(included)}，請勿把這筆記入「附加費項目金額」。只有超出 ${hkd(included)} 的差額才填「額外 studio 費用」。`;
+        note.textContent = `此套餐已包影樓租金 ${hkd(included)}，請勿把這筆記入「附加費項目金額」。只有超出 ${hkd(included)} 的差額才填「額外 Studio 費用」。`;
         note.classList.remove('hidden');
         hint.textContent = `只填超出已包 ${hkd(included)} 的金額`;
       } else {
         note.textContent = "";
         note.classList.add('hidden');
-        hint.textContent = "此套餐未包地租。如需另收影樓費，整筆填在這裡。";
+        hint.textContent = "此套餐未包租金。如需另收影樓費，整筆填在這裡。";
       }
     }
 
@@ -454,9 +454,9 @@
       const el = document.getElementById('finance-breakdown');
       if (!quote) { el.textContent = ""; return; }
       const packageBit = quote.includedStudio > 0
-        ? `套餐 ${hkd(quote.packagePrice)}（已包地租 ${hkd(quote.includedStudio)}）`
+        ? `套餐 ${hkd(quote.packagePrice)}（已包租金 ${hkd(quote.includedStudio)}）`
         : `套餐 ${hkd(quote.packagePrice)}`;
-      const bits = [packageBit, `額外 studio ${hkd(quote.extraStudioFee)}`, `附加費 ${hkd(quote.manualOtherFee)}`];
+      const bits = [packageBit, `額外 Studio ${hkd(quote.extraStudioFee)}`, `附加費 ${hkd(quote.manualOtherFee)}`];
       if (quote.extraPaxCost > 0) bits.push(`額外人數 ${hkd(quote.extraPaxCost)}`);
       if (quote.discount > 0) bits.push(`折扣 −${hkd(quote.discount)}`);
       bits.push(`實收 ${hkd(quote.total)}`);
@@ -472,7 +472,7 @@
       refreshStudioHint(pkg);
       if (suppressFinance) return;
       if (!pkg) {
-        document.getElementById('finance-breakdown').textContent = "此套餐不在目前費率表，實收維持手填。額外 studio 與附加費仍會分開記錄。";
+        document.getElementById('finance-breakdown').textContent = "此套餐不在目前費率表，實收維持手填。額外 Studio 與附加費仍會分開記錄。";
         return;
       }
       const quote = currentQuote(pkg);

@@ -705,7 +705,7 @@
         }
         if (extraStudio > 0) {
             const extraEl = document.getElementById('detail-extra-studio');
-            extraEl.innerText = `額外 studio 費用: HK$ ${extraStudio.toLocaleString()}`;
+            extraEl.innerText = `額外 Studio 費用: HK$ ${extraStudio.toLocaleString()}`;
             extraEl.classList.remove('hidden');
         }
         if (manualFee > 0) {
@@ -826,11 +826,11 @@
       const hkd = (n) => `HK$ ${Number(n).toLocaleString()}`;
       const line = (cls, label, amount) => `<tr class="${cls}"><td>${label}</td><td class="num">${amount}</td></tr>`;
       const packageLabel = includedStudio > 0
-        ? `<strong>${rawData.package || "Photography Service"}</strong><br><span style="font-size:11px;color:#8a7560;">已包地租 HK$ ${includedStudio.toLocaleString()}</span>`
+        ? `<strong>${rawData.package || "Photography Service"}</strong><br><span style="font-size:11px;color:#8a7560;">已包租金 HK$ ${includedStudio.toLocaleString()}</span>`
         : `<strong>${rawData.package || "Photography Service"}</strong>`;
 
       let tableHtml = line('inv-main', packageLabel, hkd(basePrice));
-      if(studioTopUp > 0) { tableHtml += line('inv-extra', `+ Extra Studio Fee (額外 studio 費用)`, hkd(studioTopUp)); }
+      if(studioTopUp > 0) { tableHtml += line('inv-extra', `+ Extra Studio Fee (額外 Studio 費用)`, hkd(studioTopUp)); }
       if(extraPaxCost > 0) { tableHtml += line('inv-extra', `+ Extra Pax/Pet (額外人數/寵物 x ${rawData.extraPaxCount})`, hkd(extraPaxCost)); }
       if(manualOtherFee > 0) { tableHtml += line('inv-extra', `+ Other Surcharges (其他附加費)`, hkd(manualOtherFee)); }
       if(discount > 0) { tableHtml += line('inv-deduct', `- Discount Applied (折扣優惠)`, `− ${hkd(discount)}`); }

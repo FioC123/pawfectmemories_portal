@@ -1,5 +1,5 @@
 // Booking totals for packages that already include studio rental.
-// studioLimit (設定裡的「包底地租上限」) is inside the package price.
+// studioLimit (設定裡的「包底租金上限」) is inside the package price.
 // extraStudioFee is only the amount above that allowance. It is not the full rent,
 // and it must not be typed again into 附加費項目金額.
 
@@ -27,7 +27,7 @@ export function packageOptionLabel(pkg) {
   const name = pkg && pkg.name ? pkg.name : "套餐";
   const price = amount(pkg && pkg.price);
   const limit = includedStudioLimit(pkg);
-  if (limit > 0) return `${name} (HK$ ${price} · 已包地租 ${limit})`;
+  if (limit > 0) return `${name} (HK$ ${price} · 已包租金 ${limit})`;
   return `${name} (HK$ ${price})`;
 }
 
