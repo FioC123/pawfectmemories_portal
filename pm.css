@@ -711,9 +711,6 @@ body.pm-app .pointer-events-none.absolute.top-0.right-0 { display: none !importa
   cursor: grabbing !important;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  transition: background-color var(--duration-quick) var(--ease-smooth-out);
-}
 
 @media (hover: hover) and (pointer: fine) {
   body.pm-app .kanban-card:hover {
@@ -721,9 +718,6 @@ body.pm-app .pointer-events-none.absolute.top-0.right-0 { display: none !importa
   }
   body.pm-admin > aside a:hover {
     background: color-mix(in srgb, var(--ink) 5%, transparent);
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(107, 114, 128, 0.4);
   }
 }
 
@@ -752,4 +746,60 @@ body.pm-app .pointer-events-none.absolute.top-0.right-0 { display: none !importa
   body.pm-app button:active,
   body.pm-app .kanban-card:active,
   body.pm-app .pm-tabbar a:active { transform: none; }
+}
+
+/*
+  Hide scrollbar chrome only. Wheel, trackpad, touch, and keyboard
+  scrolling stay intact.
+
+  Do not use a universal `*` / `*::-webkit-scrollbar { width: 0; height: 0 }`
+  rule. That zero-width pseudo-element can collapse pet and profile photos.
+  Scope the hide to the page and to containers that actually scroll,
+  including the workspace lanes from the denser board.
+*/
+html,
+body,
+.custom-scrollbar,
+.no-scrollbar,
+.overflow-auto,
+.overflow-scroll,
+.overflow-x-auto,
+.overflow-x-scroll,
+.overflow-y-auto,
+.overflow-y-scroll,
+.pm-scroll,
+.pm-lanes,
+.pm-lane-list,
+.pm-sheet-body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar,
+.overflow-scroll::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-x-scroll::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-y-scroll::-webkit-scrollbar,
+.pm-scroll::-webkit-scrollbar,
+.pm-lanes::-webkit-scrollbar,
+.pm-lane-list::-webkit-scrollbar,
+.pm-sheet-body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Photos, marks, and icons are not scrollbars. */
+img,
+picture,
+svg,
+video,
+canvas {
+  scrollbar-width: auto;
+  -ms-overflow-style: auto;
 }
