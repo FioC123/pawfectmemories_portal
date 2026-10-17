@@ -283,8 +283,9 @@ body.pm-admin main {
   flex-shrink: 0;
 }
 
-.pm-board { display: flex; flex-direction: column; gap: 8px; }
-.pm-lane { display: flex; flex-direction: column; gap: 6px; }
+.pm-board { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.pm-lanes { display: flex; flex-direction: column; gap: 8px; }
+.pm-lane { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .pm-lane h3 {
   display: flex;
   align-items: center;
@@ -295,6 +296,49 @@ body.pm-admin main {
   padding: 8px 2px 0;
 }
 .pm-lane-list { display: flex; flex-direction: column; gap: 8px; min-height: 44px; }
+
+/* Desktop workspace: five lanes side by side. Mobile stays a stacked list. */
+@media (min-width: 768px) {
+  body.pm-workspace {
+    grid-template-columns: var(--rail) minmax(0, 1fr);
+    justify-content: stretch;
+  }
+  body.pm-workspace > .flex-1 { max-width: none; }
+  body.pm-workspace main {
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+  body.pm-workspace #view-kanban,
+  body.pm-workspace #view-table {
+    flex: 1;
+    min-height: 0;
+  }
+  body.pm-workspace #view-table { overflow: auto; }
+  body.pm-workspace .pm-lanes {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(168px, 1fr));
+    gap: 8px;
+    overflow-x: auto;
+    overscroll-behavior: contain;
+  }
+  body.pm-workspace .pm-lane {
+    height: 100%;
+    min-height: 0;
+    padding: 2px 6px 8px;
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--ink) 4%, var(--surface));
+  }
+  body.pm-workspace .pm-lane-list {
+    flex: 1;
+    min-height: 120px;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+}
 
 .pm-listview table { width: 100%; border-collapse: collapse; }
 .pm-listview thead { display: none; }

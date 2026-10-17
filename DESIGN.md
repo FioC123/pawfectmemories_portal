@@ -4,7 +4,8 @@ Operate-mode portal. One vertical working column, shared controls, no marketing 
 
 ## Layout
 
-- Desktop: fixed vertical rail (196px) plus a content column capped at 840px, centered. Sections stack. Kanban lanes stack.
+- Desktop: fixed vertical rail (196px). Forms and finance stay in a column capped at 840px. The workspace board is five lanes side by side; each lane scrolls on its own. The list view stays a vertical stack.
+- Mobile: the same five lanes stack, one under another.
 - Mobile: rail hides. Primary actions sit in a bottom bar above the tab bar, inside the thumb zone. Tab targets are at least 44px. `100dvh` shell, safe-area padding, `viewport-fit=cover`.
 - Inputs, selects, and textareas are 16px so iOS does not zoom. Zoom is allowed.
 
