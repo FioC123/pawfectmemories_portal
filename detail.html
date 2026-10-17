@@ -223,12 +223,14 @@
                 <div class="space-y-1">
                   <p class="text-[9px] text-gray-400 font-bold uppercase">訂金證明</p>
                   <div id="thumb-deposit" class="w-full aspect-video bg-gray-50 dark:bg-[#1A211D] rounded-xl overflow-hidden border border-gray-100 dark:border-pm-dark-border flex items-center justify-center text-[10px] text-gray-400">未上傳</div>
-                  <p id="detail-deposit-date" class="text-[9px] text-gray-400 truncate hidden"></p>
+                  <p id="detail-deposit-uploaded" class="text-[10px] text-gray-400 leading-relaxed hidden"></p>
+                  <p id="detail-deposit-received" class="text-[10px] text-gray-600 dark:text-gray-300 leading-relaxed hidden"></p>
                 </div>
                 <div class="space-y-1">
                   <p class="text-[9px] text-gray-400 font-bold uppercase">尾數證明</p>
                   <div id="thumb-balance" class="w-full aspect-video bg-gray-50 dark:bg-[#1A211D] rounded-xl overflow-hidden border border-gray-100 dark:border-pm-dark-border flex items-center justify-center text-[10px] text-gray-400">未上傳</div>
-                  <p id="detail-balance-date" class="text-[9px] text-gray-400 truncate hidden"></p>
+                  <p id="detail-balance-uploaded" class="text-[10px] text-gray-400 leading-relaxed hidden"></p>
+                  <p id="detail-balance-received" class="text-[10px] text-gray-600 dark:text-gray-300 leading-relaxed hidden"></p>
                 </div>
               </div>
             </div>
@@ -346,6 +348,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
     import { escAttr, petPhotoSrc } from "./pets-avatars.js";
+    import { formatPaymentStamp } from "./payment-times.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
@@ -404,6 +407,15 @@
           if (snap.exists()) waTemplates = snap.data(); 
           else waTemplates = { reminder: "哈囉 {name}！聽日見！", balance: "哈囉 {name}！尾數 HK$ {balance} 未收。" }; 
       } catch (err) {}
+    }
+
+    function showProofTimes(prefix, slipUploadedAt, legacyDate, receivedAt) {
+      const uploaded = formatPaymentStamp(slipUploadedAt) || formatPaymentStamp(legacyDate);
+      const received = formatPaymentStamp(receivedAt);
+      const uploadedEl = document.getElementById(`detail-${prefix}-uploaded`);
+      const receivedEl = document.getElementById(`detail-${prefix}-received`);
+      if (uploaded) { uploadedEl.textContent = `入數紙上傳：${uploaded}`; uploadedEl.classList.remove("hidden"); }
+      if (received) { receivedEl.textContent = `入數：${received}`; receivedEl.classList.remove("hidden"); }
     }
 
     async function loadDetailData() {
@@ -486,9 +498,9 @@
           }
         }
 
-        if (data.depositDate) { const dDate = document.getElementById('detail-deposit-date'); dDate.innerText = `上傳日: ${data.depositDate}`; dDate.classList.remove('hidden'); }
+        showProofTimes("deposit", data.depositSlipUploadedAt, data.depositDate, data.depositReceivedAt);
         if (data.depositReceiptUrl) { document.getElementById('thumb-deposit').innerHTML = `<img src="${data.depositReceiptUrl}" class="w-full h-full object-cover receipt-thumb" onclick="window.openLightbox('${data.depositReceiptUrl}')">`; }
-        if (data.balanceDate) { const bDate = document.getElementById('detail-balance-date'); bDate.innerText = `上傳日: ${data.balanceDate}`; bDate.classList.remove('hidden'); }
+        showProofTimes("balance", data.balanceSlipUploadedAt, data.balanceDate, data.balanceReceivedAt);
         if (data.balanceReceiptUrl) { document.getElementById('thumb-balance').innerHTML = `<img src="${data.balanceReceiptUrl}" class="w-full h-full object-cover receipt-thumb" onclick="window.openLightbox('${data.balanceReceiptUrl}')">`; }
 
         const depositEl = document.getElementById('detail-deposit'); const pStatus = data.paymentStatus || (data.depositPaid ? "deposit" : "unpaid");

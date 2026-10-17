@@ -91,8 +91,9 @@ function entryTimestamp(order) {
   return presentDate(order.createdAt, order.enteredAt, order.entryDate, order.orderEnteredAt);
 }
 
-// Receipt fields, then the order entry timestamp. shootDate is not a payment month.
-// Rare fallback: no receipt date and no entry timestamp was stored at all.
+// Receipt time (depositReceivedAt / balanceReceivedAt), then the legacy payment date.
+// Slip upload timestamps are not a receipt month. shootDate is the rare last resort
+// when no receipt date and no entry timestamp was stored.
 function datedByReceiptOrEntry(order, ...preferred) {
   return presentDate(...preferred, entryTimestamp(order), order.shootDate);
 }
@@ -133,6 +134,10 @@ function recognizedReceipts(order) {
   return [{ date, amount: price, label: "全數已付" }];
 }
 
+function stored(value) {
+  return value == null ? "" : value;
+}
+
 function orderLine(order) {
   return {
     id: order.id ? String(order.id) : "",
@@ -140,7 +145,16 @@ function orderLine(order) {
     petNames: order.petNames || "未填寫",
     pets: Array.isArray(order.pets) ? order.pets : [],
     amount: 0,
-    parts: []
+    parts: [],
+    // Shown on the month list. Slip upload time is not a receipt month.
+    proof: {
+      depositReceivedAt: stored(order.depositReceivedAt),
+      balanceReceivedAt: stored(order.balanceReceivedAt),
+      depositSlipUploadedAt: stored(order.depositSlipUploadedAt),
+      balanceSlipUploadedAt: stored(order.balanceSlipUploadedAt),
+      depositDate: stored(order.depositDate),
+      balanceDate: stored(order.balanceDate)
+    }
   };
 }
 

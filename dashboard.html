@@ -167,6 +167,7 @@
     import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
     import { renderPetAvatars, DENSE_AVATAR_LIMIT, escAttr } from "./pets-avatars.js";
     import { aggregateMonthlyIncome } from "./finance-income.js";
+    import { proofSummary } from "./payment-times.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
@@ -227,6 +228,7 @@
           const note = line.parts.length === 1
             ? escAttr(line.parts[0].label)
             : line.parts.map((part) => `${escAttr(part.label)} ${hkMoney(part.amount)}`).join(" · ");
+          const times = escAttr(proofSummary(line.proof, line.parts.map((part) => part.label)));
           const avatars = renderPetAvatars(line.pets, { sizeClass: "w-8 h-8", singleClass: "border border-gray-100 dark:border-pm-dark-border", overlapClass: "-ml-2.5", maxVisible: DENSE_AVATAR_LIMIT });
           const safeId = /^[A-Za-z0-9_-]+$/.test(line.id);
           const rowClass = "px-5 md:px-6 py-3 flex items-center justify-between gap-3 hover:bg-white dark:hover:bg-[#1A211D]/50 transition-colors";
@@ -236,6 +238,7 @@
               <div class="overflow-hidden min-w-0">
                 <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate">${escAttr(line.clientName)} · ${escAttr(line.petNames)}</h4>
                 <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">${note}</p>
+                ${times ? `<p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">${times}</p>` : ""}
               </div>
             </div>
             <div class="text-right shrink-0 flex items-center gap-1">
@@ -346,6 +349,8 @@
             depositPaid: data.depositPaid,
             depositReceivedAt: data.depositReceivedAt,
             balanceReceivedAt: data.balanceReceivedAt,
+            depositSlipUploadedAt: data.depositSlipUploadedAt,
+            balanceSlipUploadedAt: data.balanceSlipUploadedAt,
             depositDate: data.depositDate,
             balanceDate: data.balanceDate,
             createdAt: data.createdAt,
