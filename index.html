@@ -198,6 +198,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { renderPetAvatars, escAttr, petPhotoSrc, DENSE_AVATAR_LIMIT } from "./pets-avatars.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
@@ -243,6 +244,14 @@
 
     let allOrdersData = [];
 
+    function renderDrawerAvatars(pets) {
+      const list = pets && pets.length ? pets : [{ name: "", photoUrl: "" }];
+      if (list.length === 1) {
+        return `<div class="w-14 h-14 rounded-full overflow-hidden border border-gray-100 dark:border-pm-dark-border shadow-sm shrink-0"><img src="${escAttr(petPhotoSrc(list[0]))}" alt="${escAttr(list[0].name || "")}" class="w-full h-full object-cover"></div>`;
+      }
+      return renderPetAvatars(list, { sizeClass: "w-14 h-14 shadow-sm", overlapClass: "-ml-5", maxVisible: DENSE_AVATAR_LIMIT });
+    }
+
     // 開啟 Drawer 預覽功能
     window.openDrawer = function(orderId) {
       const data = allOrdersData.find(o => o.id === orderId);
@@ -258,9 +267,7 @@
 
       document.getElementById('drawer-content').innerHTML = `
         <div class="flex items-center gap-4 mb-2">
-          <div class="w-14 h-14 rounded-full overflow-hidden border border-gray-100 dark:border-pm-dark-border shadow-sm shrink-0">
-            <img src="${data.avatar}" class="w-full h-full object-cover">
-          </div>
+          ${renderDrawerAvatars(data.pets)}
           <div class="overflow-hidden flex-1">
             <h4 class="font-serif font-bold text-xl text-gray-900 dark:text-white truncate">${data.petsStr}</h4>
             <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">${data.clientName} ${data.clientPhone ? '· '+data.clientPhone : ''}</p>
@@ -334,12 +341,13 @@
           let pets = d.pets || [];
           if (pets.length === 0 && d.petName) pets = [{ name: d.petName, photoUrl: d.photoUrl }];
           let petsStr = pets.length > 0 ? pets.map(p => p.name).join(' & ') : "Unknown Pet";
-          let avatar = pets.length > 0 && pets[0].photoUrl ? pets[0].photoUrl : "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
+          const kanbanAvatars = renderPetAvatars(pets, { sizeClass: "w-9 h-9", singleClass: "border border-gray-100 dark:border-pm-dark-border", overlapClass: "-ml-3", maxVisible: DENSE_AVATAR_LIMIT });
+          const tableAvatars = renderPetAvatars(pets, { sizeClass: "w-7 h-7", overlapClass: "-ml-2", maxVisible: DENSE_AVATAR_LIMIT });
 
           const colId = d.status || 'col-new';
           if(counts[colId] !== undefined) counts[colId]++;
 
-          allOrdersData.push({ id, ...d, clientName, clientPhone, petsStr, avatar });
+          allOrdersData.push({ id, ...d, clientName, clientPhone, petsStr, pets });
 
           const kanbanContainer = document.getElementById(colId) || document.getElementById('col-new');
           const searchStr = `${clientName} ${petsStr} ${d.package || ''}`.toLowerCase();
@@ -350,7 +358,7 @@
           kanbanContainer.insertAdjacentHTML('beforeend', `
             <div data-order-id="${id}" data-search="${searchStr}" class="kanban-card active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/50 dark:border-white/5 p-4 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark transition-all duration-200 mb-3" onclick="openDrawer('${id}')">
               <div class="flex items-start gap-3">
-                <img class="w-9 h-9 rounded-full object-cover shrink-0 border border-gray-100 dark:border-pm-dark-border" src="${avatar}">
+                ${kanbanAvatars}
                 <div class="overflow-hidden flex-1">
                   <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate mb-0.5">${petsStr}</h4>
                   <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate mb-2.5 font-medium">${clientName}</p>
@@ -371,7 +379,7 @@
           tableRows += `
             <tr class="hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 border-b border-gray-100 dark:border-pm-dark-border/40 transition-colors cursor-pointer" onclick="openDrawer('${id}')">
               <td class="px-6 py-3.5 flex items-center gap-3">
-                <img src="${avatar}" class="w-7 h-7 rounded-full object-cover">
+                ${tableAvatars}
                 <div><p class="font-bold text-gray-900 dark:text-white">${petsStr}</p><p class="text-[10px] text-gray-400 font-medium">${clientName}</p></div>
               </td>
               <td class="px-6 py-3.5"><span class="bg-gray-50 dark:bg-pm-dark-border text-gray-500 dark:text-gray-400 text-[9px] px-2 py-0.5 rounded-md font-bold border border-gray-200 dark:border-transparent">${statusMap[colId]}</span></td>

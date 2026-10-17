@@ -304,6 +304,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+    import { DEFAULT_PET_PHOTO, escAttr, petPreviewSrc } from "./pets-avatars.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
@@ -517,8 +518,9 @@
           
           <div class="relative">
             <label class="text-[9px] text-gray-400 font-bold uppercase mb-0.5 block">大頭照 (網址或上傳)</label>
-            <div class="flex gap-2">
-              <input type="url" id="pet-url-${i}" value="${p.photoUrl}" onchange="updatePetField(${i}, 'photoUrl', this.value)" class="taste-input w-full rounded-lg text-xs text-gray-500" placeholder="貼上網址">
+            <div class="flex gap-2 items-center">
+              <img id="pet-preview-${i}" src="${escAttr(petPreviewSrc(p.photoUrl))}" alt="${escAttr(p.name || '')}" class="w-9 h-9 rounded-full object-cover shrink-0 border border-gray-100 dark:border-pm-dark-border bg-gray-50 dark:bg-pm-dark-bg" onerror="this.onerror=null;this.src='${escAttr(DEFAULT_PET_PHOTO)}'">
+              <input type="url" id="pet-url-${i}" value="${escAttr(p.photoUrl || '')}" oninput="updatePetField(${i}, 'photoUrl', this.value)" class="taste-input w-full rounded-lg text-xs text-gray-500" placeholder="貼上網址">
               <label class="cursor-pointer shrink-0 bg-white dark:bg-[#121714] border border-gray-200 dark:border-pm-dark-border hover:border-pm-oak dark:hover:border-pm-oak text-gray-500 hover:text-pm-oak px-3 py-2 rounded-lg flex items-center justify-center transition-colors shadow-sm">
                 <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
                 <input type="file" class="hidden" accept="image/*" onchange="uploadPetImage(${i}, this)">
@@ -534,7 +536,13 @@
       lucide.createIcons();
     }
 
-    window.updatePetField = (i, key, val) => { currentPets[i][key] = val; };
+    window.updatePetField = (i, key, val) => {
+      currentPets[i][key] = val;
+      if (key === 'photoUrl') {
+        const img = document.getElementById(`pet-preview-${i}`);
+        if (img) img.src = petPreviewSrc(val);
+      }
+    };
     window.removePetRow = (i) => { currentPets.splice(i, 1); renderPetsForm(); };
     
     document.getElementById('btn-add-pet').onclick = () => {

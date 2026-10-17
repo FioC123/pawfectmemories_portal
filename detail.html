@@ -113,7 +113,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         <div class="lg:col-span-7 bg-white dark:bg-pm-dark-surface rounded-[24px] p-6 md:p-8 shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 flex flex-col sm:flex-row items-center gap-6 group">
-          <div id="detail-avatars" class="flex items-center shrink-0"></div>
+          <div id="detail-avatars" class="flex flex-wrap items-center justify-center sm:justify-start shrink-0"></div>
           <div class="flex-1 text-center sm:text-left overflow-hidden">
             <h2 id="detail-pet-name" class="font-serif font-bold text-3xl md:text-4xl text-gray-900 dark:text-white leading-tight mb-2 truncate">Loading...</h2>
             <div id="detail-tags" class="flex flex-wrap justify-center sm:justify-start gap-1.5 min-h-[24px]"></div>
@@ -345,6 +345,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { escAttr, petPhotoSrc } from "./pets-avatars.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
@@ -451,14 +452,14 @@
           document.getElementById('detail-pet-name').innerText = loadedPetsString;
           
           let avatarsHTML = '';
-          pets.slice(0, 3).forEach((p, i) => { 
-              avatarsHTML += `<div class="w-20 h-24 rounded-2xl overflow-hidden ring-4 ring-white dark:ring-pm-dark-surface bg-gray-50 dark:bg-pm-dark-bg relative shrink-0 shadow-md ${i > 0 ? '-ml-8' : ''}" style="z-index:${30-(i*10)};"><img class="w-full h-full object-cover" src="${p.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop'}"></div>`; 
+          pets.forEach((p, i) => {
+              avatarsHTML += `<div class="w-20 h-24 rounded-2xl overflow-hidden ring-4 ring-white dark:ring-pm-dark-surface bg-gray-50 dark:bg-pm-dark-bg relative shrink-0 shadow-md ${i > 0 ? '-ml-8' : ''}" style="z-index:${pets.length - i};"><img class="w-full h-full object-cover" src="${escAttr(petPhotoSrc(p))}" alt="${escAttr(p.name || '')}"></div>`;
           });
           document.getElementById('detail-avatars').innerHTML = avatarsHTML;
           
           document.getElementById('pets-list-container').innerHTML = pets.map((p, i) => `
             <div class="sm:col-span-1 flex items-start gap-3 bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-transparent">
-                <div class="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden shrink-0"><img src="${p.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop'}" class="w-full h-full object-cover"></div>
+                <div class="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden shrink-0"><img src="${escAttr(petPhotoSrc(p))}" alt="${escAttr(p.name || '')}" class="w-full h-full object-cover"></div>
                 <div><p class="text-[9px] text-gray-400 font-bold uppercase">寵物 ${i+1}</p><p class="font-semibold text-gray-900 dark:text-white text-xs">${p.name} <span class="text-gray-400 font-normal ml-0.5">(${p.type || '未填'}${p.breed ? ' · '+p.breed : ''})</span></p></div>
             </div>`).join('');
         }
