@@ -183,7 +183,15 @@ test("a month lists each contributing order once with the amount attributed to t
     amount: 2800,
     parts: [
       { label: "全數已付", amount: 2800 }
-    ]
+    ],
+    proof: {
+      depositReceivedAt: "",
+      balanceReceivedAt: "",
+      depositSlipUploadedAt: "",
+      balanceSlipUploadedAt: "",
+      depositDate: "2026-05-02",
+      balanceDate: "2026-05-18"
+    }
   });
   assert.equal(may.lines[1].id, "split");
   assert.equal(may.lines[1].amount, 1000);
@@ -205,6 +213,29 @@ test("legacy depositPaid flag and over-recorded deposits stay inside the order t
 
   assert.equal(summary.rows[0].amount, 1000);
   assert.equal(summary.rows[0].key, "2026-07");
+});
+
+test("slip upload time does not move income off the received month", () => {
+  const withReceived = aggregateMonthlyIncome([{
+    price: 1000,
+    depositAmount: 1000,
+    paymentStatus: "full",
+    depositReceivedAt: "2026-04-02T02:00:00.000Z",
+    depositSlipUploadedAt: "2026-06-01T02:00:00.000Z",
+    depositDate: "2026-01-01",
+    shootDate: "2026-08-01"
+  }]);
+  assert.equal(withReceived.rows[0].key, "2026-04");
+
+  const legacyOnly = aggregateMonthlyIncome([{
+    price: 1000,
+    depositAmount: 1000,
+    paymentStatus: "full",
+    depositSlipUploadedAt: "2026-06-01T02:00:00.000Z",
+    depositDate: "2026-05-11",
+    shootDate: "2026-08-01"
+  }]);
+  assert.equal(legacyOnly.rows[0].key, "2026-05");
 });
 
 test("several bookings in the same month add up and the current month is marked", () => {
