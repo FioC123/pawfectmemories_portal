@@ -289,22 +289,26 @@
       }
         
       document.getElementById('package-list').innerHTML = packages.map((pkg, i) => `
-        <div class="row-transition px-6 py-3.5 flex flex-col sm:grid sm:grid-cols-12 gap-3 sm:gap-4 items-start sm:items-center hover:bg-gray-50/50 dark:hover:bg-pm-fill/60 transition-colors group">
-          <div class="w-full sm:col-span-5 relative">
-            <label class="sm:hidden text-[9px] text-gray-400 uppercase font-bold mb-1 block">套餐名稱</label>
+        <div class="pkg-rate row-transition hover:bg-gray-50/50 dark:hover:bg-pm-fill/60 transition-colors group">
+          <div class="pkg-rate-field">
+            <label class="pkg-rate-label">套餐名稱</label>
             <input type="text" value="${pkg.name}" onchange="updatePkg(${i}, 'name', this.value)" class="taste-input w-full text-gray-900 dark:text-white font-bold text-xs" placeholder="輸入套餐名稱">
           </div>
-          <div class="w-full sm:col-span-3 relative flex items-center">
-            <label class="sm:hidden text-[9px] text-gray-400 uppercase font-bold w-24">定價</label>
-            <span class="absolute left-3 text-gray-400 text-xs pointer-events-none">HK$</span>
-            <input type="number" value="${pkg.price}" onchange="updatePkg(${i}, 'price', this.value)" class="bg-transparent taste-input w-full pl-9 text-pm-oak font-bold text-xs">
+          <div class="pkg-rate-field">
+            <label class="pkg-rate-label">基礎定價</label>
+            <div class="pkg-rate-money">
+              <span class="pkg-rate-ccy">HK$</span>
+              <input type="number" value="${pkg.price}" onchange="updatePkg(${i}, 'price', this.value)" class="bg-transparent taste-input text-pm-oak font-bold text-xs">
+            </div>
           </div>
-          <div class="w-full sm:col-span-3 relative flex items-center">
-            <label class="sm:hidden text-[9px] text-gray-400 uppercase font-bold w-24">包底地租上限</label>
-            <span class="absolute left-3 text-gray-400 text-xs pointer-events-none">HK$</span>
-            <input type="number" value="${pkg.studioLimit || 0}" onchange="updatePkg(${i}, 'studioLimit', this.value)" class="bg-transparent taste-input w-full pl-9 text-gray-900 dark:text-white font-semibold text-xs">
+          <div class="pkg-rate-field">
+            <label class="pkg-rate-label">包底地租上限</label>
+            <div class="pkg-rate-money">
+              <span class="pkg-rate-ccy">HK$</span>
+              <input type="number" value="${pkg.studioLimit || 0}" onchange="updatePkg(${i}, 'studioLimit', this.value)" class="bg-transparent taste-input text-gray-900 dark:text-white font-semibold text-xs">
+            </div>
           </div>
-          <div class="w-full sm:col-span-1 flex justify-end sm:justify-center mt-1 sm:mt-0">
+          <div class="pkg-rate-actions">
             <button onclick="removePkg(${i})" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors" title="移除此項目">
               <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
