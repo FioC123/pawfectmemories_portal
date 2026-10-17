@@ -44,6 +44,7 @@
     
     .excel-green { background-color: #107c41; }
     .dark .excel-green { background-color: #0b5e30; }
+    button[aria-expanded="true"] .month-chevron { transform: rotate(180deg); }
   </style>
 </head>
 <body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex h-screen overflow-hidden">
@@ -128,7 +129,7 @@
           </div>
           <div class="min-w-0">
             <h3 class="font-serif font-bold text-lg text-gray-900 dark:text-white">每月已收收入</h3>
-            <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">按訂金及尾數的入帳月份合計（香港時間）。未付款及未收尾數不計入；跨月付清的訂單會拆開計算。</p>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">按收款／輸入日期合計（香港時間），不是拍攝月份。未付款及未收尾數不計入。點擊月份可查看該月訂單。</p>
           </div>
         </div>
         <div id="monthly-income-list" class="divide-y divide-gray-100 dark:divide-pm-dark-border">
@@ -164,7 +165,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    import { renderPetAvatars, DENSE_AVATAR_LIMIT } from "./pets-avatars.js";
+    import { renderPetAvatars, DENSE_AVATAR_LIMIT, escAttr } from "./pets-avatars.js";
     import { aggregateMonthlyIncome } from "./finance-income.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
@@ -208,7 +209,7 @@
               <i data-lucide="calendar-off" class="w-5 h-5"></i>
             </div>
             <p class="text-gray-900 dark:text-white font-bold text-sm mb-0.5">暫時未有已入帳收入</p>
-            <p class="text-gray-400 dark:text-gray-500 text-xs">訂單付了訂金或尾數後，會按入帳月份顯示在這裡。</p>
+            <p class="text-gray-400 dark:text-gray-500 text-xs">訂單付了訂金或尾數後，會按收款或輸入日期顯示在這裡。</p>
           </div>
         `;
         updateIcons();
@@ -218,19 +219,52 @@
       const max = summary.rows.reduce((peak, row) => Math.max(peak, row.amount), 0);
       const rowsHTML = summary.rows.map((row) => {
         const width = max > 0 ? Math.max(6, Math.round((row.amount / max) * 100)) : 0;
+        const panelId = `month-orders-${row.key}`;
         const badge = row.current
           ? `<span class="text-[9px] bg-pm-green/10 text-pm-green dark:text-[#8DBA76] px-1.5 py-0.5 rounded-md font-bold">本月</span>`
           : "";
+        const linesHTML = (row.lines || []).map((line) => {
+          const note = line.parts.length === 1
+            ? escAttr(line.parts[0].label)
+            : line.parts.map((part) => `${escAttr(part.label)} ${hkMoney(part.amount)}`).join(" · ");
+          const avatars = renderPetAvatars(line.pets, { sizeClass: "w-8 h-8", singleClass: "border border-gray-100 dark:border-pm-dark-border", overlapClass: "-ml-2.5", maxVisible: DENSE_AVATAR_LIMIT });
+          const safeId = /^[A-Za-z0-9_-]+$/.test(line.id);
+          const rowClass = "px-5 md:px-6 py-3 flex items-center justify-between gap-3 hover:bg-white dark:hover:bg-[#1A211D]/50 transition-colors";
+          const body = `
+            <div class="flex items-center gap-3 overflow-hidden min-w-0">
+              ${avatars}
+              <div class="overflow-hidden min-w-0">
+                <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate">${escAttr(line.clientName)} · ${escAttr(line.petNames)}</h4>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">${note}</p>
+              </div>
+            </div>
+            <div class="text-right shrink-0 flex items-center gap-1">
+              <div>
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">本月入帳</p>
+                <p class="font-bold text-sm text-gray-900 dark:text-white">${hkMoney(line.amount)}</p>
+              </div>
+              ${safeId ? `<i data-lucide="chevron-right" class="w-4 h-4 text-gray-300 dark:text-gray-600"></i>` : ""}
+            </div>
+          `;
+          if (!safeId) return `<div class="${rowClass}">${body}</div>`;
+          return `<a href="detail.html?id=${line.id}" class="${rowClass} group">${body}</a>`;
+        }).join("");
         return `
-          <div class="px-5 md:px-6 py-4 flex items-center gap-3 md:gap-4">
-            <div class="w-28 shrink-0">
-              <p class="font-bold text-sm text-gray-900 dark:text-white leading-tight">${row.label}</p>
-              <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1.5 flex-wrap"><span>${row.orders} 單</span>${badge}</p>
+          <div>
+            <button type="button" data-month-toggle aria-expanded="false" aria-controls="${panelId}" class="w-full px-5 md:px-6 py-4 flex items-center gap-3 md:gap-4 text-left hover:bg-gray-50 dark:hover:bg-[#1A211D]/30 transition-colors">
+              <div class="w-28 shrink-0">
+                <p class="font-bold text-sm text-gray-900 dark:text-white leading-tight">${row.label}</p>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1.5 flex-wrap"><span>${row.orders} 單</span>${badge}</p>
+              </div>
+              <div class="flex-1 min-w-[3.5rem] h-2 rounded-full bg-gray-100 dark:bg-[#1A211D] overflow-hidden" aria-hidden="true">
+                <div class="h-full rounded-full bg-pm-green dark:bg-[#8DBA76]" style="width:${width}%"></div>
+              </div>
+              <p class="font-serif font-bold text-sm md:text-base text-gray-900 dark:text-white text-right shrink-0">${hkMoney(row.amount)}</p>
+              <i data-lucide="chevron-down" class="month-chevron w-4 h-4 text-gray-300 dark:text-gray-600 shrink-0 transition-transform"></i>
+            </button>
+            <div id="${panelId}" class="hidden border-t border-gray-100 dark:border-pm-dark-border bg-gray-50/70 dark:bg-[#1A211D]/30 divide-y divide-gray-100 dark:divide-pm-dark-border">
+              ${linesHTML}
             </div>
-            <div class="flex-1 min-w-[3.5rem] h-2 rounded-full bg-gray-100 dark:bg-[#1A211D] overflow-hidden" aria-hidden="true">
-              <div class="h-full rounded-full bg-pm-green dark:bg-[#8DBA76]" style="width:${width}%"></div>
-            </div>
-            <p class="font-serif font-bold text-sm md:text-base text-gray-900 dark:text-white text-right shrink-0">${hkMoney(row.amount)}</p>
           </div>
         `;
       }).join("");
@@ -249,6 +283,15 @@
           <span class="font-serif font-bold text-sm text-pm-green dark:text-[#8DBA76]">${hkMoney(summary.total)}</span>
         </div>
       `;
+      list.onclick = (event) => {
+        const button = event.target.closest("[data-month-toggle]");
+        if (!button || !list.contains(button)) return;
+        const panel = document.getElementById(button.getAttribute("aria-controls"));
+        if (!panel) return;
+        const open = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", open ? "false" : "true");
+        panel.classList.toggle("hidden", open);
+      };
       updateIcons();
     }
 
@@ -294,12 +337,19 @@
           totalRev += price;
           incomeOrders.push({
             id: orderId,
+            clientName,
+            petNames,
+            pets,
             price: data.price,
             depositAmount: data.depositAmount,
             paymentStatus: data.paymentStatus,
             depositPaid: data.depositPaid,
+            depositReceivedAt: data.depositReceivedAt,
+            balanceReceivedAt: data.balanceReceivedAt,
             depositDate: data.depositDate,
             balanceDate: data.balanceDate,
+            createdAt: data.createdAt,
+            enteredAt: data.enteredAt,
             shootDate: data.shootDate
           });
 
