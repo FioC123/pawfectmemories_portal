@@ -22,7 +22,27 @@
       theme: { 
         extend: { 
           colors: { 
-            "pm-green": "#244018", "pm-oak": "#C4905E", "pm-cream": "#FAFAFA", "pm-dark-bg": "#0B0E0C", "pm-dark-surface": "#121714", "pm-dark-border": "#1E2621"
+            "pm-green": "rgb(var(--pm-primary) / <alpha-value>)",
+            "pm-oak": "rgb(var(--pm-primary) / <alpha-value>)",
+            "pm-cream": "rgb(var(--pm-page) / <alpha-value>)",
+            "pm-dark-bg": "rgb(var(--pm-page) / <alpha-value>)",
+            "pm-dark-surface": "rgb(var(--pm-card) / <alpha-value>)",
+            "pm-dark-border": "rgb(var(--pm-line) / <alpha-value>)",
+            "pm-sidebar": "rgb(var(--pm-sidebar) / <alpha-value>)",
+            "pm-fill": "rgb(var(--pm-fill) / <alpha-value>)",
+            "pm-elevated": "rgb(var(--pm-elevated) / <alpha-value>)",
+            "pm-ink": "rgb(var(--pm-ink) / <alpha-value>)",
+            "pm-page": "rgb(var(--pm-page) / <alpha-value>)",
+            "pm-on": "rgb(var(--pm-on) / <alpha-value>)",
+            "pm-secondary": "rgb(var(--pm-secondary) / <alpha-value>)",
+            "pm-muted": "rgb(var(--pm-muted) / <alpha-value>)",
+            "pm-success": "rgb(var(--pm-success) / <alpha-value>)",
+            "pm-warning": "rgb(var(--pm-warning) / <alpha-value>)",
+            "pm-danger": "rgb(var(--pm-danger) / <alpha-value>)",
+            "pm-info": "rgb(var(--pm-info) / <alpha-value>)",
+            "pm-sage": "rgb(var(--pm-sage) / <alpha-value>)",
+            "pm-clay": "rgb(var(--pm-clay) / <alpha-value>)",
+            "error": "rgb(var(--pm-danger) / <alpha-value>)"
           }, 
           fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] },
           boxShadow: { 'taste': '0 20px 40px -10px rgba(0, 0, 0, 0.08)', 'taste-dark': '0 20px 40px -10px rgba(0, 0, 0, 0.6)' }
@@ -35,30 +55,30 @@
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
-    .login-input { background-color: #F9FAFB !important; border: 1px solid var(--line) !important; transition: background-color var(--duration-quick) var(--ease), border-color var(--duration-quick) var(--ease), box-shadow var(--duration-quick) var(--ease-out); }
-    .dark .login-input { background-color: #1A211D !important; }
-    .login-input:focus { background-color: #FFFFFF !important; border-color: #C4905E !important; box-shadow: 0 0 0 3px rgba(196, 144, 94, 0.1) !important; outline: none; }
-    .dark .login-input:focus { background-color: #121714 !important; }
+    .login-input { background-color: var(--fill) !important; border: 1px solid var(--line) !important; transition: background-color var(--duration-quick) var(--ease), border-color var(--duration-quick) var(--ease), box-shadow var(--duration-quick) var(--ease-out); }
+    .dark .login-input { background-color: var(--elevated) !important; }
+    .login-input:focus { background-color: var(--card) !important; border-color: var(--primary) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent) !important; outline: none; }
+    .dark .login-input:focus { background-color: var(--card) !important; }
     input[type="password"] { letter-spacing: 0.5em; font-family: 'Inter', sans-serif; }
     input[type="password"]::placeholder { letter-spacing: normal; font-family: 'Noto Sans HK', sans-serif; font-weight: 400; font-size: 1rem; }
     #err { transition: opacity var(--duration-fast) var(--ease-smooth-out); }
   </style>
-  <meta name="theme-color" content="#F3F1EC">
+  <meta name="theme-color" content="#F6F3EE">
   <meta name="color-scheme" content="light dark">
   <script>
     (function () {
       var meta = document.querySelector('meta[name="theme-color"]');
-      if (meta && document.documentElement.classList.contains("dark")) meta.setAttribute("content", "#101411");
+      if (meta && document.documentElement.classList.contains("dark")) meta.setAttribute("content", "#1A1816");
     })();
   </script>
   <link rel="stylesheet" href="pm.css">
 </head>
-<body class="pm-app pm-public bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans flex flex-col items-center justify-center min-h-screen relative selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white">
+<body class="pm-app pm-public bg-pm-cream dark:bg-pm-dark-bg text-pm-ink font-sans flex flex-col items-center justify-center min-h-screen relative selection:bg-pm-oak/30 selection:text-pm-ink">
 
   <div class="w-full max-w-sm px-5">
     <div id="login-card" class="bg-white dark:bg-pm-dark-surface p-6 rounded-[32px] border border-gray-200/60 dark:border-white/5 text-center">
       
-      <div class="w-16 h-16 bg-pm-green/5 dark:bg-pm-oak/10 rounded-[20px] flex items-center justify-center mx-auto mb-6 text-pm-green dark:text-pm-oak border border-pm-green/10 dark:border-pm-oak/20 shadow-sm">
+      <div class="w-16 h-16 bg-pm-green/5 dark:bg-pm-oak/10 rounded-[20px] flex items-center justify-center mx-auto mb-6 text-pm-oak border border-pm-green/10 dark:border-pm-oak/20 shadow-sm">
         <i data-lucide="shield-check" class="w-8 h-8"></i>
       </div>
       
@@ -94,7 +114,7 @@
       htmlEl.classList.toggle('dark', dark);
       localStorage.setItem('theme', dark ? 'dark' : 'light');
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.content = dark ? '#101411' : '#F3F1EC';
+      if (meta) meta.content = dark ? '#1A1816' : '#F6F3EE';
     };
 
     function checkLogin() {

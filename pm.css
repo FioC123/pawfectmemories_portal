@@ -32,17 +32,50 @@
   --distance-small: 6px;
   --distance-base: 8px;
 
-  --bg: #f3f1ec;
-  --surface: #fffcf8;
-  --ink: #1a2118;
-  --ink-muted: #3e4a3c;
-  --line: #e3ddd3;
-  --green: #244018;
-  --green-soft: #e7efe3;
-  --oak: #6a3f16;
-  --oak-soft: #f4eadf;
-  --focus: #6a3f16;
-  --danger: #9f1239;
+  /* Light — cream / warm wood. Channels feed Tailwind rgb(var(--pm-*) / alpha). */
+  --bg: #F6F3EE;
+  --sidebar: #F0EBE3;
+  --card: #FFFFFF;
+  --surface: var(--card);
+  --elevated: #FFFCF8;
+  --ink: #2C2825;
+  --ink-secondary: #6B645C;
+  --ink-muted: #9A9288;
+  --line: #E5DFD6;
+  --fill: #EDE7DE;
+  --primary: #8F735A;
+  --primary-hover: #7A614C;
+  --on-primary: #FFFCF8;
+  --on-danger: #FFFCF8;
+  --green: var(--primary);
+  --green-soft: var(--fill);
+  --oak: var(--primary);
+  --oak-soft: var(--fill);
+  --focus: var(--primary);
+  --success: #6B8F71;
+  --warning: #C4A35A;
+  --danger: #B56B5C;
+  --info: #7A8B9A;
+  --sage: #8B9A7D;
+  --clay: #B8957A;
+  --pm-page: 246 243 238;
+  --pm-sidebar: 240 235 227;
+  --pm-card: 255 255 255;
+  --pm-elevated: 255 252 248;
+  --pm-ink: 44 40 37;
+  --pm-secondary: 107 100 92;
+  --pm-muted: 154 146 136;
+  --pm-line: 229 223 214;
+  --pm-fill: 237 231 222;
+  --pm-primary: 143 115 90;
+  --pm-primary-hover: 122 97 76;
+  --pm-on: 255 252 248;
+  --pm-success: 107 143 113;
+  --pm-warning: 196 163 90;
+  --pm-danger: 181 107 92;
+  --pm-info: 122 139 154;
+  --pm-sage: 139 154 125;
+  --pm-clay: 184 149 122;
   --radius: 12px;
   --column: 840px;
   --rail: 196px;
@@ -55,17 +88,49 @@
 }
 
 html.dark {
-  --bg: #101411;
-  --surface: #181d19;
-  --ink: #f3f1ec;
-  --ink-muted: #c9d2c6;
-  --line: #2a332c;
-  --green: #c5d7b8;
-  --green-soft: #243028;
-  --oak: #e6c4a0;
-  --oak-soft: #2c241c;
-  --focus: #e6c4a0;
-  --danger: #fecdd3;
+  --bg: #1A1816;
+  --sidebar: #141210;
+  --card: #24211E;
+  --surface: var(--card);
+  --elevated: #2C2926;
+  --ink: #F3EEE7;
+  --ink-secondary: #B5ADA3;
+  --ink-muted: #7A736B;
+  --line: #3A3530;
+  --fill: #3A3530;
+  --primary: #C4A484;
+  --primary-hover: #D4B896;
+  --on-primary: #1A1816;
+  --on-danger: #1A1816;
+  --green: var(--primary);
+  --green-soft: var(--fill);
+  --oak: var(--primary);
+  --oak-soft: var(--fill);
+  --focus: var(--primary);
+  --success: #8FAF94;
+  --warning: #D4B86A;
+  --danger: #D4897A;
+  --info: #9AABBA;
+  --sage: #8B9A7D;
+  --clay: #B8957A;
+  --pm-page: 26 24 22;
+  --pm-sidebar: 20 18 16;
+  --pm-card: 36 33 30;
+  --pm-elevated: 44 41 38;
+  --pm-ink: 243 238 231;
+  --pm-secondary: 181 173 163;
+  --pm-muted: 122 115 107;
+  --pm-line: 58 53 48;
+  --pm-fill: 58 53 48;
+  --pm-primary: 196 164 132;
+  --pm-primary-hover: 212 184 150;
+  --pm-on: 26 24 22;
+  --pm-success: 143 175 148;
+  --pm-warning: 212 184 106;
+  --pm-danger: 212 137 122;
+  --pm-info: 154 171 186;
+  --pm-sage: 139 154 125;
+  --pm-clay: 184 149 122;
 }
 
 html {
@@ -244,7 +309,8 @@ body.pm-admin main {
 
 .pm-search { position: relative; display: block; width: 100%; }
 .pm-search i, .pm-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--ink-muted); pointer-events: none; }
-.pm-search input { width: 100%; padding: 10px 12px 10px 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); }
+.pm-search input { width: 100%; padding: 10px 12px 10px 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--elevated); color: var(--ink); }
+.pm-search input::placeholder { color: var(--ink-muted); opacity: 1; }
 
 .pm-seg {
   display: flex;
@@ -252,7 +318,7 @@ body.pm-admin main {
   padding: 3px;
   gap: 3px;
   border-radius: 10px;
-  background: color-mix(in srgb, var(--ink) 6%, var(--surface));
+  background: var(--fill);
   border: 1px solid var(--line);
 }
 .pm-seg button {
@@ -261,11 +327,11 @@ body.pm-admin main {
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
-  color: var(--ink-muted);
+  color: var(--ink-secondary);
   background: transparent;
 }
 .pm-seg button[aria-pressed="true"] {
-  background: var(--surface);
+  background: var(--elevated);
   color: var(--ink);
   border: 1px solid var(--line);
 }
@@ -295,6 +361,14 @@ body.pm-admin main {
   color: var(--ink);
   padding: 8px 2px 0;
 }
+/* Kanban identity is a thin inset bar plus title tint. Column bodies stay quiet. */
+.pm-lane[data-lane="new"] { --lane: var(--info); }
+.pm-lane[data-lane="basic"] { --lane: var(--sage); }
+.pm-lane[data-lane="pick"] { --lane: var(--primary); }
+.pm-lane[data-lane="retouch"] { --lane: var(--clay); }
+.pm-lane[data-lane="done"] { --lane: var(--success); }
+.pm-lane[data-lane] { box-shadow: inset 3px 0 0 var(--lane); }
+.pm-lane[data-lane] h3 { color: var(--lane); }
 .pm-lane-list { display: flex; flex-direction: column; gap: 8px; min-height: 44px; }
 
 /* Booking card: each pet photo sits on the same row as its name. */
@@ -403,7 +477,7 @@ body.pm-admin main {
     min-height: 0;
     padding: 2px 6px 8px;
     border-radius: var(--radius);
-    background: color-mix(in srgb, var(--ink) 4%, var(--surface));
+    background: var(--card);
   }
   body.pm-workspace .pm-lane-list {
     flex: 1;
@@ -461,10 +535,10 @@ body.pm-admin main {
   border-radius: 10px;
   font-size: 16px;
   font-weight: 700;
-  background: var(--green);
-  color: #fff;
+  background: var(--primary);
+  color: var(--on-primary);
 }
-html.dark body.pm-app .pm-btn { color: #14210f; background: var(--green); }
+html.dark body.pm-app .pm-btn { color: var(--on-primary); background: var(--primary); }
 
 .pm-tabbar {
   position: fixed;
@@ -478,7 +552,7 @@ html.dark body.pm-app .pm-btn { color: #14210f; background: var(--green); }
   box-sizing: border-box;
   height: calc(var(--tabbar) + env(safe-area-inset-bottom, 0px));
   padding: 6px 8px env(safe-area-inset-bottom, 0px);
-  background: var(--surface);
+  background: var(--sidebar);
   border-top: 1px solid var(--line);
 }
 .pm-tabbar a {
@@ -491,7 +565,7 @@ html.dark body.pm-app .pm-btn { color: #14210f; background: var(--green); }
   justify-content: center;
   gap: 2px;
   padding: 0 !important;
-  color: var(--ink-muted);
+  color: var(--ink-secondary);
   font-size: 16px !important;
   line-height: 1.1 !important;
   font-weight: 700;
@@ -559,9 +633,15 @@ body.pm-app .text-\[11px\],
 body.pm-app .text-xs,
 body.pm-app .text-sm { font-size: 16px !important; line-height: 1.4 !important; }
 body.pm-app .uppercase { letter-spacing: 0.01em !important; text-transform: none !important; }
-body.pm-app .text-gray-400,
-body.pm-app .text-gray-500 { color: var(--ink-muted) !important; }
-body.pm-app .text-pm-oak { color: var(--oak) !important; }
+body.pm-app .text-gray-400 { color: var(--ink-muted) !important; }
+body.pm-app .text-gray-500,
+body.pm-app .text-gray-600,
+body.pm-app .text-gray-700 { color: var(--ink-secondary) !important; }
+body.pm-app .text-gray-800,
+body.pm-app .text-gray-900 { color: var(--ink) !important; }
+body.pm-app .text-pm-oak,
+body.pm-app .text-pm-green { color: var(--primary) !important; }
+body.pm-app .text-red-400,
 body.pm-app .text-red-500,
 body.pm-app .text-red-600 { color: var(--danger) !important; }
 body.pm-app .kanban-card { padding: 10px 12px !important; margin-bottom: 0 !important; }
@@ -719,6 +799,12 @@ body.pm-app .pointer-events-none.absolute.top-0.right-0 { display: none !importa
   body.pm-admin > aside a:hover {
     background: color-mix(in srgb, var(--ink) 5%, transparent);
   }
+  body.pm-app .bg-pm-green:hover,
+  body.pm-app .bg-pm-oak:hover,
+  body.pm-app .pm-btn:hover,
+  body.pm-app .dark\:bg-pm-oak:hover {
+    background-color: var(--primary-hover) !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -747,6 +833,134 @@ body.pm-app .pointer-events-none.absolute.top-0.right-0 { display: none !importa
   body.pm-app .kanban-card:active,
   body.pm-app .pm-tabbar a:active { transform: none; }
 }
+
+/* Palette lock — utilities follow the warm-wood tokens in both themes. */
+body.pm-app .bg-pm-cream,
+html.dark body.pm-app .dark\:bg-pm-dark-bg { background-color: var(--bg) !important; }
+body.pm-app .bg-pm-sidebar { background-color: var(--sidebar) !important; }
+body.pm-app .bg-white,
+html.dark body.pm-app .dark\:bg-pm-dark-surface { background-color: var(--card) !important; }
+body.pm-app .bg-pm-elevated,
+html.dark body.pm-app .dark\:bg-pm-elevated,
+html.dark body.pm-app .dark\:hover\:bg-pm-elevated:hover { background-color: var(--elevated) !important; }
+body.pm-app .bg-pm-fill,
+body.pm-app .bg-gray-50,
+body.pm-app .bg-gray-50\/30,
+body.pm-app .bg-gray-50\/50,
+body.pm-app .bg-gray-50\/70,
+body.pm-app .bg-gray-50\/80,
+body.pm-app .bg-gray-100,
+html.dark body.pm-app .dark\:bg-pm-fill,
+html.dark body.pm-app .dark\:bg-pm-fill\/10,
+html.dark body.pm-app .dark\:bg-pm-fill\/30,
+html.dark body.pm-app .dark\:bg-pm-fill\/40,
+html.dark body.pm-app .dark\:bg-pm-fill\/50,
+html.dark body.pm-app .dark\:bg-pm-dark-border { background-color: var(--fill) !important; }
+body.pm-app .hover\:bg-gray-50:hover,
+body.pm-app .hover\:bg-gray-50\/50:hover,
+body.pm-app .hover\:bg-gray-50\/80:hover,
+body.pm-app .hover\:bg-gray-100:hover,
+html.dark body.pm-app .dark\:hover\:bg-pm-fill:hover,
+html.dark body.pm-app .dark\:hover\:bg-pm-fill\/30:hover,
+html.dark body.pm-app .dark\:hover\:bg-pm-fill\/40:hover,
+html.dark body.pm-app .dark\:hover\:bg-pm-fill\/50:hover,
+html.dark body.pm-app .dark\:hover\:bg-pm-fill\/60:hover,
+html.dark body.pm-app .dark\:hover\:bg-pm-fill\/70:hover,
+html.dark body.pm-app .dark\:hover\:bg-\[\#1A211D\]:hover,
+html.dark body.pm-app .dark\:hover\:bg-\[\#1A211D\]\/30:hover,
+html.dark body.pm-app .dark\:hover\:bg-\[\#1A211D\]\/40:hover,
+html.dark body.pm-app .dark\:bg-\[\#1A211D\],
+html.dark body.pm-app .dark\:bg-\[\#1A211D\]\/10,
+html.dark body.pm-app .dark\:bg-\[\#1A211D\]\/30,
+html.dark body.pm-app .dark\:bg-\[\#1A211D\]\/40,
+html.dark body.pm-app .dark\:bg-\[\#1A211D\]\/50 { background-color: var(--fill) !important; }
+body.pm-app .bg-pm-ink { background-color: var(--ink) !important; color: var(--bg) !important; }
+body.pm-app .text-pm-page { color: var(--bg) !important; }
+body.pm-app .text-pm-ink { color: var(--ink) !important; }
+body.pm-app .text-pm-on { color: var(--on-primary) !important; }
+body.pm-app .text-pm-secondary { color: var(--ink-secondary) !important; }
+body.pm-app .text-pm-muted { color: var(--ink-muted) !important; }
+body.pm-app .text-pm-success { color: var(--success) !important; }
+body.pm-app .text-pm-warning { color: var(--warning) !important; }
+body.pm-app .text-pm-danger { color: var(--danger) !important; }
+body.pm-app .text-pm-info { color: var(--info) !important; }
+body.pm-app .text-pm-sage { color: var(--sage) !important; }
+body.pm-app .text-pm-clay { color: var(--clay) !important; }
+body.pm-app .bg-pm-success\/10 { background-color: color-mix(in srgb, var(--success) 16%, transparent) !important; }
+body.pm-app .bg-pm-warning\/10 { background-color: color-mix(in srgb, var(--warning) 16%, transparent) !important; }
+body.pm-app .bg-pm-oak\/5,
+body.pm-app .bg-pm-oak\/10,
+body.pm-app .bg-pm-green\/5,
+body.pm-app .bg-pm-green\/10,
+html.dark body.pm-app .dark\:bg-pm-oak\/10 { background-color: color-mix(in srgb, var(--primary) 12%, transparent) !important; }
+body.pm-app .bg-pm-green,
+body.pm-app .bg-pm-oak,
+html.dark body.pm-app .dark\:bg-pm-oak,
+html.dark body.pm-app .dark\:bg-\[\#8DBA76\] { background-color: var(--primary) !important; }
+body.pm-app .group:hover .group-hover\:bg-pm-oak { background-color: var(--primary) !important; color: var(--on-primary) !important; }
+body.pm-app .border-gray-100,
+body.pm-app .border-gray-200,
+body.pm-app .border-gray-200\/50,
+body.pm-app .border-gray-200\/60,
+body.pm-app .border-pm-dark-border,
+html.dark body.pm-app .dark\:border-white\/5,
+html.dark body.pm-app .dark\:border-pm-dark-border,
+html.dark body.pm-app .dark\:border-transparent { border-color: var(--line) !important; }
+body.pm-app .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+html.dark body.pm-app .dark\:divide-pm-dark-border > :not([hidden]) ~ :not([hidden]) { border-color: var(--line); }
+body.pm-app .border-pm-oak\/20,
+body.pm-app .border-pm-oak\/40,
+body.pm-app .border-pm-green\/10,
+body.pm-app .border-pm-green\/30,
+html.dark body.pm-app .border-pm-oak\/40,
+body.pm-app .hover\:border-pm-oak:hover,
+body.pm-app .hover\:border-pm-oak\/40:hover { border-color: color-mix(in srgb, var(--primary) 45%, transparent) !important; }
+body.pm-app .border-pm-success\/40,
+html.dark body.pm-app .border-pm-success\/40 { border-color: color-mix(in srgb, var(--success) 45%, transparent) !important; }
+body.pm-app .border-pm-warning\/40,
+html.dark body.pm-app .border-pm-warning\/40 { border-color: color-mix(in srgb, var(--warning) 45%, transparent) !important; }
+html.dark body.pm-app .dark\:text-white,
+html.dark body.pm-app .dark\:text-\[\#EAE8E3\],
+html.dark body.pm-app .dark\:text-\[\#D1E2C7\],
+body.pm-app .hover\:text-gray-900:hover,
+html.dark body.pm-app .dark\:hover\:text-white:hover { color: var(--ink) !important; }
+html.dark body.pm-app .dark\:text-gray-300,
+html.dark body.pm-app .dark\:text-gray-400,
+html.dark body.pm-app .dark\:text-gray-500 { color: var(--ink-secondary) !important; }
+html.dark body.pm-app .dark\:text-gray-600 { color: var(--ink-muted) !important; }
+html.dark body.pm-app .dark\:text-red-400,
+html.dark body.pm-app .dark\:text-red-500 { color: var(--danger) !important; }
+body.pm-app .bg-red-50,
+html.dark body.pm-app .dark\:bg-red-500\/10 { background-color: color-mix(in srgb, var(--danger) 14%, transparent) !important; }
+body.pm-app .border-red-100,
+body.pm-app .border-red-500\/30,
+html.dark body.pm-app .border-red-500\/30,
+html.dark body.pm-app .dark\:border-red-500\/20,
+html.dark body.pm-app .dark\:border-red-500\/30 { border-color: color-mix(in srgb, var(--danger) 35%, transparent) !important; }
+body.pm-app .bg-red-500 { background-color: var(--danger) !important; color: var(--on-danger) !important; }
+body.pm-app .hover\:bg-red-600:hover { background-color: color-mix(in srgb, var(--danger) 78%, #1A1816) !important; }
+body.pm-app .bg-yellow-50\/40,
+html.dark body.pm-app .dark\:bg-yellow-900\/5 { background-color: var(--fill) !important; }
+body.pm-app .border-yellow-100\/60,
+html.dark body.pm-app .dark\:border-yellow-900\/10 { border-color: var(--line) !important; }
+body.pm-app .bg-gray-900\/40 { background-color: rgb(26 24 22 / 0.46) !important; }
+body.pm-app .bg-pm-green,
+body.pm-app .bg-pm-oak,
+body.pm-app .pm-btn { color: var(--on-primary) !important; }
+body.pm-admin > aside a:not(.text-pm-oak),
+body.pm-admin > aside button { color: var(--ink-secondary) !important; }
+body.pm-admin > aside a.text-pm-oak { color: var(--primary) !important; }
+body.pm-app .pm-tabbar a { color: var(--ink-secondary) !important; }
+body.pm-app .pm-tabbar a.text-pm-oak,
+body.pm-app .pm-tabbar a.is-current { color: var(--primary) !important; }
+body.pm-app ::selection,
+body.pm-app *::selection { background: color-mix(in srgb, var(--primary) 28%, transparent); color: var(--ink); }
+body.pm-app input::placeholder,
+body.pm-app textarea::placeholder { color: var(--ink-muted); opacity: 1; }
+html.dark body.pm-app .dark\:ring-\[\#121714\],
+html.dark body.pm-app .dark\:ring-pm-dark-surface { --tw-ring-color: var(--card) !important; }
+body.pm-workspace .pm-lane .bg-white,
+body.pm-workspace .kanban-card { background-color: var(--elevated) !important; }
 
 /*
   Hide scrollbar chrome only. Wheel, trackpad, touch, and keyboard

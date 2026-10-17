@@ -23,7 +23,27 @@
       theme: { 
         extend: { 
           colors: { 
-            "pm-green": "#244018", "pm-oak": "#C4905E", "pm-cream": "#FAFAFA", "pm-dark-bg": "#0B0E0C", "pm-dark-surface": "#121714", "pm-dark-border": "#1E2621"
+            "pm-green": "rgb(var(--pm-primary) / <alpha-value>)",
+            "pm-oak": "rgb(var(--pm-primary) / <alpha-value>)",
+            "pm-cream": "rgb(var(--pm-page) / <alpha-value>)",
+            "pm-dark-bg": "rgb(var(--pm-page) / <alpha-value>)",
+            "pm-dark-surface": "rgb(var(--pm-card) / <alpha-value>)",
+            "pm-dark-border": "rgb(var(--pm-line) / <alpha-value>)",
+            "pm-sidebar": "rgb(var(--pm-sidebar) / <alpha-value>)",
+            "pm-fill": "rgb(var(--pm-fill) / <alpha-value>)",
+            "pm-elevated": "rgb(var(--pm-elevated) / <alpha-value>)",
+            "pm-ink": "rgb(var(--pm-ink) / <alpha-value>)",
+            "pm-page": "rgb(var(--pm-page) / <alpha-value>)",
+            "pm-on": "rgb(var(--pm-on) / <alpha-value>)",
+            "pm-secondary": "rgb(var(--pm-secondary) / <alpha-value>)",
+            "pm-muted": "rgb(var(--pm-muted) / <alpha-value>)",
+            "pm-success": "rgb(var(--pm-success) / <alpha-value>)",
+            "pm-warning": "rgb(var(--pm-warning) / <alpha-value>)",
+            "pm-danger": "rgb(var(--pm-danger) / <alpha-value>)",
+            "pm-info": "rgb(var(--pm-info) / <alpha-value>)",
+            "pm-sage": "rgb(var(--pm-sage) / <alpha-value>)",
+            "pm-clay": "rgb(var(--pm-clay) / <alpha-value>)",
+            "error": "rgb(var(--pm-danger) / <alpha-value>)"
           }, 
           fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] },
           boxShadow: { 
@@ -39,39 +59,39 @@
     body { min-height: 100dvh; overflow: hidden; -webkit-font-smoothing: antialiased; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
   </style>
-  <meta name="theme-color" content="#F3F1EC">
+  <meta name="theme-color" content="#F6F3EE">
   <meta name="color-scheme" content="light dark">
   <script>
     (function () {
       var meta = document.querySelector('meta[name="theme-color"]');
-      if (meta && document.documentElement.classList.contains("dark")) meta.setAttribute("content", "#101411");
+      if (meta && document.documentElement.classList.contains("dark")) meta.setAttribute("content", "#1A1816");
     })();
   </script>
   <link rel="stylesheet" href="pm.css">
 </head>
-<body class="pm-app pm-admin pm-workspace bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex h-screen overflow-hidden">
+<body class="pm-app pm-admin pm-workspace bg-pm-cream dark:bg-pm-dark-bg text-pm-ink font-sans selection:bg-pm-oak/30 selection:text-pm-ink flex h-screen overflow-hidden">
 
-  <aside class="hidden md:flex flex-col justify-between w-16 bg-white dark:bg-pm-dark-surface border-r border-gray-200/60 dark:border-pm-dark-border h-full pm-named group z-40 relative shadow-sm">
+  <aside class="hidden md:flex flex-col justify-between w-16 bg-pm-sidebar border-r border-gray-200/60 dark:border-pm-dark-border h-full pm-named group z-40 relative shadow-sm">
     <div class="flex flex-col items-start w-full overflow-hidden">
       <div class="h-20 flex items-center px-4 w-full shrink-0 border-b border-gray-100 dark:border-white/5">
         <img src="logo_black.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 dark:hidden">
         <img src="logo_white.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 hidden dark:block">
-        <span class="ml-3 font-serif font-bold text-[16px] text-pm-green dark:text-[#D1E2C7] whitespace-nowrap tracking-tight">Pawfect Memories</span>
+        <span class="ml-3 font-serif font-bold text-[16px] text-pm-ink whitespace-nowrap tracking-tight">Pawfect Memories</span>
       </div>
       <nav class="w-full mt-6 flex flex-col gap-1.5 px-2.5">
-        <a href="index.html" class="flex items-center px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-[#1A211D] text-pm-oak font-semibold pm-named w-full overflow-hidden shadow-inner dark:shadow-none">
+        <a href="index.html" class="flex items-center px-3.5 py-3 rounded-xl bg-pm-fill text-pm-oak font-semibold pm-named w-full overflow-hidden shadow-inner dark:shadow-none">
           <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i>
           <span class="ml-4 whitespace-nowrap">工作區 (Workspace)</span>
         </a>
-        <a href="add.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden font-medium">
+        <a href="add.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-pm-fill/70 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden font-medium">
           <i data-lucide="plus-square" class="w-5 h-5 shrink-0"></i>
           <span class="ml-4 whitespace-nowrap">新增預約 (New)</span>
         </a>
-        <a href="dashboard.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden font-medium">
+        <a href="dashboard.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-pm-fill/70 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden font-medium">
           <i data-lucide="pie-chart" class="w-5 h-5 shrink-0"></i>
           <span class="ml-4 whitespace-nowrap">財務中心 (Finance)</span>
         </a>
-        <a href="settings.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden font-medium">
+        <a href="settings.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-pm-fill/70 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden font-medium">
           <i data-lucide="settings" class="w-5 h-5 shrink-0"></i>
           <span class="ml-4 whitespace-nowrap">系統設定 (Settings)</span>
         </a>
@@ -79,11 +99,11 @@
     </div>
     
     <div class="px-2.5 pb-6 flex flex-col gap-1.5 w-full overflow-hidden border-t border-gray-100 dark:border-white/5 pt-4">
-      <button onclick="toggleDarkMode()" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1A211D] hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden">
+      <button onclick="toggleDarkMode()" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50 dark:hover:bg-pm-fill hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden">
         <i data-lucide="moon" class="w-5 h-5 shrink-0 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 shrink-0 hidden dark:block"></i>
         <span class="ml-4 whitespace-nowrap">主題切換 (Theme)</span>
       </button>
-      <a href="tracker.html" target="_blank" class="flex items-center px-3.5 py-3 rounded-xl text-pm-green bg-pm-green/5 dark:text-[#8DBA76] dark:bg-[#8DBA76]/10 hover:opacity-90 pm-named w-full overflow-hidden mt-2 font-semibold text-xs shadow-sm">
+      <a href="tracker.html" target="_blank" class="flex items-center px-3.5 py-3 rounded-xl text-pm-oak bg-pm-oak/10 hover:opacity-90 pm-named w-full overflow-hidden mt-2 font-semibold text-xs shadow-sm">
         <i data-lucide="external-link" class="w-5 h-5 shrink-0"></i>
         <span class="ml-4 whitespace-nowrap">客戶大堂 (Portal)</span>
       </a>
@@ -113,23 +133,23 @@
     <main class="pm-scroll flex-1 bg-pm-cream dark:bg-pm-dark-bg" id="main-view-container">
       <div id="view-kanban" class="pm-board">
         <div class="pm-lanes">
-          <section class="pm-lane">
+          <section class="pm-lane" data-lane="new">
             <h3><i data-lucide="sparkles" class="w-4 h-4"></i> 新預約 <span id="count-col-new">0</span></h3>
             <div id="col-new" class="pm-lane-list"></div>
           </section>
-          <section class="pm-lane">
+          <section class="pm-lane" data-lane="basic">
             <h3><i data-lucide="sliders" class="w-4 h-4"></i> 基本修輯 <span id="count-col-basic-edit">0</span></h3>
             <div id="col-basic-edit" class="pm-lane-list"></div>
           </section>
-          <section class="pm-lane">
+          <section class="pm-lane" data-lane="pick">
             <h3><i data-lucide="image" class="w-4 h-4"></i> 揀相 <span id="count-col-pick-photos">0</span></h3>
             <div id="col-pick-photos" class="pm-lane-list"></div>
           </section>
-          <section class="pm-lane">
+          <section class="pm-lane" data-lane="retouch">
             <h3><i data-lucide="wand-2" class="w-4 h-4"></i> 精修 <span id="count-col-final-retouch">0</span></h3>
             <div id="col-final-retouch" class="pm-lane-list"></div>
           </section>
-          <section class="pm-lane">
+          <section class="pm-lane" data-lane="done">
             <h3><i data-lucide="check-circle" class="w-4 h-4"></i> 已完成 <span id="count-col-completed">0</span></h3>
             <div id="col-completed" class="pm-lane-list"></div>
           </section>
@@ -165,10 +185,10 @@
     <div class="pm-sheet-body flex-1 p-4" id="drawer-content"></div>
 
     <div class="pm-actionbar shrink-0">
-      <button id="drawer-btn-edit" class="w-full bg-white dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-700 dark:text-gray-300 py-3 rounded-xl font-semibold hover:border-pm-oak hover:text-pm-oak transition-colors text-xs flex items-center justify-center gap-1.5 shadow-sm">
+      <button id="drawer-btn-edit" class="w-full bg-white dark:bg-pm-fill border border-gray-200 dark:border-pm-dark-border text-gray-700 dark:text-gray-300 py-3 rounded-xl font-semibold hover:border-pm-oak hover:text-pm-oak transition-colors text-xs flex items-center justify-center gap-1.5 shadow-sm">
         <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> 完整編輯
       </button>
-      <button id="drawer-btn-detail" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] py-3 rounded-xl font-semibold shadow-md hover:shadow-lg pm-named text-xs flex items-center justify-center gap-1.5">
+      <button id="drawer-btn-detail" class="w-full bg-pm-green dark:bg-pm-oak text-pm-on py-3 rounded-xl font-semibold shadow-md hover:shadow-lg pm-named text-xs flex items-center justify-center gap-1.5">
         <i data-lucide="file-text" class="w-3.5 h-3.5"></i> 查看詳情
       </button>
     </div>
@@ -203,7 +223,7 @@
       htmlEl.classList.toggle('dark', dark);
       localStorage.setItem('theme', dark ? 'dark' : 'light');
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.content = dark ? '#101411' : '#F3F1EC';
+      if (meta) meta.content = dark ? '#1A1816' : '#F6F3EE';
     };
 
     // [SKILL: Keyboard-First] Safely intercept global keyboard controls
@@ -249,8 +269,8 @@
 
       const bal = data.price - (data.depositAmount || Math.floor(data.price/2));
       const payBadge = data.paymentStatus === 'full' 
-        ? `<span class="bg-pm-green/10 text-pm-green dark:text-[#8DBA76] px-2 py-0.5 rounded-md text-[10px] font-bold">全數已付</span>`
-        : (data.paymentStatus === 'deposit' ? `<span class="bg-pm-oak/10 text-pm-oak px-2 py-0.5 rounded-md text-[10px] font-bold">欠 HK$${bal.toLocaleString()}</span>` : `<span class="bg-red-50 text-red-500 px-2 py-0.5 rounded-md text-[10px] font-bold">未付款</span>`);
+        ? `<span class="bg-pm-success/10 text-pm-success px-2 py-0.5 rounded-md text-[10px] font-bold">全數已付</span>`
+        : (data.paymentStatus === 'deposit' ? `<span class="bg-pm-warning/10 text-pm-warning px-2 py-0.5 rounded-md text-[10px] font-bold">欠 HK$${bal.toLocaleString()}</span>` : `<span class="bg-red-50 text-red-500 px-2 py-0.5 rounded-md text-[10px] font-bold">未付款</span>`);
 
       document.getElementById('drawer-content').innerHTML = `
         <div class="flex items-center gap-4 mb-2">
@@ -262,11 +282,11 @@
         </div>
         
         <div class="grid grid-cols-2 gap-3 mt-6">
-          <div class="bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-pm-dark-border">
+          <div class="bg-gray-50 dark:bg-pm-fill p-3 rounded-xl border border-gray-100 dark:border-pm-dark-border">
             <p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">拍攝日期</p>
             <p class="text-xs font-semibold text-gray-900 dark:text-white">${data.shootDate || '未定'}</p>
           </div>
-          <div class="bg-gray-50 dark:bg-[#1A211D] p-3 rounded-xl border border-gray-100 dark:border-pm-dark-border">
+          <div class="bg-gray-50 dark:bg-pm-fill p-3 rounded-xl border border-gray-100 dark:border-pm-dark-border">
             <p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">總收費</p>
             <p class="text-xs font-bold text-pm-oak flex items-center justify-between">${payBadge}</p>
           </div>
@@ -338,8 +358,8 @@
           const kanbanContainer = document.getElementById(colId) || document.getElementById('col-new');
           const searchStr = `${clientName} ${petsStr} ${d.package || ''}`.toLowerCase();
           
-          let paymentBadge = d.paymentStatus === 'full' ? `<span class="bg-gray-100 dark:bg-[#1A211D] text-gray-400 dark:text-gray-500 px-1.5 py-0.5 rounded text-[9px] font-bold">已付</span>` : 
-                             (d.paymentStatus === 'deposit' ? `<span class="bg-pm-oak/10 text-pm-oak px-1.5 py-0.5 rounded text-[9px] font-bold">訂金</span>` : `<span class="bg-red-50 dark:bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded text-[9px] font-bold">未付</span>`);
+          let paymentBadge = d.paymentStatus === 'full' ? `<span class="bg-pm-success/10 text-pm-success px-1.5 py-0.5 rounded text-[9px] font-bold">已付</span>` : 
+                             (d.paymentStatus === 'deposit' ? `<span class="bg-pm-warning/10 text-pm-warning px-1.5 py-0.5 rounded text-[9px] font-bold">訂金</span>` : `<span class="bg-red-50 dark:bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded text-[9px] font-bold">未付</span>`);
 
           kanbanContainer.insertAdjacentHTML('beforeend', `
             <div data-order-id="${id}" data-search="${searchStr}" class="kanban-card active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/50 dark:border-white/5 p-4 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark pm-named mb-3" onclick="openDrawer('${id}')">
@@ -355,17 +375,18 @@
           `);
 
           const statusMap = { "col-new": "新預約", "col-basic-edit": "基本修輯", "col-pick-photos": "揀相", "col-final-retouch": "精修", "col-completed": "已完成" };
+          const statusTone = { "col-new": "text-pm-info", "col-basic-edit": "text-pm-sage", "col-pick-photos": "text-pm-oak", "col-final-retouch": "text-pm-clay", "col-completed": "text-pm-success" };
           const bal = Number(d.price||0) - (Number(d.depositAmount) || Math.floor(Number(d.price||0)/2));
           const balText = d.paymentStatus === 'full' ? '-' : `HK$ ${bal.toLocaleString()}`;
           const balClass = d.paymentStatus === 'full' ? 'text-gray-400' : 'text-red-500 font-bold';
 
           tableRows += `
-            <tr class="hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 border-b border-gray-100 dark:border-pm-dark-border/40 transition-colors cursor-pointer" onclick="openDrawer('${id}')">
+            <tr class="hover:bg-gray-50/80 dark:hover:bg-pm-fill/70 border-b border-gray-100 dark:border-pm-dark-border/40 transition-colors cursor-pointer" onclick="openDrawer('${id}')">
               <td class="px-6 py-3.5">
                 ${petLines}
                 <div class="pm-pet-note"><p class="pm-pet-client">${clientName}</p></div>
               </td>
-              <td class="px-6 py-3.5"><span class="bg-gray-50 dark:bg-pm-dark-border text-gray-500 dark:text-gray-400 text-[9px] px-2 py-0.5 rounded-md font-bold border border-gray-200 dark:border-transparent">${statusMap[colId]}</span></td>
+              <td class="px-6 py-3.5"><span class="bg-gray-50 dark:bg-pm-dark-border ${statusTone[colId] || "text-pm-secondary"} text-[9px] px-2 py-0.5 rounded-md font-bold border border-gray-200 dark:border-transparent">${statusMap[colId]}</span></td>
               <td class="px-6 py-3.5 text-gray-500 dark:text-gray-400 font-semibold text-[11px] tracking-wide">${d.shootDate || '未定'}</td>
               <td class="px-6 py-3.5 text-gray-400 text-[11px] font-medium">${d.package || '-'}</td>
               <td class="px-6 py-3.5 text-right ${balClass}">${balText}</td>
@@ -414,7 +435,7 @@
             <div class="w-12 h-12 rounded-full bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center mb-4"><i data-lucide="wifi-off" class="w-6 h-6"></i></div>
             <h4 class="font-bold text-gray-900 dark:text-white mb-1">同步數據庫失敗</h4>
             <p class="text-xs text-gray-400 max-w-xs mb-4">無法安全連接到遠端服務，這可能是由於網絡波動或憑證過期引起。</p>
-            <button onclick="window.location.reload()" class="bg-pm-green text-white dark:bg-pm-oak dark:text-gray-900 px-4 py-2 rounded-xl text-xs font-bold shadow-sm">重新嘗試安全連接</button>
+            <button onclick="window.location.reload()" class="bg-pm-oak text-pm-on px-4 py-2 rounded-xl text-xs font-bold shadow-sm">重新嘗試安全連接</button>
           </div>
         `;
         lucide.createIcons();
