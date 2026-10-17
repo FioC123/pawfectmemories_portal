@@ -798,7 +798,7 @@
       const line = (cls, label, amount) => `<tr class="${cls}"><td>${label}</td><td class="num">${amount}</td></tr>`;
 
       let tableHtml = line('inv-main', `<strong>${rawData.package || "Photography Service"}</strong>`, hkd(basePrice));
-      if(studioTopUp > 0) { tableHtml += line('inv-extra', `+ Extra Studio Fee (補地租差價)`, hkd(studioTopUp)); }
+      if(studioTopUp > 0) { tableHtml += line('inv-extra', `+ Extra Studio Fee (補租金差價)`, hkd(studioTopUp)); }
       if(extraPaxCost > 0) { tableHtml += line('inv-extra', `+ Extra Pax/Pet (額外人數/寵物 x ${rawData.extraPaxCount})`, hkd(extraPaxCost)); }
       if(manualOtherFee > 0) { tableHtml += line('inv-extra', `+ Other Surcharges (其他附加費)`, hkd(manualOtherFee)); }
       if(discount > 0) { tableHtml += line('inv-deduct', `- Discount Applied (折扣優惠)`, `− ${hkd(discount)}`); }
