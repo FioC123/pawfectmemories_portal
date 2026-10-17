@@ -54,3 +54,30 @@ export function renderPetAvatars(pets, {
 
   return `<div class="flex items-center shrink-0">${imgs}${badge}</div>`;
 }
+
+// One photo and one name per row, so every booking card shares the same
+// avatar column, gap, and text baseline. A positive maxVisible keeps the
+// card short and puts the rest on a final +K row.
+export function renderPetLines(pets, { maxVisible = 0 } = {}) {
+  const list = pets && pets.length ? pets : [{ name: "", photoUrl: "" }];
+  const limit = maxVisible > 0 ? Math.min(maxVisible, list.length) : list.length;
+  const visible = list.slice(0, limit);
+  const hidden = list.slice(limit);
+
+  const row = (photo, name) => `<div class="pm-pet">${photo}<span class="pm-pet-name">${escAttr(name)}</span></div>`;
+  const rows = visible.map((pet) => {
+    const name = String(pet.name || "").trim() || "Unknown Pet";
+    const photo = `<img class="pm-pet-photo" src="${escAttr(petPhotoSrc(pet))}" alt="" width="36" height="36">`;
+    return row(photo, name);
+  }).join("");
+
+  const hiddenNames = hidden.map((pet) => String(pet.name || "").trim()).filter(Boolean);
+  const more = hidden.length
+    ? row(
+        `<span class="pm-pet-more" title="${escAttr(hiddenNames.join(", "))}">+${hidden.length}</span>`,
+        hiddenNames.join(" · ") || `+${hidden.length}`
+      )
+    : "";
+
+  return `<div class="pm-pets">${rows}${more}</div>`;
+}
