@@ -2,7 +2,7 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <meta content="width=device-width, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>預約進度查詢 | Pawfect Memories</title>
   
   <script>
@@ -16,7 +16,8 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <script id="tailwind-config">
-    tailwind.config = { 
+    tailwind.config = {
+      future: { hoverOnlyWhenSupported: true }, 
       darkMode: 'class',
       theme: { 
         extend: { 
@@ -33,12 +34,12 @@
     }
   </script>
   <style>
-    body { min-height: 100dvh; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
+    body { min-height: 100dvh; transition: background-color var(--duration-fast) var(--ease-smooth-out), color var(--duration-fast) var(--ease-smooth-out); -webkit-font-smoothing: antialiased; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     
     /* [SKILL: UI-UX-Pro-Max] Continuous Flow Stepper Line */
-    .step-line { position: absolute; top: 24px; left: 19px; bottom: -24px; width: 2px; background: #E5E7EB; z-index: 0; transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .step-line { position: absolute; top: 24px; left: 19px; bottom: -24px; width: 2px; background: #E5E7EB; z-index: 0; transition: background-color var(--duration-fast) var(--ease); }
     .dark .step-line { background: #1E2621; }
     .step-active .step-line { background: #C4905E; }
     #s-5 .step-line { display: none; }
@@ -47,7 +48,7 @@
     .taste-input {
         background-color: #FFFFFF !important;
         border: 1px solid #E5E7EB !important;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: background-color var(--duration-quick) var(--ease), border-color var(--duration-quick) var(--ease), box-shadow var(--duration-quick) var(--ease-out);
     }
     .dark .taste-input { background-color: #1A211D !important; border-color: transparent !important; }
     .taste-input:focus {
@@ -58,14 +59,18 @@
 
     /* [SKILL: UI-UX-Pro-Max] Micro-interaction Border Aura */
     .active-glow { position: relative; }
-    .active-glow::after {
-      content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-      box-shadow: 0 0 0 1px #C4905E; opacity: 0; transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .active-glow:hover::after { opacity: 0.3; }
   </style>
+  <meta name="theme-color" content="#F3F1EC">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (function () {
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta && document.documentElement.classList.contains("dark")) meta.setAttribute("content", "#101411");
+    })();
+  </script>
+  <link rel="stylesheet" href="pm.css">
 </head>
-<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white pb-24">
+<body class="pm-app pm-public bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white pb-24">
 
   <header class="w-full pt-8 pb-6 px-4 md:px-6 flex justify-between items-center max-w-2xl mx-auto">
     <button id="btn-back-header" onclick="handleHeaderBack()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-pm-dark-border text-gray-500 dark:text-gray-400 hover:text-pm-oak transition-colors shadow-sm shrink-0" title="返回">
@@ -80,18 +85,18 @@
 
   <main class="px-5 md:px-8 max-w-2xl mx-auto mt-4">
     
-    <div id="login-box" class="hidden space-y-6 mt-12 animate-[fadeIn_0.4s_ease-out]">
+    <div id="login-box" class="hidden space-y-6 mt-12">
       <div class="text-center mb-8">
-        <h2 class="font-serif text-3xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">Welcome Back</h2>
+        <h2 class="font-serif text-3xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">歡迎回來</h2>
         <p class="text-gray-500 dark:text-gray-400 text-xs font-medium tracking-wide">請輸入您登記的電話號碼以即時追蹤毛孩預約檔案</p>
       </div>
       <input type="tel" id="phone" placeholder="輸入 8 位數字電話號碼" inputmode="numeric" class="taste-input w-full rounded-2xl px-6 py-4 text-center font-bold text-xl text-gray-900 dark:text-white shadow-sm outline-none">
-      <button id="btn-track" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold tracking-wide py-4 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all text-lg flex items-center justify-center gap-2">
+      <button id="btn-track" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold tracking-wide py-4 rounded-2xl shadow-lg hover:shadow-xl pm-named text-lg flex items-center justify-center gap-2">
         <i data-lucide="search" class="w-5 h-5"></i> <span id="btn-track-text">查詢檔案進度</span>
       </button>
     </div>
 
-    <div id="multi-orders-box" class="hidden space-y-6 animate-[fadeIn_0.4s_ease-out]">
+    <div id="multi-orders-box" class="hidden space-y-6">
       <div class="text-center mb-6">
         <h2 class="font-serif text-2xl font-bold text-gray-900 dark:text-white mb-1">您的專屬預約紀錄</h2>
         <p class="text-gray-400 text-xs font-medium">系統偵測到您有多個活躍的預約單，請選擇其中一項查看進度：</p>
@@ -100,7 +105,7 @@
          </div>
     </div>
 
-    <div id="result" class="hidden space-y-6 animate-[fadeIn_0.5s_cubic-bezier(0.16,1,0.3,1)]">
+    <div id="result" class="hidden space-y-6">
       
       <div class="text-center mt-6 mb-8">
         <span id="res-order-id" class="inline-block text-[9px] font-bold tracking-[0.2em] uppercase bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-pm-dark-border text-gray-400 px-3 py-1 rounded-full mb-3 shadow-inner">BOOKING #------</span>
@@ -157,29 +162,29 @@
         </h3>
         
         <div id="stepper" class="space-y-6 pl-1">
-          <div class="flex gap-4 relative transition-all duration-300" id="s-1">
+          <div class="flex gap-4 relative pm-named" id="s-1">
               <div class="step-line"></div>
-              <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface transition-all"><i data-lucide="clock" class="w-4 h-4"></i></div>
+              <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface pm-named"><i data-lucide="clock" class="w-4 h-4"></i></div>
               <div class="pt-1.5"><p class="text-xs font-bold text-gray-400 s-title transition-colors">收到新預約</p><p class="text-[11px] text-gray-400 mt-0.5 font-medium">已成功為您保留拍攝檔期</p></div>
           </div>
-          <div class="flex gap-4 relative transition-all duration-300" id="s-2">
+          <div class="flex gap-4 relative pm-named" id="s-2">
               <div class="step-line"></div>
-              <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface transition-all"><i data-lucide="sliders" class="w-4 h-4"></i></div>
+              <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface pm-named"><i data-lucide="sliders" class="w-4 h-4"></i></div>
               <div class="pt-1.5"><p class="text-xs font-bold text-gray-400 s-title transition-colors">基本色調修輯</p><p class="text-[11px] text-gray-400 mt-0.5 font-medium">攝影師正在處理光暗及微調色彩</p></div>
           </div>
-          <div class="flex gap-4 relative transition-all duration-300" id="s-3">
+          <div class="flex gap-4 relative pm-named" id="s-3">
               <div class="step-line"></div>
-              <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface transition-all"><i data-lucide="image" class="w-4 h-4"></i></div>
+              <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface pm-named"><i data-lucide="image" class="w-4 h-4"></i></div>
               <div class="pt-1.5"><p class="text-xs font-bold text-gray-400 s-title transition-colors">客戶線上限時揀相</p><p class="text-[11px] text-gray-400 mt-0.5 font-medium">初修底片已備妥，請挑選您心儀的精修相片</p></div>
           </div>
-          <div class="flex gap-4 relative transition-all duration-300" id="s-4">
+          <div class="flex gap-4 relative pm-named" id="s-4">
               <div class="step-line"></div>
-              <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface transition-all"><i data-lucide="wand-2" class="w-4 h-4"></i></div>
+              <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface pm-named"><i data-lucide="wand-2" class="w-4 h-4"></i></div>
               <div class="pt-1.5"><p class="text-xs font-bold text-gray-400 s-title transition-colors">高級人像毛孩精修</p><p class="text-[11px] text-gray-400 mt-0.5 font-medium">正在進行精細毛髮微調與瑕疵修飾</p></div>
           </div>
-          <div class="flex gap-4 relative transition-all duration-300" id="s-5">
+          <div class="flex gap-4 relative pm-named" id="s-5">
               <div class="step-line"></div>
-              <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface transition-all"><i data-lucide="check" class="w-4 h-4"></i></div>
+              <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#1A211D] flex items-center justify-center z-10 s-icon text-gray-400 border-2 border-white dark:border-pm-dark-surface pm-named"><i data-lucide="check" class="w-4 h-4"></i></div>
               <div class="pt-1.5"><p class="text-xs font-bold text-gray-400 s-title transition-colors">完美相片交付</p><p class="text-[11px] text-gray-400 mt-0.5 font-medium">所有成品相片已全數交付，感謝您的耐心等待</p></div>
           </div>
         </div>
@@ -192,13 +197,13 @@
               <p class="text-xs font-bold text-gray-900 dark:text-white">您的完美回憶珍藏相簿已送達！</p>
             </div>
             
-            <a id="gallery-link" href="#" target="_blank" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] py-3.5 rounded-xl flex items-center justify-center gap-1.5 font-bold shadow-md hover:shadow-lg active:scale-95 transition-all text-sm tracking-wide">
+            <a id="gallery-link" href="#" target="_blank" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] py-3.5 rounded-xl flex items-center justify-center gap-1.5 font-bold shadow-md hover:shadow-lg pm-named text-sm tracking-wide">
               <i data-lucide="cloud-download" class="w-4 h-4"></i> 即刻瀏覽雲端相簿
             </a>
             
             <div class="flex items-center gap-2 mt-3">
               <input type="text" id="gallery-url-text" readonly class="bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border rounded-xl px-4 py-2.5 text-[11px] font-medium text-gray-400 w-full outline-none shadow-inner">
-              <button onclick="copyGalleryLink()" class="bg-gray-100 dark:bg-pm-dark-border p-2.5 rounded-xl text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex shrink-0 active:scale-95" title="複製完整網址">
+              <button onclick="copyGalleryLink()" class="bg-gray-100 dark:bg-pm-dark-border p-2.5 rounded-xl text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex shrink-0" title="複製完整網址">
                 <i data-lucide="copy" class="w-4 h-4"></i>
               </button>
             </div>
@@ -255,13 +260,13 @@
       const bgColor = type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900';
       const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
       
-      toast.className = `px-4 py-2.5 rounded-xl shadow-2xl text-xs font-bold transform transition-all translate-y-10 opacity-0 flex items-center gap-2 ${bgColor}`;
+      toast.className = `pm-toast flex items-center gap-2 ${bgColor}`;
       toast.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${msg}`;
       
       container.appendChild(toast);
       lucide.createIcons();
-      requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
-      setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
+      requestAnimationFrame(() => toast.classList.add('is-in'));
+      setTimeout(() => { toast.classList.remove('is-in'); toast.classList.add('is-out'); setTimeout(() => toast.remove(), 160); }, 3000);
     }
 
     window.copyGalleryLink = () => {
@@ -370,7 +375,7 @@
             let petNames = pets.length > 0 ? pets.map(p=>p.name).join(' & ') : '未知毛孩';
             
             return `
-              <div onclick="selectActiveOrder('${order.id}')" class="active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-white/5 p-5 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark flex items-center justify-between group transition-all duration-200">
+              <div onclick="selectActiveOrder('${order.id}')" class="active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-white/5 p-5 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark flex items-center justify-between group pm-named">
                  <div class="flex items-center gap-3 overflow-hidden">
                     ${renderPetAvatars(pets, { sizeClass: "w-8 h-8", singleClass: "border border-gray-100 dark:border-pm-dark-border", overlapClass: "-ml-2.5", maxVisible: DENSE_AVATAR_LIMIT })}
                     <div class="overflow-hidden">
