@@ -371,6 +371,79 @@ body.pm-admin main {
 .pm-lane[data-lane] h3 { color: var(--lane); }
 .pm-lane-list { display: flex; flex-direction: column; gap: 8px; min-height: 44px; }
 
+/* Booking card: each pet photo sits on the same row as its name. */
+.pm-pets { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pm-pet {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: center;
+  min-height: 36px;
+}
+.pm-pet-photo,
+.pm-pet-more {
+  width: 36px;
+  height: 36px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--ink) 5%, var(--surface));
+}
+.pm-pet-photo { display: block; object-fit: cover; }
+.pm-pet-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+.pm-pet-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+}
+.pm-pet-note {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  column-gap: 10px;
+  margin-top: 6px;
+}
+.pm-pet-note > .pm-pet-client,
+.pm-pet-note > .pm-pet-meta { grid-column: 2; min-width: 0; }
+.pm-pet-client {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pm-pet-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pm-pet-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
 /* Desktop workspace: five lanes side by side. Mobile stays a stacked list. */
 @media (min-width: 768px) {
   body.pm-workspace {
@@ -429,7 +502,7 @@ body.pm-admin main {
   margin-bottom: 8px;
 }
 .pm-listview td { padding: 2px 0 !important; white-space: normal !important; }
-.pm-listview td:first-child { display: flex; align-items: center; gap: 10px; }
+.pm-listview td:first-child { display: block; }
 
 .pm-scroll { overflow: auto; overscroll-behavior: contain; }
 
@@ -718,9 +791,6 @@ body.pm-app .pointer-events-none.absolute.top-0.right-0 { display: none !importa
   cursor: grabbing !important;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  transition: background-color var(--duration-quick) var(--ease-smooth-out);
-}
 
 @media (hover: hover) and (pointer: fine) {
   body.pm-app .kanban-card:hover {
@@ -728,9 +798,6 @@ body.pm-app .pointer-events-none.absolute.top-0.right-0 { display: none !importa
   }
   body.pm-admin > aside a:hover {
     background: color-mix(in srgb, var(--ink) 5%, transparent);
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(122, 115, 107, 0.45);
   }
   body.pm-app .bg-pm-green:hover,
   body.pm-app .bg-pm-oak:hover,
@@ -894,3 +961,59 @@ html.dark body.pm-app .dark\:ring-\[\#121714\],
 html.dark body.pm-app .dark\:ring-pm-dark-surface { --tw-ring-color: var(--card) !important; }
 body.pm-workspace .pm-lane .bg-white,
 body.pm-workspace .kanban-card { background-color: var(--elevated) !important; }
+
+/*
+  Hide scrollbar chrome only. Wheel, trackpad, touch, and keyboard
+  scrolling stay intact.
+
+  Do not use a universal `*` / `*::-webkit-scrollbar { width: 0; height: 0 }`
+  rule. That zero-width pseudo-element can collapse pet and profile photos.
+  Scope the hide to the page and to containers that actually scroll,
+  including the workspace lanes from the denser board.
+*/
+html,
+body,
+.custom-scrollbar,
+.no-scrollbar,
+.overflow-auto,
+.overflow-scroll,
+.overflow-x-auto,
+.overflow-x-scroll,
+.overflow-y-auto,
+.overflow-y-scroll,
+.pm-scroll,
+.pm-lanes,
+.pm-lane-list,
+.pm-sheet-body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar,
+.overflow-scroll::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-x-scroll::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-y-scroll::-webkit-scrollbar,
+.pm-scroll::-webkit-scrollbar,
+.pm-lanes::-webkit-scrollbar,
+.pm-lane-list::-webkit-scrollbar,
+.pm-sheet-body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Photos, marks, and icons are not scrollbars. */
+img,
+picture,
+svg,
+video,
+canvas {
+  scrollbar-width: auto;
+  -ms-overflow-style: auto;
+}
