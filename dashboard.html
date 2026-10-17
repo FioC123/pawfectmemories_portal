@@ -8,7 +8,7 @@
       document.documentElement.classList.add('dark');
     }
   </script>
-  <meta content="width=device-width, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>營運與財務中心 | Pawfect Memories</title>
   
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -17,7 +17,8 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
   
   <script id="tailwind-config">
-    tailwind.config = { 
+    tailwind.config = {
+      future: { hoverOnlyWhenSupported: true }, 
       darkMode: 'class', 
       theme: { 
         extend: { 
@@ -35,69 +36,77 @@
     }
   </script>
   <style>
-    body { min-height: 100dvh; overflow: hidden; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
+    body { min-height: 100dvh; overflow: hidden; transition: background-color var(--duration-fast) var(--ease-smooth-out), color var(--duration-fast) var(--ease-smooth-out); -webkit-font-smoothing: antialiased; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     
     .excel-green { background-color: #107c41; }
     .dark .excel-green { background-color: #0b5e30; }
     button[aria-expanded="true"] .month-chevron { transform: rotate(180deg); }
   </style>
+  <meta name="theme-color" content="#F3F1EC">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (function () {
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta && document.documentElement.classList.contains("dark")) meta.setAttribute("content", "#101411");
+    })();
+  </script>
   <link rel="stylesheet" href="pm.css">
 </head>
-<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex h-screen overflow-hidden">
+<body class="pm-app pm-admin bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex h-screen overflow-hidden">
 
-  <aside class="hidden md:flex flex-col justify-between w-16 hover:w-64 bg-white dark:bg-pm-dark-surface border-r border-gray-200/60 dark:border-pm-dark-border h-full transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) group z-40 relative shadow-sm shrink-0">
+  <aside class="hidden md:flex flex-col justify-between w-16 bg-white dark:bg-pm-dark-surface border-r border-gray-200/60 dark:border-pm-dark-border h-full pm-named group z-40 relative shadow-sm shrink-0">
     <div class="flex flex-col items-start w-full overflow-hidden">
       <div class="h-20 flex items-center px-4 w-full shrink-0 border-b border-gray-100 dark:border-white/5">
         <img src="logo_black.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 dark:hidden">
         <img src="logo_white.png" alt="Pawfect Memories" class="w-8 h-8 object-contain shrink-0 hidden dark:block">
-        <span class="ml-3 font-serif font-bold text-[16px] text-pm-green dark:text-[#D1E2C7] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 tracking-tight">Pawfect Memories</span>
+        <span class="ml-3 font-serif font-bold text-[16px] text-pm-green dark:text-[#D1E2C7] whitespace-nowrap tracking-tight">Pawfect Memories</span>
       </div>
       <nav class="w-full mt-6 flex flex-col gap-1.5 px-2.5">
-        <a href="index.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+        <a href="index.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden font-medium">
           <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i>
-          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">工作區 (Workspace)</span>
+          <span class="ml-4 whitespace-nowrap">工作區 (Workspace)</span>
         </a>
-        <a href="add.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+        <a href="add.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden font-medium">
           <i data-lucide="plus-square" class="w-5 h-5 shrink-0"></i>
-          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">新增預約 (New)</span>
+          <span class="ml-4 whitespace-nowrap">新增預約 (New)</span>
         </a>
-        <a href="dashboard.html" class="flex items-center px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-[#1A211D] text-pm-oak font-semibold transition-all w-full overflow-hidden shadow-inner dark:shadow-none">
+        <a href="dashboard.html" class="flex items-center px-3.5 py-3 rounded-xl bg-gray-50 dark:bg-[#1A211D] text-pm-oak font-semibold pm-named w-full overflow-hidden shadow-inner dark:shadow-none">
           <i data-lucide="pie-chart" class="w-5 h-5 shrink-0"></i>
-          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">財務中心 (Finance)</span>
+          <span class="ml-4 whitespace-nowrap">財務中心 (Finance)</span>
         </a>
-        <a href="settings.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden font-medium">
+        <a href="settings.html" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50/80 dark:hover:bg-[#1A211D]/40 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden font-medium">
           <i data-lucide="settings" class="w-5 h-5 shrink-0"></i>
-          <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">系統設定 (Settings)</span>
+          <span class="ml-4 whitespace-nowrap">系統設定 (Settings)</span>
         </a>
       </nav>
     </div>
     
     <div class="px-2.5 pb-6 flex flex-col gap-1.5 w-full overflow-hidden border-t border-gray-100 dark:border-white/5 pt-4">
-      <button onclick="toggleDarkMode()" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1A211D] hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all w-full overflow-hidden">
+      <button onclick="toggleDarkMode()" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1A211D] hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden">
         <i data-lucide="moon" class="w-5 h-5 shrink-0 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 shrink-0 hidden dark:block"></i>
-        <span class="ml-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">主題切換 (Theme)</span>
+        <span class="ml-4 whitespace-nowrap">主題切換 (Theme)</span>
       </button>
     </div>
   </aside>
 
   <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
     
-    <header class="h-20 flex justify-between items-center px-6 md:px-8 shrink-0 border-b border-gray-200/60 dark:border-pm-dark-border bg-white/50 dark:bg-pm-dark-bg/50 backdrop-blur-md z-30">
-      <div class="flex flex-col">
-        <h2 class="font-serif text-2xl font-bold tracking-tight text-gray-900 dark:text-white">財務中心</h2>
+    <header class="pm-pagehead shrink-0">
+      <div class="pm-pagehead-row">
+        <h1>財務中心</h1>
+        <button type="button" class="pm-iconbtn md:hidden" onclick="toggleDarkMode()" aria-label="切換主題">
+          <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+          <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+        </button>
       </div>
-      
-      <button id="btn-export-excel" class="excel-green text-white px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 hover:opacity-90 active:scale-95 shadow-sm transition-all shrink-0">
-        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> 匯出 Excel 報表
-      </button>
     </header>
 
     <main class="flex-1 overflow-y-auto custom-scrollbar px-6 pt-6 pb-24 md:px-8 md:pt-8 md:pb-8 space-y-6 bg-pm-cream dark:bg-pm-dark-bg" id="dashboard-main-container">
       
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] border border-gray-200/50 dark:border-white/5 shadow-taste dark:shadow-taste-dark relative overflow-hidden group transition-colors">
-          <div class="absolute top-0 right-0 p-6 opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+          <div class="absolute top-0 right-0 p-6 opacity-[0.03] dark:opacity-[0.02] pointer-events-none">
             <i data-lucide="trending-up" class="w-24 h-24 text-pm-green"></i>
           </div>
           <div class="flex items-center gap-2 mb-3">
@@ -108,7 +117,7 @@
         </div>
 
         <div class="bg-white dark:bg-pm-dark-surface p-6 md:p-8 rounded-[24px] border border-gray-200/50 dark:border-white/5 shadow-taste dark:shadow-taste-dark relative overflow-hidden group transition-colors">
-          <div class="absolute top-0 right-0 p-6 opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+          <div class="absolute top-0 right-0 p-6 opacity-[0.03] dark:opacity-[0.02] pointer-events-none">
             <i data-lucide="alert-circle" class="w-24 h-24 text-red-500"></i>
           </div>
           <div class="flex items-center gap-2 mb-3">
@@ -148,11 +157,16 @@
       </div>
 
     </main>
+    <div class="pm-actionbar">
+      <button type="button" id="btn-export-excel" class="pm-btn">
+        <i data-lucide="file-spreadsheet" class="w-5 h-5"></i> 匯出 Excel 報表
+      </button>
+    </div>
   </div>
 
   <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
-  <nav class="md:hidden fixed bottom-0 w-full h-16 bg-white dark:bg-pm-dark-surface border-t border-gray-200/60 dark:border-pm-dark-border z-40 flex items-center justify-around px-2 pb-safe shadow-lg">
+  <nav class="pm-tabbar" aria-label="主要導覽">
     <a href="index.html" class="flex flex-col items-center p-2 text-gray-400"><i data-lucide="layout-dashboard" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">工作區</span></a>
     <a href="add.html" class="flex flex-col items-center p-2 text-gray-400"><i data-lucide="plus-square" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">新增</span></a>
     <a href="dashboard.html" class="flex flex-col items-center p-2 text-pm-oak"><i data-lucide="pie-chart" class="w-5 h-5 mb-0.5"></i><span class="text-[9px] font-bold">財務</span></a>
@@ -175,8 +189,11 @@
 
     window.toggleDarkMode = function() {
       const htmlEl = document.documentElement;
-      if (htmlEl.classList.contains('dark')) { htmlEl.classList.remove('dark'); localStorage.setItem('theme', 'light'); } 
-      else { htmlEl.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
+      const dark = !htmlEl.classList.contains('dark');
+      htmlEl.classList.toggle('dark', dark);
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = dark ? '#101411' : '#F3F1EC';
     };
 
     window.showToast = function(msg, type='success') {
@@ -185,13 +202,13 @@
       const bgColor = type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900';
       const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
       
-      toast.className = `px-4 py-2.5 rounded-xl shadow-2xl text-xs font-bold transform transition-all translate-y-10 opacity-0 flex items-center gap-2 ${bgColor}`;
+      toast.className = `pm-toast flex items-center gap-2 ${bgColor}`;
       toast.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${msg}`;
       
       container.appendChild(toast);
       updateIcons();
-      requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
-      setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
+      requestAnimationFrame(() => toast.classList.add('is-in'));
+      setTimeout(() => { toast.classList.remove('is-in'); toast.classList.add('is-out'); setTimeout(() => toast.remove(), 160); }, 3000);
     }
 
     let allOrdersData = [];
@@ -440,7 +457,7 @@
                 <i data-lucide="party-popper" class="w-5 h-5"></i>
             </div>
             <p class="text-gray-900 dark:text-white font-bold text-sm mb-0.5">清數找齊！</p>
-            <p class="text-gray-400 dark:text-gray-500 text-xs">目前沒有任何客戶拖欠尾數 🥳</p>
+            <p class="text-gray-400 dark:text-gray-500 text-xs">目前沒有任何客戶拖欠尾數</p>
           </div>
         `;
         

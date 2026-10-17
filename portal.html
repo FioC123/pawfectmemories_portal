@@ -2,7 +2,7 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>我的預約紀錄 | Pawfect Memories</title>
   
   <script>
@@ -16,7 +16,8 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <script id="tailwind-config">
-    tailwind.config = { 
+    tailwind.config = {
+      future: { hoverOnlyWhenSupported: true }, 
       darkMode: 'class',
       theme: { 
         extend: { 
@@ -36,22 +37,13 @@
           boxShadow: {
             'taste': '0 10px 40px -10px rgba(0, 0, 0, 0.08)',
             'taste-dark': '0 10px 40px -10px rgba(0, 0, 0, 0.5)'
-          },
-          animation: {
-            'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
-          },
-          keyframes: {
-            fadeInUp: {
-              '0%': { opacity: '0', transform: 'translateY(10px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            }
           }
         } 
       } 
     }
   </script>
   <style>
-    body { min-height: 100dvh; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
+    body { min-height: 100dvh; transition: background-color var(--duration-fast) var(--ease-smooth-out), color var(--duration-fast) var(--ease-smooth-out); -webkit-font-smoothing: antialiased; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     
     input[type="tel"] { 
@@ -64,9 +56,17 @@
         font-family: 'Noto Sans HK', sans-serif;
     }
   </style>
+  <meta name="theme-color" content="#F3F1EC">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (function () {
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta && document.documentElement.classList.contains("dark")) meta.setAttribute("content", "#101411");
+    })();
+  </script>
   <link rel="stylesheet" href="pm.css">
 </head>
-<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex flex-col items-center">
+<body class="pm-app pm-public bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex flex-col items-center">
 
   <header class="w-full pt-10 pb-6 px-6 flex justify-center items-center max-w-2xl mx-auto z-10">
     <div class="flex flex-col items-center text-center select-none">
@@ -77,8 +77,8 @@
 
   <main class="w-full max-w-xl px-5 md:px-8 flex-1 flex flex-col relative">
     
-    <div id="login-section" class="flex-1 flex flex-col justify-center pb-32 transition-all duration-500">
-      <div class="bg-white dark:bg-pm-dark-surface p-8 md:p-10 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 text-center space-y-8 animate-fade-in-up">
+    <div id="login-section" class="flex-1 flex flex-col justify-center pb-32 pm-named">
+      <div class="bg-white dark:bg-pm-dark-surface p-8 md:p-10 rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 text-center space-y-8 ">
         
         <div class="space-y-3">
           <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">查詢預約紀錄</h2>
@@ -89,9 +89,9 @@
 
         <div class="space-y-6 pt-2">
           <div>
-            <input type="tel" id="phone-input" placeholder="例如: 98765432" autocomplete="tel" class="w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-900 dark:text-white rounded-2xl px-6 py-4 outline-none focus:border-pm-oak focus:ring-2 focus:ring-pm-oak/20 transition-all shadow-inner dark:shadow-none text-lg font-medium" onkeypress="if(event.key === 'Enter') document.getElementById('btn-submit').click();">
+            <input type="tel" id="phone-input" placeholder="例如: 98765432" autocomplete="tel" class="w-full bg-gray-50 dark:bg-[#1A211D] border border-gray-200 dark:border-pm-dark-border text-gray-900 dark:text-white rounded-2xl px-6 py-4 outline-none focus:border-pm-oak focus:ring-2 focus:ring-pm-oak/20 pm-named shadow-inner dark:shadow-none text-lg font-medium" onkeypress="if(event.key === 'Enter') document.getElementById('btn-submit').click();">
           </div>
-          <button type="button" id="btn-submit" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold tracking-wide py-4 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all text-lg flex items-center justify-center gap-2">
+          <button type="button" id="btn-submit" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold tracking-wide py-4 rounded-2xl shadow-lg hover:shadow-xl pm-named text-lg flex items-center justify-center gap-2">
             <i data-lucide="search" class="w-5 h-5"></i> 搜尋我的預約
           </button>
         </div>
@@ -207,13 +207,10 @@
         const loginSec = document.getElementById('login-section');
         const listSec = document.getElementById('list-section');
         
-        loginSec.style.opacity = '0';
-        loginSec.style.transform = 'translateY(-20px)';
-        
-        setTimeout(() => {
+        loginSec.classList.add('hidden');
+        listSec.classList.remove('hidden');
+        {
             loginSec.classList.add('hidden');
-            listSec.classList.remove('hidden');
-            listSec.classList.add('animate-fade-in-up');
             
             document.getElementById('display-client-name').innerText = clientName;
             document.getElementById('display-order-count').innerText = orders.length;
@@ -233,9 +230,9 @@
                 });
                 
                 return `
-                <div class="bg-white dark:bg-pm-dark-surface p-6 rounded-[20px] border border-gray-200/60 dark:border-white/5 hover:border-pm-oak/40 dark:hover:border-pm-oak/40 hover:shadow-taste dark:hover:shadow-taste-dark transition-all cursor-pointer relative overflow-hidden group" onclick="window.location.href='tracker.html?id=${order.id}'">
+                <div class="bg-white dark:bg-pm-dark-surface p-6 rounded-[20px] border border-gray-200/60 dark:border-white/5 hover:border-pm-oak/40 dark:hover:border-pm-oak/40 hover:shadow-taste dark:hover:shadow-taste-dark pm-named cursor-pointer relative overflow-hidden group" onclick="window.location.href='tracker.html?id=${order.id}'">
                   
-                  <div class="absolute right-5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-400 group-hover:bg-pm-oak group-hover:text-white transition-all transform group-hover:translate-x-1">
+                  <div class="absolute right-5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gray-50 dark:bg-[#1A211D] flex items-center justify-center text-gray-400 group-hover:bg-pm-oak group-hover:text-white pm-named transform group-hover:translate-x-1">
                     <i data-lucide="chevron-right" class="w-4 h-4"></i>
                   </div>
                   
@@ -255,7 +252,7 @@
             }).join('');
             
             lucide.createIcons();
-        }, 400);
+        }
 
       } catch (error) {
         console.error(error);

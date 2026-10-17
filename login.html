@@ -2,7 +2,7 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>登入 | Pawfect Memories Admin</title>
   
   <script>
@@ -16,7 +16,8 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <script id="tailwind-config">
-    tailwind.config = { 
+    tailwind.config = {
+      future: { hoverOnlyWhenSupported: true }, 
       darkMode: 'class',
       theme: { 
         extend: { 
@@ -24,42 +25,38 @@
             "pm-green": "#244018", "pm-oak": "#C4905E", "pm-cream": "#FAFAFA", "pm-dark-bg": "#0B0E0C", "pm-dark-surface": "#121714", "pm-dark-border": "#1E2621"
           }, 
           fontFamily: { serif: ['"Playfair Display"', 'serif'], sans: ['"Noto Sans HK"', '"Inter"', 'sans-serif'] },
-          boxShadow: { 'taste': '0 20px 40px -10px rgba(0, 0, 0, 0.08)', 'taste-dark': '0 20px 40px -10px rgba(0, 0, 0, 0.6)' },
-          animation: { 'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards', 'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both' },
-          keyframes: {
-            fadeInUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-            shake: {
-              '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' }, '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-              '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' }, '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
-            }
-          }
+          boxShadow: { 'taste': '0 20px 40px -10px rgba(0, 0, 0, 0.08)', 'taste-dark': '0 20px 40px -10px rgba(0, 0, 0, 0.6)' }
         } 
       } 
     }
   </script>
   <style>
-    body { transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
+    body { transition: background-color var(--duration-fast) var(--ease-smooth-out), color var(--duration-fast) var(--ease-smooth-out); -webkit-font-smoothing: antialiased; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
-    .login-input { background-color: #F9FAFB !important; border: 1px solid transparent !important; transition: all 0.3s ease; }
+    .login-input { background-color: #F9FAFB !important; border: 1px solid var(--line) !important; transition: background-color var(--duration-quick) var(--ease), border-color var(--duration-quick) var(--ease), box-shadow var(--duration-quick) var(--ease-out); }
     .dark .login-input { background-color: #1A211D !important; }
     .login-input:focus { background-color: #FFFFFF !important; border-color: #C4905E !important; box-shadow: 0 0 0 3px rgba(196, 144, 94, 0.1) !important; outline: none; }
     .dark .login-input:focus { background-color: #121714 !important; }
     input[type="password"] { letter-spacing: 0.5em; font-family: 'Inter', sans-serif; }
     input[type="password"]::placeholder { letter-spacing: normal; font-family: 'Noto Sans HK', sans-serif; font-weight: 400; font-size: 1rem; }
+    #err { transition: opacity var(--duration-fast) var(--ease-smooth-out); }
   </style>
+  <meta name="theme-color" content="#F3F1EC">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (function () {
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta && document.documentElement.classList.contains("dark")) meta.setAttribute("content", "#101411");
+    })();
+  </script>
   <link rel="stylesheet" href="pm.css">
 </head>
-<body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans flex flex-col items-center justify-center min-h-screen relative selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white">
-
-  <button onclick="toggleDarkMode()" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-pm-dark-surface transition-colors" title="切換深淺色主題">
-    <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
-    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
-  </button>
+<body class="pm-app pm-public bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans flex flex-col items-center justify-center min-h-screen relative selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white">
 
   <div class="w-full max-w-sm px-5">
-    <div id="login-card" class="bg-white dark:bg-pm-dark-surface p-8 md:p-10 rounded-[32px] shadow-taste dark:shadow-taste-dark border border-gray-200/60 dark:border-white/5 text-center opacity-0 animate-fade-in-up">
+    <div id="login-card" class="bg-white dark:bg-pm-dark-surface p-6 rounded-[32px] border border-gray-200/60 dark:border-white/5 text-center">
       
       <div class="w-16 h-16 bg-pm-green/5 dark:bg-pm-oak/10 rounded-[20px] flex items-center justify-center mx-auto mb-6 text-pm-green dark:text-pm-oak border border-pm-green/10 dark:border-pm-oak/20 shadow-sm">
         <i data-lucide="shield-check" class="w-8 h-8"></i>
@@ -73,12 +70,15 @@
           <input type="password" id="pin" placeholder="輸入管理員 PIN 碼" autocomplete="current-password" inputmode="numeric" class="login-input w-full rounded-2xl px-4 py-4 text-center font-bold text-2xl text-gray-900 dark:text-white placeholder:text-gray-400" onkeypress="if(event.key === 'Enter') checkLogin();">
         </div>
         
-        <button id="btn-login" onclick="checkLogin()" class="w-full bg-pm-green dark:bg-pm-oak text-white dark:text-[#121714] font-serif font-bold text-lg py-4 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 group">
-          進入系統 <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+        <button id="btn-login" onclick="checkLogin()" class="pm-btn w-full">
+          進入系統
+        </button>
+        <button type="button" onclick="toggleDarkMode()" class="w-full min-h-[44px] text-base font-semibold text-gray-600 dark:text-gray-300">
+          切換深淺色主題
         </button>
       </div>
 
-      <p id="err" class="text-sm mt-5 text-red-500 dark:text-red-400 font-semibold flex items-center justify-center gap-1.5 opacity-0 transition-opacity duration-300">
+      <p id="err" class="text-sm mt-5 text-red-500 dark:text-red-400 font-semibold flex items-center justify-center gap-1.5 opacity-0">
         <i data-lucide="alert-circle" class="w-4 h-4"></i> PIN 碼錯誤，請重試
       </p>
 
@@ -90,13 +90,11 @@
 
     window.toggleDarkMode = function() {
       const htmlEl = document.documentElement;
-      if (htmlEl.classList.contains('dark')) {
-        htmlEl.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      } else {
-        htmlEl.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      }
+      const dark = !htmlEl.classList.contains('dark');
+      htmlEl.classList.toggle('dark', dark);
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = dark ? '#101411' : '#F3F1EC';
     };
 
     function checkLogin() {
@@ -106,7 +104,7 @@
       const card = document.getElementById('login-card');
       const loginBtn = document.getElementById('btn-login');
 
-      card.classList.remove('animate-shake');
+      card.classList.remove('is-shaking');
       errText.classList.remove('opacity-100');
       errText.classList.add('opacity-0');
 
@@ -129,7 +127,7 @@
         pinInput.value = ''; 
         pinInput.focus();
         void card.offsetWidth; 
-        card.classList.add('animate-shake');
+        card.classList.add('is-shaking');
         errText.classList.remove('opacity-0');
         errText.classList.add('opacity-100');
       }
