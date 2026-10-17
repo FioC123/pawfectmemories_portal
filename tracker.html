@@ -360,18 +360,37 @@
       if (btnText) btnText.innerText = "查詢檔案進度";
     }
 
+    const DEFAULT_PET_PHOTO = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
+
+    function escAttr(value) {
+      return String(value ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function petPhotoSrc(pet) {
+      const url = pet && typeof pet.photoUrl === "string" ? pet.photoUrl.trim() : "";
+      return url || DEFAULT_PET_PHOTO;
+    }
+
+    function renderOrderAvatars(pets) {
+      const list = pets && pets.length ? pets : [{ name: "", photoUrl: "" }];
+      if (list.length === 1) {
+        return `<img src="${escAttr(petPhotoSrc(list[0]))}" alt="${escAttr(list[0].name || "")}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-100 dark:border-pm-dark-border">`;
+      }
+      return `<div class="flex items-center shrink-0">${list.map((p, i) => `<img src="${escAttr(petPhotoSrc(p))}" alt="${escAttr(p.name || "")}" title="${escAttr(p.name || "")}" class="w-8 h-8 rounded-full object-cover relative shrink-0 ring-2 ring-white dark:ring-pm-dark-surface ${i > 0 ? "-ml-2.5" : ""}" style="z-index:${list.length - i};">`).join("")}</div>`;
+    }
+
     function renderMultiOrdersSelection() {
         const listContainer = document.getElementById('multi-orders-list');
         
         listContainer.innerHTML = multipleFoundOrders.map(order => {
             let pets = order.pets || [];
-            if (pets.length === 0 && order.petName) pets = [{ name: order.petName }];
+            if (pets.length === 0 && order.petName) pets = [{ name: order.petName, photoUrl: order.photoUrl || "" }];
             let petNames = pets.length > 0 ? pets.map(p=>p.name).join(' & ') : '未知毛孩';
             
             return `
               <div onclick="selectActiveOrder('${order.id}')" class="active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-white/5 p-5 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark flex items-center justify-between group transition-all duration-200">
                  <div class="flex items-center gap-3 overflow-hidden">
-                    <div class="w-8 h-8 rounded-full bg-pm-oak/10 text-pm-oak flex items-center justify-center shrink-0"><i data-lucide="camera" class="w-4 h-4"></i></div>
+                    ${renderOrderAvatars(pets)}
                     <div class="overflow-hidden">
                        <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate mb-0.5">${currentClientName} 的預約檔案：${petNames}</h4>
                        <p class="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wider">套餐: ${order.package || '未定'} | 拍攝日期: ${order.shootDate || '待定'}</p>
@@ -416,7 +435,7 @@
             avatarsHTML = `<div class="flex flex-col items-center"><div class="w-20 h-20 rounded-full overflow-hidden ring-4 ring-white dark:ring-pm-dark-surface bg-gray-50 dark:bg-[#1A211D] shadow-md"><img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop"></div></div>`;
         } else {
             pets.forEach((p) => {
-                const imgSrc = p.photoUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
+                const imgSrc = (p.photoUrl && String(p.photoUrl).trim()) || DEFAULT_PET_PHOTO;
                 avatarsHTML += `<div class="flex flex-col items-center gap-2"><div class="w-20 h-20 rounded-full overflow-hidden ring-4 ring-white dark:ring-pm-dark-surface bg-gray-50 dark:bg-[#1A211D] shadow-md"><img class="w-full h-full object-cover" src="${imgSrc}"></div><span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${p.name}</span></div>`;
             });
         }

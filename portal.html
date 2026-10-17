@@ -229,11 +229,12 @@
                 if (pets.length === 0) {
                     avatarsHTML = `<img class="w-14 h-14 rounded-full object-cover ring-2 ring-white dark:ring-[#121714] shrink-0 bg-gray-50 dark:bg-pm-dark-surface" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop">`;
                 } else {
-                    pets.slice(0, 3).forEach((p, j) => {
-                        const zIndex = 30 - (j * 10);
+                    const esc = (v) => String(v ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+                    pets.forEach((p, j) => {
+                        const zIndex = pets.length - j;
                         const marginClass = j > 0 ? '-ml-5' : '';
-                        const imgSrc = p.photoUrl || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
-                        avatarsHTML += `<img class="w-14 h-14 rounded-full object-cover ring-2 ring-white dark:ring-[#121714] relative shrink-0 bg-gray-50 dark:bg-pm-dark-surface shadow-sm ${marginClass}" style="z-index:${zIndex};" src="${imgSrc}">`;
+                        const imgSrc = (p.photoUrl && String(p.photoUrl).trim()) || "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
+                        avatarsHTML += `<img class="w-14 h-14 rounded-full object-cover ring-2 ring-white dark:ring-[#121714] relative shrink-0 bg-gray-50 dark:bg-pm-dark-surface shadow-sm ${marginClass}" style="z-index:${zIndex};" src="${esc(imgSrc)}" alt="${esc(p.name || '')}">`;
                     });
                 }
                 
@@ -250,7 +251,7 @@
                   </div>
                   
                   <div class="flex items-center gap-5 pr-10">
-                    <div class="flex items-center shrink-0 pl-1">${avatarsHTML}</div>
+                    <div class="flex flex-wrap items-center shrink-0 pl-1">${avatarsHTML}</div>
                     <div class="overflow-hidden">
                       <h3 class="text-xl font-serif font-bold text-gray-900 dark:text-white mb-1.5 truncate leading-none">${petsStr}</h3>
                       <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${order.shootDate || '日期未定'} ${order.shootTime || ''}</p>

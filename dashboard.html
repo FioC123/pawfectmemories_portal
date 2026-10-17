@@ -179,6 +179,24 @@
     }
 
     let allOrdersData = [];
+    const DEFAULT_PET_PHOTO = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
+
+    function escAttr(value) {
+      return String(value ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function petPhotoSrc(pet) {
+      const url = pet && typeof pet.photoUrl === "string" ? pet.photoUrl.trim() : "";
+      return url || DEFAULT_PET_PHOTO;
+    }
+
+    function renderPetAvatars(pets) {
+      const list = pets && pets.length ? pets : [{ name: "", photoUrl: "" }];
+      if (list.length === 1) {
+        return `<img src="${escAttr(petPhotoSrc(list[0]))}" alt="${escAttr(list[0].name || "")}" class="w-8 h-8 rounded-full object-cover shrink-0 border border-gray-100 dark:border-pm-dark-border">`;
+      }
+      return `<div class="flex items-center shrink-0">${list.map((p, i) => `<img src="${escAttr(petPhotoSrc(p))}" alt="${escAttr(p.name || "")}" title="${escAttr(p.name || "")}" class="w-8 h-8 rounded-full object-cover relative shrink-0 ring-2 ring-white dark:ring-pm-dark-surface ${i > 0 ? "-ml-2.5" : ""}" style="z-index:${list.length - i};">`).join("")}</div>`;
+    }
 
     // [SKILL: Code Review & Performance Boost] Asynchronous caching pipeline strategy
     async function loadDashboard() {
@@ -212,7 +230,7 @@
           let pets = data.pets || [];
           if (pets.length === 0 && data.petName) pets = [{ name: data.petName, photoUrl: data.photoUrl }];
           let petNames = pets.length > 0 ? pets.map(p => p.name).join(' & ') : "未填寫";
-          let avatar = pets.length > 0 && pets[0].photoUrl ? pets[0].photoUrl : "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=150&h=150&fit=crop";
+          const avatarsHTML = renderPetAvatars(pets);
 
           const price = Number(data.price || 0);
           const deposit = Number(data.depositAmount || 0);
@@ -250,7 +268,7 @@
             pendingHTML += `
               <div class="p-5 flex items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-[#1A211D]/30 transition-colors cursor-pointer group" onclick="window.location.href='detail.html?id=${orderId}'">
                 <div class="flex items-center gap-3 overflow-hidden">
-                  <img src="${avatar}" class="w-8 h-8 rounded-full object-cover border border-gray-100 dark:border-pm-dark-border">
+                  ${avatarsHTML}
                   <div class="overflow-hidden">
                     <div class="flex items-center gap-2 mb-0.5">
                       <h4 class="font-bold text-xs text-gray-900 dark:text-white group-hover:text-pm-oak transition-colors truncate">${clientName} · ${petNames}</h4>
@@ -273,7 +291,7 @@
             pendingHTML += `
               <div class="p-5 flex items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-[#1A211D]/30 transition-colors cursor-pointer group" onclick="window.location.href='detail.html?id=${orderId}'">
                 <div class="flex items-center gap-3 overflow-hidden">
-                  <img src="${avatar}" class="w-8 h-8 rounded-full object-cover border border-gray-100 dark:border-pm-dark-border">
+                  ${avatarsHTML}
                   <div class="overflow-hidden">
                     <div class="flex items-center gap-2 mb-0.5">
                       <h4 class="font-bold text-xs text-gray-900 dark:text-white group-hover:text-pm-oak transition-colors truncate">${clientName} · ${petNames}</h4>
