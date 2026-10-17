@@ -10,21 +10,49 @@
 }
 
 /*
-  Hide scrollbar chrome on the page and every overflow container
-  (kanban lanes, sheets, lists). Wheel, trackpad, touch, and keyboard
-  scrolling are unchanged — only the bar is removed.
+  Hide scrollbar chrome only. Wheel, trackpad, touch, and keyboard
+  scrolling stay intact.
+
+  Do not use a universal `*` / `*::-webkit-scrollbar { width: 0; height: 0 }`
+  rule. That zero-width pseudo-element matches replaced content in WebKit
+  and can collapse pet and profile photos. Scope the hide to the page and
+  to containers that actually scroll.
 */
 html,
 body,
-* {
+.custom-scrollbar,
+.no-scrollbar,
+.overflow-auto,
+.overflow-scroll,
+.overflow-x-auto,
+.overflow-x-scroll,
+.overflow-y-auto,
+.overflow-y-scroll {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
 html::-webkit-scrollbar,
 body::-webkit-scrollbar,
-*::-webkit-scrollbar {
+.custom-scrollbar::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar,
+.overflow-scroll::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-x-scroll::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-y-scroll::-webkit-scrollbar {
   width: 0;
   height: 0;
   display: none;
+}
+
+/* Photos, marks, and icons are not scrollbars. */
+img,
+picture,
+svg,
+video,
+canvas {
+  scrollbar-width: auto;
+  -ms-overflow-style: auto;
 }
