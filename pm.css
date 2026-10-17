@@ -1,0 +1,30 @@
+/* Shared Pawfect Memories tokens (mirrors the portal palette). */
+:root {
+  --pm-green: #244018;
+  --pm-oak: #c4905e;
+  --pm-cream: #fafafa;
+  --pm-ink: #1c241c;
+  --pm-muted: #5c6560;
+  --pm-line: #e6e1d8;
+  --pm-paper: #f7f4ef;
+}
+
+/*
+  Hide scrollbar chrome on the page and every overflow container
+  (kanban lanes, sheets, lists). Wheel, trackpad, touch, and keyboard
+  scrolling are unchanged — only the bar is removed.
+*/
+html,
+body,
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}

@@ -37,12 +37,6 @@
   <style>
     body { min-height: 100dvh; overflow: hidden; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
     
-    /* [SKILL: Web Design Guidelines] Subtle Elegant Scrollbars */
-    .custom-scrollbar::-webkit-scrollbar { height: 5px; width: 5px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.2); border-radius: 99px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 128, 0.4); }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
     
     /* [SKILL: Emil Kowalski] Physics-based Drag & Drop Interactions */
@@ -61,6 +55,7 @@
     }
     .active-glow:hover::after { opacity: 0.25; }
   </style>
+  <link rel="stylesheet" href="pm.css">
 </head>
 <body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex h-screen overflow-hidden">
 

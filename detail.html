@@ -32,19 +32,166 @@
   </script>
   <style>
     body { min-height: 100dvh; transition: background-color 0.4s ease, color 0.4s ease; -webkit-font-smoothing: antialiased; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 10px; }
-    
+
     .receipt-thumb { cursor: zoom-in; transition: transform 0.3s ease; }
     .receipt-thumb:hover { transform: scale(1.02); }
     
     #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; cursor: zoom-out; transition: opacity 0.3s ease; }
     #lightbox img { max-width: 90%; max-height: 90%; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); object-fit: contain; }
     
-    #pdf-container { position: absolute; left: -9999px; top: -9999px; }
-    #invoice-template { width: 800px; background: white; color: black; padding: 50px; font-family: 'Inter', 'Noto Sans HK', sans-serif; box-sizing: border-box; }
+    #pdf-container { position: absolute; left: -9999px; top: 0; }
+    #invoice-template {
+      width: 794px;
+      background: #ffffff;
+      color: #1c241c;
+      padding: 36px 46px 40px;
+      box-sizing: border-box;
+      font-family: "Noto Sans HK", "Inter", sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    #invoice-template * { box-sizing: border-box; }
+    #invoice-template .inv-rule { height: 3px; background: #244018; border-radius: 2px; margin: 0 0 22px; }
+    #invoice-template .inv-head { width: 100%; border-collapse: collapse; margin: 0 0 20px; }
+    #invoice-template .inv-head td { vertical-align: bottom; padding: 0; }
+    #invoice-template .inv-name {
+      margin: 0;
+      font-family: "Playfair Display", "Noto Sans HK", serif;
+      font-weight: 600;
+      font-size: 28px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #244018;
+    }
+    #invoice-template .inv-contact { margin: 8px 0 0; font-size: 12px; line-height: 1.55; color: #5c6560; }
+    #invoice-template .inv-doc { text-align: right; }
+    #invoice-template .inv-doc-zh {
+      margin: 0;
+      font-family: "Noto Sans HK", sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: 0.18em;
+      color: #244018;
+    }
+    #invoice-template .inv-doc-en {
+      margin: 7px 0 0;
+      font-family: Inter, sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      color: #c4905e;
+    }
+    #invoice-template .inv-meta {
+      background: #f7f4ef;
+      border: 1px solid #efeae3;
+      border-radius: 12px;
+      padding: 4px 8px 4px 18px;
+      margin: 0 0 22px;
+    }
+    #invoice-template .inv-meta table { width: 100%; border-collapse: collapse; }
+    #invoice-template .inv-meta td { width: 50%; padding: 12px 16px 12px 0; vertical-align: top; }
+    #invoice-template .inv-label {
+      margin: 0 0 3px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #8a8178;
+    }
+    #invoice-template .inv-label span {
+      margin-left: 6px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: #b0a79c;
+    }
+    #invoice-template .inv-value { margin: 0; font-size: 16px; font-weight: 700; color: #1c241c; line-height: 1.35; }
+    #invoice-template .inv-sub { margin: 3px 0 0; font-size: 12px; color: #5c6560; }
+    #invoice-template .inv-lines { width: 100%; border-collapse: collapse; margin: 0 0 8px; }
+    #invoice-template .inv-lines th {
+      padding: 0 0 8px;
+      border-bottom: 1.5px solid #244018;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: left;
+      color: #5c6560;
+    }
+    #invoice-template .inv-lines th span,
+    #invoice-template .inv-sum span span,
+    #invoice-template .inv-pay-title span,
+    #invoice-template .inv-pay .k span {
+      margin-left: 6px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: #b0a79c;
+    }
+    #invoice-template .inv-lines th.num,
+    #invoice-template .inv-lines td.num { text-align: right; width: 30%; }
+    #invoice-template .inv-lines td {
+      padding: 11px 0;
+      border-bottom: 1px solid #efebe4;
+      font-size: 14px;
+      color: #1c241c;
+      vertical-align: top;
+    }
+    #invoice-template .inv-lines td.num {
+      font-family: Inter, sans-serif;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    #invoice-template .inv-lines tr.inv-main td { padding-top: 13px; padding-bottom: 13px; }
+    #invoice-template .inv-lines tr.inv-extra td { padding-top: 8px; padding-bottom: 8px; font-size: 13px; color: #3e4842; }
+    #invoice-template .inv-lines tr.inv-extra td:first-child { padding-left: 14px; }
+    #invoice-template .inv-lines tr.inv-deduct td { color: #244018; }
+    #invoice-template .inv-sum { width: 320px; margin: 10px 0 26px auto; }
+    #invoice-template .inv-sum-row,
+    #invoice-template .inv-due {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #invoice-template .inv-sum-row { padding: 8px 2px 10px; font-size: 13px; color: #3e4842; }
+    #invoice-template .inv-sum-row .num,
+    #invoice-template .inv-due .num {
+      font-family: Inter, sans-serif;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    #invoice-template .inv-sum-row .num { color: #1c241c; }
+    #invoice-template .inv-due {
+      background: #244018;
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    #invoice-template .inv-due .num {
+      font-family: "Playfair Display", "Noto Sans HK", serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+    #invoice-template .inv-due span span { color: rgba(255, 255, 255, 0.72); }
+    #invoice-template .inv-pay {
+      background: #f7f4ef;
+      border: 1px solid #efeae3;
+      border-left: 3px solid #c4905e;
+      border-radius: 12px;
+      padding: 16px 18px 14px;
+    }
+    #invoice-template .inv-pay-title { margin: 0 0 12px; font-size: 13px; font-weight: 700; color: #244018; }
+    #invoice-template .inv-pay table { width: 100%; border-collapse: collapse; }
+    #invoice-template .inv-pay td { width: 50%; padding: 0 16px 12px 0; vertical-align: top; }
+    #invoice-template .inv-pay .k { margin: 0 0 2px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #8a8178; }
+    #invoice-template .inv-pay .v { margin: 0; font-size: 13px; font-weight: 600; color: #1c241c; font-family: Inter, "Noto Sans HK", sans-serif; }
+    #invoice-template .inv-note { margin: 2px 0 0; font-size: 11px; line-height: 1.5; color: #5c6560; }
     
     i[data-lucide] { display: inline-block; vertical-align: text-bottom; }
 
@@ -56,6 +203,7 @@
         padding-right: 2.5rem;
     }
   </style>
+  <link rel="stylesheet" href="pm.css">
 </head>
 <body class="bg-pm-cream dark:bg-pm-dark-bg text-gray-800 dark:text-[#EAE8E3] font-sans selection:bg-pm-oak/30 selection:text-pm-green dark:selection:text-white flex h-screen overflow-hidden">
 
@@ -287,43 +435,88 @@
 
   <div id="pdf-container">
     <div id="invoice-template">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
-        <div style="font-family: 'Playfair Display', serif; font-size: 32px; font-weight: bold; color: #244018;">Pawfect Memories</div>
-        <div style="font-size: 50px; font-weight: bold; letter-spacing: -1px; line-height: 1; color: #111827;">INVOICE</div>
+      <div class="inv-rule"></div>
+      <table class="inv-head">
+        <tr>
+          <td>
+            <p class="inv-name">Pawfect Memories</p>
+            <p class="inv-contact">寵物攝影 · 香港<br>+852-9442 2612</p>
+          </td>
+          <td class="inv-doc">
+            <p class="inv-doc-zh">財務收據</p>
+            <p class="inv-doc-en">RECEIPT</p>
+          </td>
+        </tr>
+      </table>
+      <div class="inv-meta">
+        <table>
+          <tr>
+            <td>
+              <p class="inv-label">客戶 <span>Billed To</span></p>
+              <p class="inv-value" id="pdf-client-name"></p>
+            </td>
+            <td>
+              <p class="inv-label">寵物 <span>Pet</span></p>
+              <p class="inv-value" id="pdf-pet-name"></p>
+              <p class="inv-sub" id="pdf-shoot"></p>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p class="inv-label">預約編號 <span>Invoice #</span></p>
+              <p class="inv-value" id="pdf-invoice-id"></p>
+            </td>
+            <td>
+              <p class="inv-label">日期 <span>Date</span></p>
+              <p class="inv-value" id="pdf-invoice-date"></p>
+            </td>
+          </tr>
+        </table>
       </div>
-      <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
-        <div>
-          <p style="color: #6B7280; font-size: 14px; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Billed To:</p>
-          <p style="font-size: 20px; font-weight: bold; margin: 0; color: #111827;" id="pdf-client-name"></p>
-        </div>
-        <div style="text-align: right; color: #374151;">
-          <p style="margin: 0 0 5px 0;"><strong>Invoice #:</strong> <span id="pdf-invoice-id"></span></p>
-          <p style="margin: 0 0 15px 0;"><strong>Date:</strong> <span id="pdf-invoice-date"></span></p>
-          <p style="margin: 0 0 5px 0; font-weight: bold; color: #111827;">Pawfect Memories</p>
-          <p style="margin: 0; color: #6B7280;">+852-9442 2612</p>
-        </div>
-      </div>
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+      <table class="inv-lines">
         <thead>
           <tr>
-            <th style="border-bottom: 2px solid #111827; padding: 12px 10px; text-align: left; width: 70%; font-weight: bold; text-transform: uppercase; font-size: 14px;">Description</th>
-            <th style="border-bottom: 2px solid #111827; padding: 12px 10px; text-align: right; width: 30%; font-weight: bold; text-transform: uppercase; font-size: 14px;">Amount (HKD)</th>
+            <th>項目 <span>Description</span></th>
+            <th class="num">金額 <span>HKD</span></th>
           </tr>
         </thead>
         <tbody id="pdf-table-body"></tbody>
       </table>
-      <div style="display: flex; justify-content: flex-end; font-size: 16px; margin-bottom: 40px;">
-        <div style="width: 350px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #4B5563;"><span>Subtotal</span><span id="pdf-subtotal"></span></div>
-          <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 24px; color: #111827; border-top: 2px solid #E5E7EB; padding-top: 12px;"><span>Total Balance:</span><span id="pdf-total-balance"></span></div>
+      <div class="inv-sum">
+        <div class="inv-sum-row">
+          <span>收費總額 <span>Subtotal</span></span>
+          <span class="num" id="pdf-subtotal"></span>
+        </div>
+        <div class="inv-due">
+          <span>尚欠尾數 <span>Total Balance</span></span>
+          <span class="num" id="pdf-total-balance"></span>
         </div>
       </div>
-      <div style="font-size: 14px; line-height: 1.6; border-top: 1px solid #E5E7EB; padding-top: 24px; color: #4B5563;">
-        <p style="font-weight: bold; font-size: 16px; margin-bottom: 12px; color: #111827;">Payment Information</p>
-        <p style="margin: 0 0 4px 0;"><strong>Bank:</strong> HANG SENG BANK</p>
-        <p style="margin: 0 0 4px 0;"><strong>Account Name:</strong> Pawfect Memories</p>
-        <p style="margin: 0 0 4px 0;"><strong>Account Number:</strong> 769-644758-883</p>
-        <p style="margin: 0;"><strong>FPS ID:</strong> 118198266</p>
+      <div class="inv-pay">
+        <p class="inv-pay-title">付款資料 <span>Payment Information</span></p>
+        <table>
+          <tr>
+            <td>
+              <p class="k">銀行 <span>Bank</span></p>
+              <p class="v">HANG SENG BANK</p>
+            </td>
+            <td>
+              <p class="k">戶口名稱 <span>Account Name</span></p>
+              <p class="v">Pawfect Memories</p>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p class="k">戶口號碼 <span>Account Number</span></p>
+              <p class="v">769-644758-883</p>
+            </td>
+            <td>
+              <p class="k">轉數快 <span>FPS ID</span></p>
+              <p class="v">118198266</p>
+            </td>
+          </tr>
+        </table>
+        <p class="inv-note">金額以港幣 (HKD) 計算。轉賬後請把入數紙傳給我們核對。</p>
       </div>
     </div>
   </div>
@@ -545,23 +738,29 @@
       const btn = document.getElementById('btn-generate-pdf'); const originalHTML = btn.innerHTML;
       btn.innerHTML = `<i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i> 產生中...`; btn.classList.add('opacity-70', 'cursor-not-allowed'); updateIcons();
 
-      document.getElementById('pdf-client-name').innerText = loadedClientName; document.getElementById('pdf-invoice-id').innerText = orderId;
-      document.getElementById('pdf-invoice-date').innerText = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-      
+      document.getElementById('pdf-client-name').innerText = loadedClientName;
+      document.getElementById('pdf-pet-name').innerText = loadedPetsString || '—';
+      const shootBits = [orderShootDate, rawData.shootTime, orderLocation].filter(Boolean);
+      document.getElementById('pdf-shoot').innerText = shootBits.join(' · ');
+      document.getElementById('pdf-invoice-id').innerText = orderId;
+      document.getElementById('pdf-invoice-date').innerText = new Date().toLocaleDateString('zh-HK', { year: 'numeric', month: 'long', day: 'numeric' });
+
       const grandTotal = Number(rawData.price || 0); const dep = Number(rawData.depositAmount || 0);
       const extraPaxCost = Number(rawData.extraPaxCount || 0) * 300; const manualOtherFee = Number(rawData.manualOtherFee || 0); const totalOtherFee = Number(rawData.otherFee || 0);
-      const studioTopUp = totalOtherFee - extraPaxCost - manualOtherFee; const discount = Number(rawData.discount || 0); const basePrice = grandTotal - totalOtherFee + discount; 
-      
-      let tableHtml = `<tr><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; color: #111827;"><strong>${rawData.package || "Photography Service"}</strong></td><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; text-align:right; color: #111827;">${basePrice.toLocaleString()}</td></tr>`;
-      if(studioTopUp > 0) { tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Extra Studio Fee (補地租差價)</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${studioTopUp.toLocaleString()}</td></tr>`; }
-      if(extraPaxCost > 0) { tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Extra Pax/Pet (額外人數/寵物 x ${rawData.extraPaxCount})</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${extraPaxCost.toLocaleString()}</td></tr>`; }
-      if(manualOtherFee > 0) { tableHtml += `<tr><td style="padding:12px 10px 12px 20px; border-bottom:1px solid #F3F4F6; font-size: 14px; color: #4B5563;">+ Other Surcharges (其他附加費)</td><td style="padding:12px 10px; border-bottom:1px solid #F3F4F6; text-align:right; font-size: 14px; color: #4B5563;">${manualOtherFee.toLocaleString()}</td></tr>`; }
-      if(discount > 0) { tableHtml += `<tr><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; font-size: 14px; color: #4B5563;">- Discount Applied (折扣優惠)</td><td style="padding:16px 10px; border-bottom:1px solid #E5E7EB; text-align:right; font-size: 14px; color: #EF4444;">- ${discount.toLocaleString()}</td></tr>`; }
-      if(dep > 0) { tableHtml += `<tr><td style="padding:16px 10px; border-bottom:1px solid #111827; color: #111827;"><strong>Deposit Paid (已付訂金)</strong></td><td style="padding:16px 10px; border-bottom:1px solid #111827; text-align:right; color:#EF4444;">- ${dep.toLocaleString()}</td></tr>`; }
-      
+      const studioTopUp = totalOtherFee - extraPaxCost - manualOtherFee; const discount = Number(rawData.discount || 0); const basePrice = grandTotal - totalOtherFee + discount;
+      const hkd = (n) => `HK$ ${Number(n).toLocaleString()}`;
+      const line = (cls, label, amount) => `<tr class="${cls}"><td>${label}</td><td class="num">${amount}</td></tr>`;
+
+      let tableHtml = line('inv-main', `<strong>${rawData.package || "Photography Service"}</strong>`, hkd(basePrice));
+      if(studioTopUp > 0) { tableHtml += line('inv-extra', `+ Extra Studio Fee (補地租差價)`, hkd(studioTopUp)); }
+      if(extraPaxCost > 0) { tableHtml += line('inv-extra', `+ Extra Pax/Pet (額外人數/寵物 x ${rawData.extraPaxCount})`, hkd(extraPaxCost)); }
+      if(manualOtherFee > 0) { tableHtml += line('inv-extra', `+ Other Surcharges (其他附加費)`, hkd(manualOtherFee)); }
+      if(discount > 0) { tableHtml += line('inv-deduct', `- Discount Applied (折扣優惠)`, `− ${hkd(discount)}`); }
+      if(dep > 0) { tableHtml += line('inv-deduct', `<strong>Deposit Paid (已付訂金)</strong>`, `− ${hkd(dep)}`); }
+
       document.getElementById('pdf-table-body').innerHTML = tableHtml;
-      document.getElementById('pdf-subtotal').innerText = `${grandTotal.toLocaleString()}`;
-      document.getElementById('pdf-total-balance').innerText = `HK$ ${(grandTotal - dep > 0 ? grandTotal - dep : 0).toLocaleString()}`;
+      document.getElementById('pdf-subtotal').innerText = hkd(grandTotal);
+      document.getElementById('pdf-total-balance').innerText = hkd(grandTotal - dep > 0 ? grandTotal - dep : 0);
 
       const element = document.getElementById('invoice-template');
       setTimeout(() => {
