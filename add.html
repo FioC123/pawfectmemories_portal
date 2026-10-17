@@ -238,6 +238,8 @@
                </select>
           </div>
 
+          <p id="studio-included-note" class="hidden text-[11px] leading-relaxed font-semibold text-pm-oak bg-pm-oak/10 border border-pm-oak/25 rounded-xl px-3 py-2.5"></p>
+
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">實收總金額 (HK$)</label>
@@ -251,14 +253,22 @@
 
           <div class="grid grid-cols-2 gap-4 border-t border-gray-100 dark:border-pm-dark-border pt-3">
             <div>
-              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">附加費項目金額</label>
-              <input type="number" id="manualOtherFee" value="0" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-500">
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block" for="extraStudioFee">額外 Studio 費用</label>
+              <input type="number" id="extraStudioFee" value="0" min="0" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-900 dark:text-white">
+              <p id="extra-studio-hint" class="text-[10px] text-gray-400 mt-1 leading-snug">只填超出已包租金的金額</p>
             </div>
             <div>
-              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">平日扣減折扣</label>
-              <input type="number" id="discount" value="0" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-500">
+              <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block" for="manualOtherFee">附加費項目金額</label>
+              <input type="number" id="manualOtherFee" value="0" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-500">
+              <p class="text-[10px] text-gray-400 mt-1 leading-snug">化妝、加相、車馬等。不要填已包的影樓租金。</p>
             </div>
           </div>
+
+          <div>
+            <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block" for="discount">平日扣減折扣</label>
+            <input type="number" id="discount" value="0" min="0" class="taste-input w-full rounded-xl text-xs font-semibold text-gray-500">
+          </div>
+          <p id="finance-breakdown" class="text-[10px] text-gray-400 leading-relaxed"></p>
 
           <div>
             <label class="text-[10px] text-gray-400 font-bold uppercase mb-1 block">目前付款進度狀態</label>
@@ -351,6 +361,7 @@
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
     import { DEFAULT_PET_PHOTO, escAttr, petPreviewSrc } from "./pets-avatars.js";
     import { applySlipUpload, formatPaymentStamp, hkDateTimeLocalValue, hkWallToIso } from "./payment-times.js";
+    import { extraStudioFromOrder, includedStudioLimit, packageOptionLabel, quoteBooking } from "./booking-finance.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
@@ -395,7 +406,85 @@
     let availableTags = [];
     let currentPets = [];
     let selectedTags = [];
-    let originalClientId = ""; 
+    let originalClientId = "";
+    let suppressFinance = false;
+
+    function selectedPackage() {
+      const name = document.getElementById('package-select').value;
+      return packageConfig.find(p => p.name === name) || null;
+    }
+
+    function hkd(n) {
+      return `HK$${Number(n || 0).toLocaleString()}`;
+    }
+
+    function refreshStudioHint(pkg) {
+      const note = document.getElementById('studio-included-note');
+      const hint = document.getElementById('extra-studio-hint');
+      if (!pkg) {
+        note.textContent = "";
+        note.classList.add('hidden');
+        hint.textContent = "只填超出已包租金的金額；未包租金的套餐則填整筆影樓費。";
+        return;
+      }
+      const included = includedStudioLimit(pkg);
+      if (included > 0) {
+        note.textContent = `此套餐已包影樓租金 ${hkd(included)}，請勿把這筆記入「附加費項目金額」。只有超出 ${hkd(included)} 的差額才填「額外 Studio 費用」。`;
+        note.classList.remove('hidden');
+        hint.textContent = `只填超出已包 ${hkd(included)} 的金額`;
+      } else {
+        note.textContent = "";
+        note.classList.add('hidden');
+        hint.textContent = "此套餐未包租金。如需另收影樓費，整筆填在這裡。";
+      }
+    }
+
+    function currentQuote(pkg) {
+      return quoteBooking({
+        packagePrice: pkg ? pkg.price : 0,
+        studioLimit: pkg ? pkg.studioLimit : 0,
+        extraStudioFee: document.getElementById('extraStudioFee').value,
+        manualOtherFee: document.getElementById('manualOtherFee').value,
+        extraPaxCount: document.getElementById('extraPaxCount').value,
+        discount: document.getElementById('discount').value
+      });
+    }
+
+    function renderBreakdown(quote, displayedTotal) {
+      const el = document.getElementById('finance-breakdown');
+      if (!quote) { el.textContent = ""; return; }
+      const packageBit = quote.includedStudio > 0
+        ? `套餐 ${hkd(quote.packagePrice)}（已包租金 ${hkd(quote.includedStudio)}）`
+        : `套餐 ${hkd(quote.packagePrice)}`;
+      const bits = [packageBit, `額外 Studio ${hkd(quote.extraStudioFee)}`, `附加費 ${hkd(quote.manualOtherFee)}`];
+      if (quote.extraPaxCost > 0) bits.push(`額外人數 ${hkd(quote.extraPaxCost)}`);
+      if (quote.discount > 0) bits.push(`折扣 −${hkd(quote.discount)}`);
+      bits.push(`實收 ${hkd(quote.total)}`);
+      let text = bits.join(" · ");
+      if (displayedTotal != null && Math.abs(Number(displayedTotal) - quote.total) > 0.001) {
+        text += ` · 目前欄位 ${hkd(displayedTotal)}，改動費用後會按公式更新`;
+      }
+      el.textContent = text;
+    }
+
+    function applyFinanceTotal() {
+      const pkg = selectedPackage();
+      refreshStudioHint(pkg);
+      if (suppressFinance) return;
+      if (!pkg) {
+        document.getElementById('finance-breakdown').textContent = "此套餐不在目前費率表，實收維持手填。額外 Studio 與附加費仍會分開記錄。";
+        return;
+      }
+      const quote = currentQuote(pkg);
+      document.getElementById('price').value = quote.total;
+      renderBreakdown(quote);
+    }
+
+    function bindFinanceInputs() {
+      ["extraStudioFee", "manualOtherFee", "discount", "extraPaxCount"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", applyFinanceTotal);
+      });
+    } 
 
     async function initPage() {
       try {
@@ -409,12 +498,9 @@
         availableTags = snapTags.exists() ? snapTags.data().list : [];
         
         const selectEl = document.getElementById('package-select');
-        selectEl.innerHTML = packageConfig.map(p => `<option value="${p.name}">${p.name} (HK$ ${p.price})</option>`).join('');
-
-        selectEl.addEventListener('change', (e) => {
-            const chosen = packageConfig.find(p => p.name === e.target.value);
-            if(chosen && !editId) { document.getElementById('price').value = chosen.price; }
-        });
+        selectEl.innerHTML = packageConfig.map(p => `<option value="${escAttr(p.name)}">${escAttr(packageOptionLabel(p))}</option>`).join('');
+        selectEl.addEventListener('change', applyFinanceTotal);
+        bindFinanceInputs();
 
         if (snapOrder && snapOrder.exists()) {
           document.getElementById('page-title').innerText = "編輯預約檔案資料";
@@ -426,9 +512,18 @@
           document.getElementById('shootTime').value = o.shootTime || "";
           document.getElementById('shootLocation').value = o.shootLocation || "";
           document.getElementById('platform').value = o.platform || "Instagram";
+          suppressFinance = true;
+          if (o.package && !packageConfig.some(p => p.name === o.package)) {
+            const opt = document.createElement('option');
+            opt.value = o.package;
+            opt.textContent = `${o.package}（已不在費率表）`;
+            selectEl.appendChild(opt);
+          }
+          const savedPkg = packageConfig.find(p => p.name === o.package) || null;
           document.getElementById('package-select').value = o.package || "";
           document.getElementById('price').value = o.price || 0;
           document.getElementById('depositAmount').value = o.depositAmount || 0;
+          document.getElementById('extraStudioFee').value = extraStudioFromOrder(o, savedPkg);
           document.getElementById('manualOtherFee').value = o.manualOtherFee || 0;
           document.getElementById('discount').value = o.discount || 0;
           document.getElementById('paymentStatus').value = o.paymentStatus || "unpaid";
@@ -467,14 +562,21 @@
           if(currentPets.length === 0 && o.petName) {
               currentPets.push({ name: o.petName, type: o.petType || "", breed: o.petBreed || "", photoUrl: o.photoUrl || "" });
           }
+          suppressFinance = false;
+          const loadedPkg = selectedPackage();
+          refreshStudioHint(loadedPkg);
+          renderBreakdown(loadedPkg ? currentQuote(loadedPkg) : null, Number(o.price || 0));
+          if (!loadedPkg) document.getElementById('finance-breakdown').textContent = "此套餐不在目前費率表，實收維持已儲存金額。";
         } else {
           currentPets = [{ name: "", type: "", breed: "", photoUrl: "" }];
+          applyFinanceTotal();
         }
 
         renderTagsSelection();
         renderPetsForm();
 
       } catch (err) {
+        suppressFinance = false;
         showToast("同步安全中心網絡出錯", "error");
       }
     }
@@ -651,9 +753,9 @@
             clientId = cSnap.id;
         }
 
-        const extraPax = Number(document.getElementById('extraPaxCount').value || 0);
-        const manualFee = Number(document.getElementById('manualOtherFee').value || 0);
-        const totalOtherFee = (extraPax * 300) + manualFee;
+        const pkg = selectedPackage();
+        const quote = currentQuote(pkg);
+        const extraPax = quote.extraPaxCount;
 
         const orderPayload = {
           clientId,
@@ -665,9 +767,10 @@
           package: document.getElementById('package-select').value,
           price: Number(document.getElementById('price').value || 0),
           depositAmount: Number(document.getElementById('depositAmount').value || 0),
-          manualOtherFee: manualFee,
-          otherFee: totalOtherFee,
-          discount: Number(document.getElementById('discount').value || 0),
+          extraStudioFee: quote.extraStudioFee,
+          manualOtherFee: quote.manualOtherFee,
+          otherFee: quote.otherFee,
+          discount: quote.discount,
           paymentStatus: document.getElementById('paymentStatus').value,
           notes: document.getElementById('notes').value,
           product: document.getElementById('product').value,

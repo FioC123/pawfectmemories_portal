@@ -391,6 +391,9 @@
               </div>
             </div>
             
+            <div id="detail-studio-included" class="hidden text-xs text-pm-oak font-semibold px-1"></div>
+            <div id="detail-extra-studio" class="hidden text-xs text-gray-600 dark:text-gray-300 font-semibold px-1"></div>
+            <div id="detail-manual-fee" class="hidden text-xs text-gray-400 px-1"></div>
             <div id="detail-discount-wrapper" class="hidden text-xs text-pm-oak font-semibold px-1"></div>
             <div id="detail-other-fee-wrapper" class="hidden text-xs text-gray-400 px-1"></div>
 
@@ -585,6 +588,7 @@
     import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
     import { escAttr, petPhotoSrc } from "./pets-avatars.js";
     import { formatPaymentStamp } from "./payment-times.js";
+    import { includedStudioLimit, studioTopUpForReceipt } from "./booking-finance.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
     const app = initializeApp(firebaseConfig);
@@ -620,7 +624,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('id') || urlParams.get('editId'); 
 
-    let rawData = {}; let loadedClientName = ""; let loadedClientPhone = ""; let loadedPetsString = ""; let orderShootDate = ""; let orderLocation = ""; let waTemplates = {};
+    let rawData = {}; let loadedClientName = ""; let loadedClientPhone = ""; let loadedPetsString = ""; let orderShootDate = ""; let orderLocation = ""; let waTemplates = {}; let loadedPackages = [];
 
     window.openLightbox = (url) => { 
         document.getElementById('lightbox-img').src = url; 
@@ -661,9 +665,14 @@
       if (!orderId) return;
       document.getElementById('detail-id').innerText = "#" + orderId;
       try {
-        const snap = await getDoc(doc(db, "Orders", orderId));
+        const [snap, pkgSnap] = await Promise.all([
+          getDoc(doc(db, "Orders", orderId)),
+          getDoc(doc(db, "Settings", "packages_config"))
+        ]);
         if (!snap.exists()) return;
         rawData = snap.data(); const data = rawData;
+        loadedPackages = pkgSnap.exists() ? (pkgSnap.data().list || []) : [];
+        const pkg = loadedPackages.find(p => p.name === data.package) || null;
         
         orderShootDate = data.shootDate; orderLocation = data.shootLocation;
 
@@ -686,9 +695,26 @@
             const stdEl = document.getElementById('detail-studio'); 
             stdEl.innerText = `Studio: ${data.studio}`; stdEl.classList.remove('hidden'); 
         }
-        if (data.otherFee > 0) { 
-            const feeEl = document.getElementById('detail-other-fee-wrapper'); 
-            feeEl.innerText = `含各項附加費: HK$ ${data.otherFee.toLocaleString()}`; feeEl.classList.remove('hidden'); 
+        const includedStudio = includedStudioLimit(pkg);
+        const extraStudio = studioTopUpForReceipt(data);
+        const manualFee = Number(data.manualOtherFee || 0);
+        if (includedStudio > 0) {
+            const incEl = document.getElementById('detail-studio-included');
+            incEl.innerText = `已包影樓租金 HK$ ${includedStudio.toLocaleString()}（已含在套餐價錢內，不用再記入附加費）`;
+            incEl.classList.remove('hidden');
+        }
+        if (extraStudio > 0) {
+            const extraEl = document.getElementById('detail-extra-studio');
+            extraEl.innerText = `額外 Studio 費用: HK$ ${extraStudio.toLocaleString()}`;
+            extraEl.classList.remove('hidden');
+        }
+        if (manualFee > 0) {
+            const manualEl = document.getElementById('detail-manual-fee');
+            manualEl.innerText = `其他附加費: HK$ ${manualFee.toLocaleString()}`;
+            manualEl.classList.remove('hidden');
+        } else if (extraStudio === 0 && data.otherFee > 0) {
+            const feeEl = document.getElementById('detail-other-fee-wrapper');
+            feeEl.innerText = `含各項附加費: HK$ ${data.otherFee.toLocaleString()}`; feeEl.classList.remove('hidden');
         }
         if (data.discount > 0) { 
             const discEl = document.getElementById('detail-discount-wrapper'); 
@@ -792,13 +818,19 @@
       document.getElementById('pdf-invoice-date').innerText = new Date().toLocaleDateString('zh-HK', { year: 'numeric', month: 'long', day: 'numeric' });
 
       const grandTotal = Number(rawData.price || 0); const dep = Number(rawData.depositAmount || 0);
-      const extraPaxCost = Number(rawData.extraPaxCount || 0) * 300; const manualOtherFee = Number(rawData.manualOtherFee || 0); const totalOtherFee = Number(rawData.otherFee || 0);
-      const studioTopUp = totalOtherFee - extraPaxCost - manualOtherFee; const discount = Number(rawData.discount || 0); const basePrice = grandTotal - totalOtherFee + discount;
+      const extraPaxCost = Number(rawData.extraPaxCount || 0) * 300; const manualOtherFee = Number(rawData.manualOtherFee || 0);
+      const studioTopUp = studioTopUpForReceipt(rawData); const discount = Number(rawData.discount || 0);
+      const basePrice = grandTotal - studioTopUp - extraPaxCost - manualOtherFee + discount;
+      const receiptPkg = loadedPackages.find(p => p.name === rawData.package) || null;
+      const includedStudio = includedStudioLimit(receiptPkg);
       const hkd = (n) => `HK$ ${Number(n).toLocaleString()}`;
       const line = (cls, label, amount) => `<tr class="${cls}"><td>${label}</td><td class="num">${amount}</td></tr>`;
+      const packageLabel = includedStudio > 0
+        ? `<strong>${rawData.package || "Photography Service"}</strong><br><span style="font-size:11px;color:#8a7560;">已包租金 HK$ ${includedStudio.toLocaleString()}</span>`
+        : `<strong>${rawData.package || "Photography Service"}</strong>`;
 
-      let tableHtml = line('inv-main', `<strong>${rawData.package || "Photography Service"}</strong>`, hkd(basePrice));
-      if(studioTopUp > 0) { tableHtml += line('inv-extra', `+ Extra Studio Fee (補租金差價)`, hkd(studioTopUp)); }
+      let tableHtml = line('inv-main', packageLabel, hkd(basePrice));
+      if(studioTopUp > 0) { tableHtml += line('inv-extra', `+ Extra Studio Fee (額外 Studio 費用)`, hkd(studioTopUp)); }
       if(extraPaxCost > 0) { tableHtml += line('inv-extra', `+ Extra Pax/Pet (額外人數/寵物 x ${rawData.extraPaxCount})`, hkd(extraPaxCost)); }
       if(manualOtherFee > 0) { tableHtml += line('inv-extra', `+ Other Surcharges (其他附加費)`, hkd(manualOtherFee)); }
       if(discount > 0) { tableHtml += line('inv-deduct', `- Discount Applied (折扣優惠)`, `− ${hkd(discount)}`); }
