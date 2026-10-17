@@ -11,19 +11,41 @@ Operate-mode portal. One vertical working column, shared controls, no marketing 
 
 ## Color
 
-| Token | Light | Use |
-| --- | --- | --- |
-| `--bg` | `#f3f1ec` | page |
-| `--surface` | `#fffcf8` | cards, sheets |
-| `--ink` | `#1a2118` | text |
-| `--ink-muted` | `#3e4a3c` | secondary text, ≥4.5:1 on `--bg` |
-| `--line` | `#e3ddd3` | borders |
-| `--green` | `#244018` | primary button |
-| `--oak` | `#6a3f16` | accent text and current nav |
-| `--danger` | `#9f1239` | unpaid / destructive text |
-| `--focus` | `#6a3f16` | `:focus-visible` ring |
+Warm wood and cream. Primary is only for main actions, the active nav item, and a few key figures. Semantic hues mark state (paid, owing, unpaid, destructive). They are not decoration.
 
-Dark values live on `html.dark` in `pm.css`.
+Tokens live on `:root` and `html.dark` in `pm.css`. Tailwind colors (`pm-oak`, `pm-cream`, `pm-fill`, and the rest) read those channels, so one toggle updates both themes. `--green` and `--oak` are aliases of `--primary`.
+
+| Token | Light | Dark | Use |
+| --- | --- | --- | --- |
+| `--bg` | `#F6F3EE` | `#1A1816` | page |
+| `--sidebar` | `#F0EBE3` | `#141210` | rail, mobile tab bar |
+| `--card` / `--surface` | `#FFFFFF` | `#24211E` | cards, sheets, list rows |
+| `--elevated` | `#FFFCF8` | `#2C2926` | raised inputs, search |
+| `--ink` | `#2C2825` | `#F3EEE7` | primary text |
+| `--ink-secondary` | `#6B645C` | `#B5ADA3` | secondary text, idle nav |
+| `--ink-muted` | `#9A9288` | `#7A736B` | hints, placeholders |
+| `--line` | `#E5DFD6` | `#3A3530` | borders, dividers |
+| `--fill` | `#EDE7DE` | `#3A3530` | muted fills, active nav well |
+| `--primary` | `#8F735A` | `#C4A484` | CTA, active nav, key highlight |
+| `--primary-hover` | `#7A614C` | `#D4B896` | CTA hover |
+| `--on-primary` | `#FFFCF8` | `#1A1816` | label on a primary button |
+| `--success` | `#6B8F71` | `#8FAF94` | paid, saved, delivered |
+| `--warning` | `#C4A35A` | `#D4B86A` | deposit still owing |
+| `--danger` | `#B56B5C` | `#D4897A` | unpaid, destructive |
+| `--info` | `#7A8B9A` | `#9AABBA` | new booking |
+| `--focus` | `--primary` | `--primary` | `:focus-visible` ring |
+
+Kanban lanes stay the quiet card color. A 3px inset bar and the column title carry the stage color:
+
+| Lane | Token | Color |
+| --- | --- | --- |
+| 新預約 | `--info` | light `#7A8B9A` / dark `#9AABBA` |
+| 基本修輯 | `--sage` | `#8B9A7D` |
+| 揀相 | `--primary` | light `#8F735A` / dark `#C4A484` |
+| 精修 | `--clay` | `#B8957A` |
+| 已完成 | `--success` | light `#6B8F71` / dark `#8FAF94` |
+
+Page backgrounds are never `#000`. Light cards may be `#FFFFFF`. The invoice is the light palette on white paper: ink `#2C2825`, secondary `#6B645C`, line `#E5DFD6`, wordmark `#8F735A`, deductions `#B56B5C`.
 
 ## Space and type
 

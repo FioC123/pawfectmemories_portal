@@ -49,7 +49,7 @@ export function renderPetAvatars(pets, {
   }).join("");
 
   const badge = extra > 0
-    ? `<span class="${sizeClass} rounded-full bg-gray-100 dark:bg-[#1A211D] text-gray-500 dark:text-gray-400 text-[9px] font-bold leading-none flex items-center justify-center relative shrink-0 ${ringClass} ${overlapClass}" style="z-index:${visible.length + 2};" title="${escAttr(hiddenNames)}">+${extra}</span>`
+    ? `<span class="${sizeClass} rounded-full bg-gray-100 dark:bg-pm-fill text-gray-500 dark:text-gray-400 text-[9px] font-bold leading-none flex items-center justify-center relative shrink-0 ${ringClass} ${overlapClass}" style="z-index:${visible.length + 2};" title="${escAttr(hiddenNames)}">+${extra}</span>`
     : "";
 
   return `<div class="flex items-center shrink-0">${imgs}${badge}</div>`;
