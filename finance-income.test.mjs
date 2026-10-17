@@ -53,13 +53,14 @@ test("deposit and balance in different months split without double counting", ()
   assert.equal(summary.total, 2830);
 });
 
-test("a fully paid booking with only one payment date stays in that month", () => {
+test("a fully paid booking with only one payment date stays in that receipt month", () => {
   const summary = aggregateMonthlyIncome([{
     price: 2000,
     depositAmount: 800,
     paymentStatus: "full",
     depositDate: "2026-04-03 08:52",
     balanceDate: "",
+    createdAt: "2026-01-15T02:00:00.000Z",
     shootDate: "2026-08-01"
   }]);
 
@@ -95,7 +96,21 @@ test("unpaid bookings and missing dates do not invent a month", () => {
   assert.equal(summary.total, 900);
 });
 
-test("paid bookings with no receipt date fall back to the shoot month", () => {
+test("missing receipt dates use the entry timestamp, not the shoot month", () => {
+  const summary = aggregateMonthlyIncome([{
+    price: 1600,
+    depositAmount: 0,
+    paymentStatus: "full",
+    createdAt: "2026-03-31T16:00:00.000Z",
+    shootDate: "2026-02-14"
+  }]);
+
+  assert.equal(summary.rows.length, 1);
+  assert.equal(summary.rows[0].key, "2026-04");
+  assert.equal(summary.rows[0].amount, 1600);
+});
+
+test("shoot month is only used when receipt and entry dates are both missing", () => {
   const summary = aggregateMonthlyIncome([{
     price: 1600,
     depositAmount: 0,
@@ -105,6 +120,79 @@ test("paid bookings with no receipt date fall back to the shoot month", () => {
 
   assert.equal(summary.rows[0].key, "2026-02");
   assert.equal(summary.rows[0].amount, 1600);
+});
+
+test("explicit receipt timestamps override stored payment strings and the shoot date", () => {
+  const summary = aggregateMonthlyIncome([{
+    id: "r",
+    clientName: "陳小姐",
+    petNames: "小吉",
+    price: 2000,
+    depositAmount: 800,
+    paymentStatus: "full",
+    depositReceivedAt: "2026-03-02",
+    balanceReceivedAt: "2026-05-09",
+    depositDate: "2026-01-01",
+    balanceDate: "2026-01-20",
+    createdAt: "2026-01-01",
+    shootDate: "2026-08-01"
+  }]);
+
+  assert.deepEqual(
+    summary.rows.map((row) => [row.key, row.amount, row.lines[0].clientName, row.lines[0].petNames, row.lines[0].parts[0].label]),
+    [
+      ["2026-05", 1200, "陳小姐", "小吉", "尾數"],
+      ["2026-03", 800, "陳小姐", "小吉", "訂金"]
+    ]
+  );
+});
+
+test("a month lists each contributing order once with the amount attributed to that month", () => {
+  const summary = aggregateMonthlyIncome([
+    {
+      id: "same",
+      clientName: "阿明",
+      petNames: "Mochi & Bean",
+      price: 2800,
+      depositAmount: 1400,
+      paymentStatus: "full",
+      depositDate: "2026-05-02",
+      balanceDate: "2026-05-18"
+    },
+    {
+      id: "split",
+      clientName: "阿芬",
+      petNames: "茶茶",
+      price: 3000,
+      depositAmount: 1000,
+      paymentStatus: "full",
+      depositDate: "2026-05-20",
+      balanceDate: "2026-06-02"
+    }
+  ]);
+
+  const may = summary.rows.find((row) => row.key === "2026-05");
+  assert.equal(may.orders, 2);
+  assert.equal(may.amount, 3800);
+  assert.equal(may.lines.length, 2);
+  assert.deepEqual(may.lines[0], {
+    id: "same",
+    clientName: "阿明",
+    petNames: "Mochi & Bean",
+    pets: [],
+    amount: 2800,
+    parts: [
+      { label: "全數已付", amount: 2800 }
+    ]
+  });
+  assert.equal(may.lines[1].id, "split");
+  assert.equal(may.lines[1].amount, 1000);
+  assert.deepEqual(may.lines[1].parts, [{ label: "訂金", amount: 1000 }]);
+
+  const june = summary.rows.find((row) => row.key === "2026-06");
+  assert.equal(june.lines.length, 1);
+  assert.equal(june.lines[0].amount, 2000);
+  assert.equal(june.lines[0].parts[0].label, "尾數");
 });
 
 test("legacy depositPaid flag and over-recorded deposits stay inside the order total", () => {

@@ -1,5 +1,6 @@
 // Monthly recognized income for the finance center.
-// Cash basis: count money already received, and put it in the Hong Kong calendar month it arrived.
+// Cash basis: count money already received in the Hong Kong month of its receipt date,
+// or the order entry timestamp when no receipt date was stored.
 
 export const HK_TZ = "Asia/Hong_Kong";
 
@@ -79,8 +80,25 @@ function paymentStatusOf(order) {
   return order.depositPaid ? "deposit" : "unpaid";
 }
 
+function presentDate(...values) {
+  for (const value of values) {
+    if (hkMonthKey(value)) return value;
+  }
+  return "";
+}
+
+function entryTimestamp(order) {
+  return presentDate(order.createdAt, order.enteredAt, order.entryDate, order.orderEnteredAt);
+}
+
+// Receipt fields, then the order entry timestamp. shootDate is not a payment month.
+// Rare fallback: no receipt date and no entry timestamp was stored at all.
+function datedByReceiptOrEntry(order, ...preferred) {
+  return presentDate(...preferred, entryTimestamp(order), order.shootDate);
+}
+
 // One fully paid order becomes two receipts only when the deposit and the balance
-// were received in different months. Otherwise the whole paid amount stays in one month.
+// were recorded in different months. Otherwise the whole paid amount stays in one month.
 function recognizedReceipts(order) {
   const price = money(order.price);
   const recordedDeposit = money(order.depositAmount);
@@ -89,26 +107,41 @@ function recognizedReceipts(order) {
 
   if (status === "deposit") {
     if (deposit <= 0) return [];
-    return [{ date: order.depositDate || order.shootDate || "", amount: deposit }];
+    return [{
+      date: datedByReceiptOrEntry(order, order.depositReceivedAt, order.depositDate),
+      amount: deposit,
+      label: "訂金"
+    }];
   }
 
   if (status !== "full" || price <= 0) return [];
 
   const balance = addMoney(price, -deposit);
-  const depositMonth = hkMonthKey(order.depositDate);
-  const balanceMonth = hkMonthKey(order.balanceDate);
-  if (deposit > 0 && balance > 0 && depositMonth && balanceMonth && depositMonth !== balanceMonth) {
+  const depositDate = presentDate(order.depositReceivedAt, order.depositDate);
+  const balanceDate = presentDate(order.balanceReceivedAt, order.balanceDate);
+  if (deposit > 0 && balance > 0 && depositDate && balanceDate && hkMonthKey(depositDate) !== hkMonthKey(balanceDate)) {
     return [
-      { date: order.depositDate, amount: deposit },
-      { date: order.balanceDate, amount: balance }
+      { date: depositDate, amount: deposit, label: "訂金" },
+      { date: balanceDate, amount: balance, label: "尾數" }
     ];
   }
 
-  const depositCoversAll = deposit >= price;
-  const date = (depositCoversAll && order.depositDate)
-    ? order.depositDate
-    : (order.balanceDate || order.depositDate || order.shootDate || "");
-  return [{ date, amount: price }];
+  const depositCoversAll = deposit >= price && deposit > 0;
+  const date = depositCoversAll
+    ? datedByReceiptOrEntry(order, depositDate, balanceDate)
+    : datedByReceiptOrEntry(order, balanceDate, depositDate);
+  return [{ date, amount: price, label: "全數已付" }];
+}
+
+function orderLine(order) {
+  return {
+    id: order.id ? String(order.id) : "",
+    clientName: order.clientName || "未知客戶",
+    petNames: order.petNames || "未填寫",
+    pets: Array.isArray(order.pets) ? order.pets : [],
+    amount: 0,
+    parts: []
+  };
 }
 
 export function aggregateMonthlyIncome(orders, now = new Date()) {
@@ -116,8 +149,8 @@ export function aggregateMonthlyIncome(orders, now = new Date()) {
   let undated = 0;
   const current = currentHkMonthKey(now);
 
-  for (const order of orders || []) {
-    const touched = new Set();
+  for (const [index, order] of (orders || []).entries()) {
+    const token = order.id ? String(order.id) : `anon-${index}`;
     for (const receipt of recognizedReceipts(order)) {
       const amount = money(receipt.amount);
       if (amount <= 0) continue;
@@ -126,13 +159,13 @@ export function aggregateMonthlyIncome(orders, now = new Date()) {
         undated = addMoney(undated, amount);
         continue;
       }
-      if (!buckets.has(key)) buckets.set(key, { amount: 0, orders: 0 });
+      if (!buckets.has(key)) buckets.set(key, { amount: 0, lines: new Map() });
       const bucket = buckets.get(key);
       bucket.amount = addMoney(bucket.amount, amount);
-      if (!touched.has(key)) {
-        touched.add(key);
-        bucket.orders += 1;
-      }
+      if (!bucket.lines.has(token)) bucket.lines.set(token, orderLine(order));
+      const line = bucket.lines.get(token);
+      line.amount = addMoney(line.amount, amount);
+      line.parts.push({ label: receipt.label, amount });
     }
   }
 
@@ -141,8 +174,9 @@ export function aggregateMonthlyIncome(orders, now = new Date()) {
       key,
       label: formatHkMonthLabel(key),
       amount: bucket.amount,
-      orders: bucket.orders,
-      current: key === current
+      orders: bucket.lines.size,
+      current: key === current,
+      lines: [...bucket.lines.values()]
     }))
     .sort((a, b) => (a.key < b.key ? 1 : -1));
 
