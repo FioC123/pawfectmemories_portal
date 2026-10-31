@@ -40,7 +40,7 @@
   --elevated: #FFFCF8;
   --ink: #2C2825;
   --ink-secondary: #6B645C;
-  --ink-muted: #9A9288;
+  --ink-muted: #736E66;
   --line: #E5DFD6;
   --fill: #EDE7DE;
   --primary: #8F735A;
@@ -54,6 +54,7 @@
   --focus: var(--primary);
   --success: #6B8F71;
   --warning: #C4A35A;
+  --warning-ink: #816C3B;
   --danger: #B56B5C;
   --info: #7A8B9A;
   --sage: #8B9A7D;
@@ -64,7 +65,7 @@
   --pm-elevated: 255 252 248;
   --pm-ink: 44 40 37;
   --pm-secondary: 107 100 92;
-  --pm-muted: 154 146 136;
+  --pm-muted: 115 110 102;
   --pm-line: 229 223 214;
   --pm-fill: 237 231 222;
   --pm-primary: 143 115 90;
@@ -109,6 +110,7 @@ html.dark {
   --focus: var(--primary);
   --success: #8FAF94;
   --warning: #D4B86A;
+  --warning-ink: #D4B86A;
   --danger: #D4897A;
   --info: #9AABBA;
   --sage: #8B9A7D;
@@ -932,7 +934,7 @@ body.pm-app .text-pm-on { color: var(--on-primary) !important; }
 body.pm-app .text-pm-secondary { color: var(--ink-secondary) !important; }
 body.pm-app .text-pm-muted { color: var(--ink-muted) !important; }
 body.pm-app .text-pm-success { color: var(--success) !important; }
-body.pm-app .text-pm-warning { color: var(--warning) !important; }
+body.pm-app .text-pm-warning { color: var(--warning-ink) !important; }
 body.pm-app .text-pm-danger { color: var(--danger) !important; }
 body.pm-app .text-pm-info { color: var(--info) !important; }
 body.pm-app .text-pm-sage { color: var(--sage) !important; }

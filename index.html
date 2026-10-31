@@ -2,6 +2,7 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
+  <link rel="manifest" href="manifest.json">
   <script>
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -9,11 +10,11 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>Pawfect Memories | Workspace</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17?plugins=forms,container-queries"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
   
   <script id="tailwind-config">
     tailwind.config = {
@@ -284,15 +285,15 @@
         <div class="flex items-center gap-4 mb-2">
           ${renderDrawerAvatars(data.pets)}
           <div class="overflow-hidden flex-1">
-            <h4 class="font-serif font-bold text-xl text-gray-900 dark:text-white truncate">${data.petsStr}</h4>
-            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">${data.clientName} ${data.clientPhone ? '· '+data.clientPhone : ''}</p>
+            <h4 class="font-serif font-bold text-xl text-gray-900 dark:text-white truncate">${escAttr(data.petsStr)}</h4>
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">${escAttr(data.clientName)} ${data.clientPhone ? '· '+escAttr(data.clientPhone) : ''}</p>
           </div>
         </div>
         
         <div class="grid grid-cols-2 gap-3 mt-6">
           <div class="bg-gray-50 dark:bg-pm-fill p-3 rounded-xl border border-gray-100 dark:border-pm-dark-border">
             <p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">拍攝日期</p>
-            <p class="text-xs font-semibold text-gray-900 dark:text-white">${data.shootDate || '未定'}</p>
+            <p class="text-xs font-semibold text-gray-900 dark:text-white">${escAttr(data.shootDate || '未定')}</p>
           </div>
           <div class="bg-gray-50 dark:bg-pm-fill p-3 rounded-xl border border-gray-100 dark:border-pm-dark-border">
             <p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">總收費</p>
@@ -303,7 +304,7 @@
         <div class="mt-6 border-t border-gray-100 dark:border-pm-dark-border pt-5">
           <p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider mb-2">備註 / 特殊要求</p>
           <div class="bg-yellow-50/40 dark:bg-yellow-900/5 p-4 rounded-xl text-xs text-gray-600 dark:text-gray-400 whitespace-pre-wrap border border-yellow-100/60 dark:border-yellow-900/10 leading-relaxed">
-            ${data.notes || '無特別備註'}
+            ${escAttr(data.notes || '無特別備註')}
           </div>
         </div>
       `;
@@ -328,6 +329,16 @@
       document.querySelectorAll(".kanban-card, tr[data-search]").forEach((el) => {
         const hay = el.getAttribute("data-search") || "";
         el.style.display = hay.includes(term) ? "" : "none";
+      });
+    }
+
+    const workspace = document.getElementById("main-view-container");
+    if (workspace && workspace.dataset.openBound !== "1") {
+      workspace.dataset.openBound = "1";
+      workspace.addEventListener("click", (event) => {
+        const row = event.target.closest("[data-order-id]");
+        if (!row || !workspace.contains(row)) return;
+        window.openDrawer(row.getAttribute("data-order-id"));
       });
     }
 
@@ -414,18 +425,19 @@
 
           const kanbanContainer = document.getElementById(colId);
           const searchStr = `${clientName} ${petsStr} ${d.package || ''}`.toLowerCase();
+          const searchAttr = escAttr(searchStr);
           
           const payState = paymentStatus(d);
           let paymentBadge = payState === 'full' ? `<span class="bg-pm-success/10 text-pm-success px-1.5 py-0.5 rounded text-[9px] font-bold">已付</span>` : 
                              (payState === 'deposit' ? `<span class="bg-pm-warning/10 text-pm-warning px-1.5 py-0.5 rounded text-[9px] font-bold">訂金</span>` : `<span class="bg-red-50 dark:bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded text-[9px] font-bold">未付</span>`);
 
           kanbanContainer.insertAdjacentHTML('beforeend', `
-            <div data-order-id="${id}" data-search="${searchStr}" class="kanban-card active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/50 dark:border-white/5 p-4 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark pm-named mb-3" onclick="openDrawer('${id}')">
+            <div data-order-id="${escAttr(id)}" data-search="${searchAttr}" class="kanban-card active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/50 dark:border-white/5 p-4 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark pm-named mb-3">
               ${petLines}
-              <div class="pm-pet-note"><p class="pm-pet-client">${clientName}</p></div>
+              <div class="pm-pet-note"><p class="pm-pet-client">${escAttr(clientName)}</p></div>
               <div class="pm-pet-note">
                 <div class="pm-pet-meta">
-                  <span class="pm-pet-date"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${d.shootDate || '未定'}</span>
+                  <span class="pm-pet-date"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${escAttr(d.shootDate || '未定')}</span>
                   ${paymentBadge}
                 </div>
               </div>
@@ -439,14 +451,14 @@
           const balClass = payState === 'full' ? 'text-gray-400' : 'text-red-500 font-bold';
 
           tableRows += `
-            <tr data-search="${searchStr}" class="hover:bg-gray-50/80 dark:hover:bg-pm-fill/70 border-b border-gray-100 dark:border-pm-dark-border/40 transition-colors cursor-pointer" onclick="openDrawer('${id}')">
+            <tr data-order-id="${escAttr(id)}" data-search="${searchAttr}" class="hover:bg-gray-50/80 dark:hover:bg-pm-fill/70 border-b border-gray-100 dark:border-pm-dark-border/40 transition-colors cursor-pointer">
               <td class="px-6 py-3.5">
                 ${petLines}
-                <div class="pm-pet-note"><p class="pm-pet-client">${clientName}</p></div>
+                <div class="pm-pet-note"><p class="pm-pet-client">${escAttr(clientName)}</p></div>
               </td>
-              <td class="px-6 py-3.5"><span class="bg-gray-50 dark:bg-pm-dark-border ${statusTone[colId] || "text-pm-secondary"} text-[9px] px-2 py-0.5 rounded-md font-bold border border-gray-200 dark:border-transparent">${statusMap[colId]}</span></td>
-              <td class="px-6 py-3.5 text-gray-500 dark:text-gray-400 font-semibold text-[11px] tracking-wide">${d.shootDate || '未定'}</td>
-              <td class="px-6 py-3.5 text-gray-400 text-[11px] font-medium">${d.package || '-'}</td>
+              <td class="px-6 py-3.5"><span class="bg-gray-50 dark:bg-pm-dark-border ${statusTone[colId] || "text-pm-secondary"} text-[9px] px-2 py-0.5 rounded-md font-bold border border-gray-200 dark:border-transparent">${escAttr(statusMap[colId] || "")}</span></td>
+              <td class="px-6 py-3.5 text-gray-500 dark:text-gray-400 font-semibold text-[11px] tracking-wide">${escAttr(d.shootDate || '未定')}</td>
+              <td class="px-6 py-3.5 text-gray-400 text-[11px] font-medium">${escAttr(d.package || '-')}</td>
               <td class="px-6 py-3.5 text-right ${balClass}">${balText}</td>
             </tr>
           `;

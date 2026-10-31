@@ -2,6 +2,7 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
+  <link rel="manifest" href="manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>預約進度查詢 | Pawfect Memories</title>
   
@@ -11,9 +12,9 @@
     }
   </script>
   
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.min.js"></script>
   
   <script id="tailwind-config">
     tailwind.config = {
@@ -165,7 +166,7 @@
 
           <div id="res-product-block" class="space-y-1 sm:col-span-2 border-t border-gray-100 dark:border-pm-dark-border pt-4 hidden">
             <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">內含實體紀念產品</p>
-            <p id="res-product" class="font-semibold text-pm-oak flex items-center gap-1.5"><i data-lucide="gift" class="w-3.5 h-3.5"></i> -</p>
+            <p id="res-product" class="font-semibold text-pm-oak flex items-center gap-1.5"><i data-lucide="gift" class="w-3.5 h-3.5"></i> <span id="res-product-text">-</span></p>
           </div>
 
           <div id="res-notes-block" class="space-y-1.5 sm:col-span-2 border-t border-gray-100 dark:border-pm-dark-border pt-4 hidden">
@@ -263,7 +264,7 @@
     import { db } from "./firebase.js";
     import { isPortalPhoneKey, normalizePhone } from "./phone.js";
     import { balanceDue, paymentStatus, recordedDeposit } from "./order-money.js";
-    import { DEFAULT_PET_PHOTO, DENSE_AVATAR_LIMIT, escAttr, petPhotoSrc, renderPetAvatars } from "./pets-avatars.js"; 
+    import { DEFAULT_PET_PHOTO, DENSE_AVATAR_LIMIT, escAttr, petPhotoSrc, renderPetAvatars, safeHttpUrl } from "./pets-avatars.js"; 
     const stepMap = { "col-new": 1, "col-basic-edit": 2, "col-pick-photos": 3, "col-final-retouch": 4, "col-completed": 5 };
     const statusMap = { "col-new": "新預約", "col-basic-edit": "基本修輯", "col-pick-photos": "揀相", "col-final-retouch": "精修", "col-completed": "已完成" };
 
@@ -280,7 +281,10 @@
       const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
       
       toast.className = `pm-toast flex items-center gap-2 ${bgColor}`;
-      toast.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${msg}`;
+      const iconEl = document.createElement("i");
+      iconEl.setAttribute("data-lucide", icon);
+      iconEl.className = "w-3.5 h-3.5";
+      toast.replaceChildren(iconEl, document.createTextNode(` ${msg}`));
       
       container.appendChild(toast);
       lucide.createIcons();
@@ -382,12 +386,12 @@
             let petNames = pets.length > 0 ? pets.map(p=>p.name).join(' & ') : '未知毛孩';
             
             return `
-              <div onclick="selectActiveOrder('${order.id}')" class="active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-white/5 p-5 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark flex items-center justify-between group pm-named">
+              <div data-order-id="${escAttr(order.id)}" class="pm-order-choice active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-white/5 p-5 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark flex items-center justify-between group pm-named">
                  <div class="flex items-center gap-3 overflow-hidden">
                     ${renderPetAvatars(pets, { sizeClass: "w-8 h-8", singleClass: "border border-gray-100 dark:border-pm-dark-border", overlapClass: "-ml-2.5", maxVisible: DENSE_AVATAR_LIMIT })}
                     <div class="overflow-hidden">
-                       <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate mb-0.5">${currentClientName} 的預約檔案：${petNames}</h4>
-                       <p class="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wider">套餐: ${order.package || '未定'} | 拍攝日期: ${order.shootDate || '待定'}</p>
+                       <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate mb-0.5">${escAttr(currentClientName)} 的預約檔案：${escAttr(petNames)}</h4>
+                       <p class="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wider">套餐: ${escAttr(order.package || '未定')} | 拍攝日期: ${escAttr(order.shootDate || '待定')}</p>
                     </div>
                  </div>
                  <div class="text-right shrink-0 flex items-center gap-1.5">
@@ -400,6 +404,14 @@
         
         document.getElementById('multi-orders-box').classList.remove('hidden');
         lucide.createIcons();
+        if (listContainer.dataset.bound !== "1") {
+          listContainer.dataset.bound = "1";
+          listContainer.addEventListener("click", (event) => {
+            const card = event.target.closest("[data-order-id]");
+            if (!card) return;
+            window.selectActiveOrder(card.getAttribute("data-order-id"));
+          });
+        }
     }
 
     window.selectActiveOrder = (orderId) => {
@@ -454,7 +466,7 @@
         }
 
         if(d.product) {
-            document.getElementById('res-product').innerHTML = d.product;
+            document.getElementById('res-product-text').textContent = d.product;
             document.getElementById('res-product-block').classList.remove('hidden');
         }
 
@@ -485,10 +497,16 @@
           }
         });
 
-        if(cLv >= 3 && d.galleryUrl) { 
-            document.getElementById('gallery-box').classList.remove('hidden'); 
-            document.getElementById('gallery-link').href = d.galleryUrl; 
-            document.getElementById('gallery-url-text').value = d.galleryUrl;
+        const gallery = safeHttpUrl(d.galleryUrl);
+        const galleryBox = document.getElementById('gallery-box');
+        if(cLv >= 3 && gallery) {
+            galleryBox.classList.remove('hidden');
+            const galleryLink = document.getElementById('gallery-link');
+            galleryLink.href = gallery;
+            galleryLink.rel = "noopener noreferrer";
+            document.getElementById('gallery-url-text').value = gallery;
+        } else {
+            galleryBox.classList.add('hidden');
         }
         
         const pStat = paymentStatus(d);

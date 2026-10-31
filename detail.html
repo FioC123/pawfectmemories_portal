@@ -2,6 +2,7 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
+  <link rel="manifest" href="manifest.json">
   <script>
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -9,10 +10,10 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>預約詳情 | Pawfect Memories</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17?plugins=forms,container-queries"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   
   <script id="tailwind-config">
@@ -593,7 +594,7 @@
     import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
     import { db } from "./firebase.js";
     import { logoutAdmin, requireAdmin } from "./auth.js";
-    import { escAttr, petPhotoSrc } from "./pets-avatars.js";
+    import { escAttr, petPhotoSrc, safeHttpUrl } from "./pets-avatars.js";
     import { formatPaymentStamp } from "./payment-times.js";
     import { includedStudioLimit, studioTopUpForReceipt } from "./booking-finance.js";
     import { patchPortalOrder, removePortalOrder } from "./portal-mirror.js";
@@ -622,7 +623,10 @@
       const icon = type === 'error' ? 'alert-triangle' : 'check-circle';
       
       toast.className = `pm-toast flex items-center gap-2 ${bgColor}`;
-      toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i> ${msg}`;
+      const iconEl = document.createElement("i");
+      iconEl.setAttribute("data-lucide", icon);
+      iconEl.className = "w-4 h-4";
+      toast.replaceChildren(iconEl, document.createTextNode(` ${msg}`));
       
       container.appendChild(toast);
       updateIcons();
@@ -635,8 +639,27 @@
 
     let rawData = {}; let loadedClientName = ""; let loadedClientPhone = ""; let loadedPetsString = ""; let orderShootDate = ""; let orderLocation = ""; let waTemplates = {}; let loadedPackages = [];
 
-    window.openLightbox = (url) => { 
-        document.getElementById('lightbox-img').src = url; 
+    function showReceiptThumb(id, url) {
+        const host = document.getElementById(id);
+        if (!host) return;
+        const safe = safeHttpUrl(url);
+        host.replaceChildren();
+        if (!safe) {
+            host.textContent = "未上傳";
+            return;
+        }
+        const img = document.createElement("img");
+        img.src = safe;
+        img.alt = "入數紙";
+        img.className = "w-full h-full object-cover receipt-thumb";
+        img.addEventListener("click", () => window.openLightbox(safe));
+        host.append(img);
+    }
+
+    window.openLightbox = (url) => {
+        const safe = safeHttpUrl(url);
+        if (!safe) return;
+        document.getElementById('lightbox-img').src = safe; 
         const lb = document.getElementById('lightbox');
         lb.style.display = 'flex'; void lb.offsetWidth; lb.style.opacity = '1';
     };
@@ -752,12 +775,12 @@
           document.getElementById('pets-list-container').innerHTML = pets.map((p, i) => `
             <div class="sm:col-span-1 flex items-start gap-3 bg-gray-50 dark:bg-pm-fill p-3 rounded-xl border border-gray-100 dark:border-transparent">
                 <div class="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden shrink-0"><img src="${escAttr(petPhotoSrc(p))}" alt="${escAttr(p.name || '')}" class="w-full h-full object-cover"></div>
-                <div><p class="text-[9px] text-gray-400 font-bold uppercase">寵物 ${i+1}</p><p class="font-semibold text-gray-900 dark:text-white text-xs">${p.name} <span class="text-gray-400 font-normal ml-0.5">(${p.type || '未填'}${p.breed ? ' · '+p.breed : ''})</span></p></div>
+                <div><p class="text-[9px] text-gray-400 font-bold uppercase">寵物 ${i+1}</p><p class="font-semibold text-gray-900 dark:text-white text-xs">${escAttr(p.name)} <span class="text-gray-400 font-normal ml-0.5">(${escAttr(p.type || '未填')}${p.breed ? ' · '+escAttr(p.breed) : ''})</span></p></div>
             </div>`).join('');
         }
         
         if (data.tags) {
-            document.getElementById('detail-tags').innerHTML = data.tags.map(t => `<span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 dark:bg-pm-fill text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-transparent">${t.name}</span>`).join('');
+            document.getElementById('detail-tags').innerHTML = data.tags.map(t => `<span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 dark:bg-pm-fill text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-transparent">${escAttr(t && t.name)}</span>`).join('');
         }
 
         if (data.clientId) {
@@ -768,20 +791,38 @@
             document.getElementById('detail-client-phone').innerText = c.phone || "無電話";
             
             const igEl = document.getElementById('detail-client-ig');
-            if(c.instagram) { 
-                const cleanIg = c.instagram.replace('@', ''); 
-                igEl.innerHTML = `<a href="https://instagram.com/${cleanIg}" target="_blank" class="text-pm-oak hover:underline flex items-center gap-1 text-xs font-semibold"><i data-lucide="instagram" class="w-3.5 h-3.5"></i> @${cleanIg}</a>`; 
-                igEl.classList.remove('hidden'); 
+            const handle = String(c.instagram || "").replace(/^@/, "").trim();
+            if (/^[A-Za-z0-9._]{1,30}$/.test(handle)) {
+                igEl.replaceChildren();
+                const link = document.createElement("a");
+                link.href = `https://instagram.com/${handle}`;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.className = "text-pm-oak hover:underline flex items-center gap-1 text-xs font-semibold";
+                const igIcon = document.createElement("i");
+                igIcon.setAttribute("data-lucide", "instagram");
+                igIcon.className = "w-3.5 h-3.5";
+                link.append(igIcon, document.createTextNode(` @${handle}`));
+                igEl.append(link);
+                igEl.classList.remove('hidden');
             }
-            if(c.email) { document.getElementById('detail-client-email').innerHTML = `<i data-lucide="mail" class="w-3 h-3 inline mr-1"></i>${c.email}`; document.getElementById('detail-client-email').classList.remove('hidden'); }
-            if(c.address) { document.getElementById('detail-client-address').innerHTML = `<i data-lucide="map-pin" class="w-3 h-3 inline mr-1"></i>${c.address}`; document.getElementById('detail-client-address').classList.remove('hidden'); }
+            if(c.email) {
+                const emailEl = document.getElementById('detail-client-email');
+                emailEl.replaceChildren(document.createTextNode(c.email));
+                emailEl.classList.remove('hidden');
+            }
+            if(c.address) {
+                const addressEl = document.getElementById('detail-client-address');
+                addressEl.replaceChildren(document.createTextNode(c.address));
+                addressEl.classList.remove('hidden');
+            }
           }
         }
 
         showProofTimes("deposit", data.depositSlipUploadedAt, data.depositDate, data.depositReceivedAt);
-        if (data.depositReceiptUrl) { document.getElementById('thumb-deposit').innerHTML = `<img src="${data.depositReceiptUrl}" class="w-full h-full object-cover receipt-thumb" onclick="window.openLightbox('${data.depositReceiptUrl}')">`; }
+        showReceiptThumb("thumb-deposit", data.depositReceiptUrl);
         showProofTimes("balance", data.balanceSlipUploadedAt, data.balanceDate, data.balanceReceivedAt);
-        if (data.balanceReceiptUrl) { document.getElementById('thumb-balance').innerHTML = `<img src="${data.balanceReceiptUrl}" class="w-full h-full object-cover receipt-thumb" onclick="window.openLightbox('${data.balanceReceiptUrl}')">`; }
+        showReceiptThumb("thumb-balance", data.balanceReceiptUrl);
 
         const depositEl = document.getElementById('detail-deposit'); const pStatus = data.paymentStatus || (data.depositPaid ? "deposit" : "unpaid");
         if (pStatus === 'full') { depositEl.innerHTML = `<span class="text-pm-success font-bold text-xs flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> 全數已付</span>`; } 
@@ -821,7 +862,7 @@
       let phone = loadedClientPhone.replace(/\D/g, ''); if (phone.length === 8) phone = "852" + phone;
       const bal = balanceDue(rawData);
       const templateKey = document.getElementById('wa-template-select').value;
-      let msg = (waTemplates[templateKey] || "").replace(/{name}/g, loadedClientName || "").replace(/{pets}/g, loadedPetsString || "").replace(/{date}/g, orderShootDate || "待定").replace(/{location}/g, orderLocation || "待定").replace(/{link}/g, document.getElementById('detail-gallery-url').value.trim() || "[未提供連結]").replace(/{balance}/g, bal || "0");
+      let msg = (waTemplates[templateKey] || "").replace(/{name}/g, loadedClientName || "").replace(/{pets}/g, loadedPetsString || "").replace(/{date}/g, orderShootDate || "待定").replace(/{location}/g, orderLocation || "待定").replace(/{link}/g, safeHttpUrl(document.getElementById('detail-gallery-url').value.trim()) || "[未提供連結]").replace(/{balance}/g, bal || "0");
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
     });
 
@@ -844,9 +885,10 @@
       const includedStudio = includedStudioLimit(receiptPkg);
       const hkd = (n) => `HK$ ${Number(n).toLocaleString()}`;
       const line = (cls, label, amount) => `<tr class="${cls}"><td>${label}</td><td class="num">${amount}</td></tr>`;
+      const packageName = escAttr(rawData.package || "Photography Service");
       const packageLabel = includedStudio > 0
-        ? `<strong>${rawData.package || "Photography Service"}</strong><br><span style="font-size:11px;color:#8a7560;">已包租金 HK$ ${includedStudio.toLocaleString()}</span>`
-        : `<strong>${rawData.package || "Photography Service"}</strong>`;
+        ? `<strong>${packageName}</strong><br><span style="font-size:11px;color:#8a7560;">已包租金 HK$ ${includedStudio.toLocaleString()}</span>`
+        : `<strong>${packageName}</strong>`;
 
       let tableHtml = line('inv-main', packageLabel, hkd(basePrice));
       if(studioTopUp > 0) { tableHtml += line('inv-extra', `+ Extra Studio Fee (額外 Studio 費用)`, hkd(studioTopUp)); }

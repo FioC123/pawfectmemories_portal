@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { renderPetLines } from "./pets-avatars.js";
+import { petPhotoSrc, renderPetLines, safeHttpUrl } from "./pets-avatars.js";
 
 function names(html) {
   return [...html.matchAll(/class="pm-pet-name">([^<]*)</g)].map((match) => match[1]);
@@ -41,6 +41,12 @@ test("a fourth pet stays on an aligned +K row", () => {
   assert.match(html, /class="pm-pet-more"[^>]*>\+1</);
   assert.match(html, /title="Kiki &quot;Kit&quot;"/);
   assert.deepEqual(names(html), ["Mochi", "Luna", "Boba", "Kiki &quot;Kit&quot;"]);
+});
+
+test("photo urls only allow http and https", () => {
+  assert.equal(safeHttpUrl("javascript:alert(1)"), "");
+  assert.equal(safeHttpUrl("https://example.com/a.jpg"), "https://example.com/a.jpg");
+  assert.match(petPhotoSrc({ photoUrl: "javascript:alert(1)" }), /^https:\/\//);
 });
 
 test("a booking with no pets still renders one aligned row", () => {
