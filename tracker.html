@@ -262,6 +262,7 @@
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
     import { db } from "./firebase.js";
     import { isPortalPhoneKey, normalizePhone } from "./phone.js";
+    import { balanceDue, paymentStatus, recordedDeposit } from "./order-money.js";
     import { DEFAULT_PET_PHOTO, DENSE_AVATAR_LIMIT, escAttr, petPhotoSrc, renderPetAvatars } from "./pets-avatars.js"; 
     const stepMap = { "col-new": 1, "col-basic-edit": 2, "col-pick-photos": 3, "col-final-retouch": 4, "col-completed": 5 };
     const statusMap = { "col-new": "新預約", "col-basic-edit": "基本修輯", "col-pick-photos": "揀相", "col-final-retouch": "精修", "col-completed": "已完成" };
@@ -490,10 +491,10 @@
             document.getElementById('gallery-url-text').value = d.galleryUrl;
         }
         
-        const pStat = d.paymentStatus || 'unpaid';
+        const pStat = paymentStatus(d);
         const price = Number(d.price || 0);
-        const dep = d.depositAmount ? Number(d.depositAmount) : Math.floor(price / 2);
-        const bal = price - dep;
+        const dep = recordedDeposit(d);
+        const bal = balanceDue(d);
 
         const fCard = document.getElementById('finance-card');
         const fStat = document.getElementById('res-finance');
@@ -521,19 +522,19 @@
             bTotal.innerText = `HK$ ${price.toLocaleString()}`;
             bLabelSec.innerText = "前期已付訂金 (Deposit)";
             bAmtSec.className = "font-bold text-pm-warning";
-            bAmtSec.innerText = `- HK$ ${(d.depositAmount || dep).toLocaleString()}`;
+            bAmtSec.innerText = `- HK$ ${dep.toLocaleString()}`;
             fBreakdown.classList.remove('hidden');
         } else {
             fCard.classList.add('border-red-500/30');
             fStat.innerHTML = `<span class="flex items-center gap-1 text-red-500 dark:text-red-400"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> 尚未收到前期留檔款項</span>`;
-            fBalLabel.innerText = "需付留檔訂金";
-            fBal.innerText = `HK$ ${dep.toLocaleString()}`; 
+            fBalLabel.innerText = "未付金額";
+            fBal.innerText = `HK$ ${bal.toLocaleString()}`; 
             fBal.className = "text-xl font-serif font-bold leading-none mt-1 text-red-500 dark:text-red-400";
             
             bTotal.innerText = `HK$ ${price.toLocaleString()}`;
-            bLabelSec.innerText = "預計所需訂金 (50%)";
+            bLabelSec.innerText = "未付金額";
             bAmtSec.className = "font-bold text-red-500 dark:text-red-400";
-            bAmtSec.innerText = `HK$ ${dep.toLocaleString()}`;
+            bAmtSec.innerText = `HK$ ${bal.toLocaleString()}`;
             fBreakdown.classList.remove('hidden');
         }
         

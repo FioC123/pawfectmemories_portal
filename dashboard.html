@@ -137,7 +137,7 @@
           </div>
           <div class="flex items-center gap-2 mb-3">
             <div class="w-7 h-7 rounded-full bg-pm-green/10 text-pm-oak flex items-center justify-center"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
-            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">系統總營業額</p>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">已收金額</p>
           </div>
           <p id="total-revenue" class="text-3xl md:text-4xl font-serif font-bold text-gray-900 dark:text-white">載入中...</p>
         </div>
@@ -205,7 +205,8 @@
     import { logoutAdmin, requireAdmin } from "./auth.js";
     import { renderPetAvatars, DENSE_AVATAR_LIMIT, escAttr } from "./pets-avatars.js";
     import { aggregateMonthlyIncome } from "./finance-income.js";
-    import { proofSummary } from "./payment-times.js";
+    import { proofSummary, hkDateOnly } from "./payment-times.js";
+    import { balanceDue, depositWasStored, paymentStatus, recordedDeposit } from "./order-money.js";
 
     window.pmLogout = () => logoutAdmin();
 
@@ -350,7 +351,6 @@
         const clientCache = {};
         clientsSnap.forEach(cDoc => { clientCache[cDoc.id] = cDoc.data(); });
 
-        let totalRev = 0;
         let totalPending = 0;
         let pendingHTML = '';
         const incomeOrders = [];
@@ -374,9 +374,8 @@
           const avatarsHTML = renderPetAvatars(pets, { sizeClass: "w-8 h-8", singleClass: "border border-gray-100 dark:border-pm-dark-border", overlapClass: "-ml-2.5", maxVisible: DENSE_AVATAR_LIMIT });
 
           const price = Number(data.price || 0);
-          const deposit = Number(data.depositAmount || 0);
-          const balance = price - deposit;
-          totalRev += price;
+          const deposit = depositWasStored(data) ? recordedDeposit(data) : 0;
+          const balance = balanceDue(data);
           incomeOrders.push({
             id: orderId,
             clientName,
@@ -398,7 +397,7 @@
           });
 
           let paymentText = "未付款";
-          const pStatus = data.paymentStatus || (data.depositPaid ? "deposit" : "unpaid");
+          const pStatus = paymentStatus(data);
           if (pStatus === 'full') paymentText = "全數已付";
           else if (pStatus === 'deposit') paymentText = "已付訂金";
 
@@ -446,8 +445,8 @@
                 </div>
               </div>
             `;
-          } else if (pStatus === 'unpaid' && price > 0) {
-            totalPending += price;
+          } else if (pStatus === 'unpaid' && balance > 0) {
+            totalPending += balance;
             pendingHTML += `
               <div class="p-5 flex items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-pm-fill/60 transition-colors cursor-pointer group" onclick="window.location.href='detail.html?id=${orderId}'">
                 <div class="flex items-center gap-3 overflow-hidden">
@@ -463,7 +462,7 @@
                 <div class="text-right shrink-0 flex items-center gap-1">
                   <div>
                     <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">總費用</p>
-                    <p class="font-bold text-red-500 dark:text-red-400 text-sm">HK$ ${price.toLocaleString()}</p>
+                    <p class="font-bold text-red-500 dark:text-red-400 text-sm">HK$ ${balance.toLocaleString()}</p>
                   </div>
                   <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300 dark:text-gray-600 transform group-hover:translate-x-0.5 transition-transform"></i>
                 </div>
@@ -472,9 +471,10 @@
           }
         }
 
-        document.getElementById('total-revenue').innerText = `HK$ ${totalRev.toLocaleString()}`;
+        const income = aggregateMonthlyIncome(incomeOrders);
+        document.getElementById('total-revenue').innerText = `HK$ ${income.total.toLocaleString()}`;
         document.getElementById('total-pending').innerText = `HK$ ${totalPending.toLocaleString()}`;
-        renderMonthlyIncome(aggregateMonthlyIncome(incomeOrders));
+        renderMonthlyIncome(income);
         
         const emptyStateHTML = `
           <div class="py-12 flex flex-col items-center justify-center text-center opacity-80">
@@ -527,7 +527,7 @@
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, "2026 Summary");
 
-                const today = new Date().toISOString().split('T')[0];
+                const today = hkDateOnly(new Date());
                 XLSX.writeFile(workbook, `Pawfect_Memories_Export_${today}.xlsx`);
                 
                 showToast("✅ 已成功匯出最新 Excel 財務報表");

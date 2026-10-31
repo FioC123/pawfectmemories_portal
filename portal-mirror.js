@@ -8,7 +8,8 @@ import {
   doc,
   getDoc,
   getDocs,
-  setDoc
+  setDoc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { isPortalPhoneKey, normalizePhone } from "./phone.js";
 
@@ -118,7 +119,15 @@ export async function rebuildPortalIndex(db) {
     getDocs(collection(db, "portalByPhone"))
   ]);
   const clients = {};
-  clientsSnap.forEach((item) => { clients[item.id] = item.data(); });
+  for (const item of clientsSnap.docs) {
+    const data = item.data();
+    const phone = normalizePhone(data.phone || "");
+    if (isPortalPhoneKey(phone) && phone !== (data.phone || "")) {
+      await updateDoc(item.ref, { phone });
+      data.phone = phone;
+    }
+    clients[item.id] = data;
+  }
 
   const buckets = new Map();
   ordersSnap.forEach((item) => {
