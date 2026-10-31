@@ -59,8 +59,8 @@
     .dark .login-input { background-color: var(--elevated) !important; }
     .login-input:focus { background-color: var(--card) !important; border-color: var(--primary) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent) !important; outline: none; }
     .dark .login-input:focus { background-color: var(--card) !important; }
-    input[type="password"] { letter-spacing: 0.5em; font-family: 'Inter', sans-serif; }
-    input[type="password"]::placeholder { letter-spacing: normal; font-family: 'Noto Sans HK', sans-serif; font-weight: 400; font-size: 1rem; }
+    input[type="password"] { font-family: 'Inter', sans-serif; }
+    input[type="password"]::placeholder { font-family: 'Noto Sans HK', sans-serif; font-weight: 400; font-size: 1rem; }
     #err { transition: opacity var(--duration-fast) var(--ease-smooth-out); }
   </style>
   <meta name="theme-color" content="#F6F3EE">
@@ -87,10 +87,11 @@
       
       <div class="space-y-5">
         <div id="input-wrapper">
-          <input type="password" id="pin" placeholder="輸入管理員 PIN 碼" autocomplete="current-password" inputmode="numeric" class="login-input w-full rounded-2xl px-4 py-4 text-center font-bold text-2xl text-gray-900 dark:text-white placeholder:text-gray-400" onkeypress="if(event.key === 'Enter') checkLogin();">
+          <label for="password" class="block text-left text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2">密碼</label>
+          <input type="password" id="password" placeholder="輸入密碼" autocomplete="current-password" class="login-input w-full rounded-2xl px-4 py-4 text-center font-bold text-2xl text-gray-900 dark:text-white placeholder:text-gray-400" onkeypress="if(event.key === 'Enter') checkLogin();">
         </div>
         
-        <button id="btn-login" onclick="checkLogin()" class="pm-btn w-full">
+        <button type="button" id="btn-login" onclick="checkLogin()" class="pm-btn w-full">
           進入系統
         </button>
         <button type="button" onclick="toggleDarkMode()" class="w-full min-h-[44px] text-base font-semibold text-gray-600 dark:text-gray-300">
@@ -98,14 +99,17 @@
         </button>
       </div>
 
-      <p id="err" class="text-sm mt-5 text-red-500 dark:text-red-400 font-semibold flex items-center justify-center gap-1.5 opacity-0">
-        <i data-lucide="alert-circle" class="w-4 h-4"></i> PIN 碼錯誤，請重試
+      <p id="err" role="alert" aria-live="assertive" class="text-sm mt-5 text-red-500 dark:text-red-400 font-semibold flex items-center justify-center gap-1.5 opacity-0">
+        <i data-lucide="alert-circle" class="w-4 h-4"></i> <span id="err-text">密碼不正確，請重試</span>
       </p>
 
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { auth } from "./firebase.js";
+    import { isAdminUser, loginWithPassword } from "./auth.js";
+
     lucide.createIcons();
 
     window.toggleDarkMode = function() {
@@ -117,41 +121,52 @@
       if (meta) meta.content = dark ? '#1A1816' : '#F6F3EE';
     };
 
-    function checkLogin() {
-      const pinInput = document.getElementById('pin');
-      const pin = pinInput.value;
+    auth.authStateReady().then(() => {
+      if (isAdminUser(auth.currentUser)) window.location.replace("index.html");
+    });
+
+    function showLoginError(message) {
+      const errText = document.getElementById('err');
+      const card = document.getElementById('login-card');
+      document.getElementById('err-text').textContent = message;
+      void card.offsetWidth;
+      card.classList.add('is-shaking');
+      errText.classList.remove('opacity-0');
+      errText.classList.add('opacity-100');
+    }
+
+    window.checkLogin = async function() {
+      const passwordInput = document.getElementById('password');
+      const password = passwordInput.value;
       const errText = document.getElementById('err');
       const card = document.getElementById('login-card');
       const loginBtn = document.getElementById('btn-login');
+      if (!password || loginBtn.disabled) return;
 
       card.classList.remove('is-shaking');
       errText.classList.remove('opacity-100');
       errText.classList.add('opacity-0');
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> 載入中...`;
+      lucide.createIcons();
 
-      if (pin === '0124') { 
-        // 寫入授權
-        sessionStorage.setItem('pm_admin_logged', 'true');
-        
-        // 按鈕視覺改變
-        if(loginBtn) {
-            loginBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> 載入中...`;
-            lucide.createIcons();
-            loginBtn.classList.add('opacity-80', 'cursor-not-allowed');
-        }
-        
-        // 強制跳轉 (用 replace 避免禁 Back 掣返轉頭)
-        setTimeout(() => {
-            window.location.replace('index.html'); 
-        }, 400); 
-      } else {
-        pinInput.value = ''; 
-        pinInput.focus();
-        void card.offsetWidth; 
-        card.classList.add('is-shaking');
-        errText.classList.remove('opacity-0');
-        errText.classList.add('opacity-100');
+      try {
+        await loginWithPassword(password);
+        window.location.replace('index.html');
+      } catch (error) {
+        passwordInput.value = '';
+        passwordInput.focus();
+        loginBtn.disabled = false;
+        loginBtn.textContent = '進入系統';
+        const code = error && error.code;
+        const message = code === 'auth/too-many-requests'
+          ? '嘗試次數太多，請稍後再試'
+          : code === 'auth/network-request-failed'
+            ? '網絡連線失敗，請再試'
+            : '密碼不正確，或管理員帳戶尚未建立';
+        showLoginError(message);
       }
-    }
+    };
   </script>
 </body>
 </html>

@@ -2,7 +2,6 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <script>if(!sessionStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
   <script>
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -127,6 +126,10 @@
         <i data-lucide="moon" class="w-5 h-5 shrink-0 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 shrink-0 hidden dark:block"></i>
         <span class="ml-4 whitespace-nowrap">主題切換 (Theme)</span>
       </button>
+      <button type="button" onclick="pmLogout()" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50 dark:hover:bg-pm-fill hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden">
+        <i data-lucide="log-out" class="w-5 h-5 shrink-0"></i>
+        <span class="ml-4 whitespace-nowrap">登出 (Log out)</span>
+      </button>
     </div>
   </aside>
 
@@ -135,6 +138,9 @@
     <header class="pm-pagehead shrink-0">
       <div class="pm-pagehead-row">
         <h1>系統設定</h1>
+        <button type="button" class="pm-iconbtn md:hidden" onclick="pmLogout()" aria-label="登出">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
         <button type="button" class="pm-iconbtn md:hidden" onclick="toggleDarkMode()" aria-label="切換主題">
           <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
           <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
@@ -145,6 +151,22 @@
     <main class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 space-y-10 bg-pm-cream dark:bg-pm-dark-bg">
       <div class="max-w-3xl mx-auto space-y-10 pb-24">
         
+        <section class="space-y-4">
+          <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/50 dark:border-white/5 overflow-hidden transition-colors">
+            <div class="px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h3 class="font-serif font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
+                  <i data-lucide="search" class="w-4 h-4 text-pm-oak"></i> 客人查詢索引
+                </h3>
+                <p class="text-[11px] leading-relaxed text-gray-500 dark:text-gray-400 mt-1">客人頁只可以按電話讀取自己嘅進度。儲存預約時會更新；舊單要撳一次重建。</p>
+              </div>
+              <button type="button" id="btn-rebuild-portal" class="bg-pm-green dark:bg-pm-oak text-pm-on py-2 px-4 rounded-lg text-xs font-bold shadow-sm hover:opacity-90 shrink-0">
+                <span id="text-rebuild-portal">重建客人查詢索引</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
         <section class="space-y-4">
           <div class="bg-white dark:bg-pm-dark-surface rounded-[24px] shadow-taste dark:shadow-taste-dark border border-gray-200/50 dark:border-white/5 overflow-hidden transition-colors">
             <div class="px-6 py-5 border-b border-gray-100 dark:border-pm-dark-border flex items-center justify-between bg-gray-50/50 dark:bg-pm-fill/40">
@@ -219,12 +241,12 @@
   </nav>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { db } from "./firebase.js";
+    import { logoutAdmin, requireAdmin } from "./auth.js";
+    import { rebuildPortalIndex } from "./portal-mirror.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    window.pmLogout = () => logoutAdmin();
 
     lucide.createIcons();
 
@@ -404,7 +426,25 @@
         }
     };
 
-    loadSettings();
+    document.getElementById('btn-rebuild-portal').onclick = async () => {
+      const btn = document.getElementById('btn-rebuild-portal');
+      const label = document.getElementById('text-rebuild-portal');
+      btn.disabled = true;
+      label.textContent = "重建中...";
+      try {
+        const count = await rebuildPortalIndex(db);
+        showToast(`客人查詢索引已更新（${count} 個電話）`);
+      } catch (error) {
+        console.error(error);
+        showToast("重建客人查詢索引失敗", "error");
+      } finally {
+        btn.disabled = false;
+        label.textContent = "重建客人查詢索引";
+      }
+    };
+
+    const adminUser = await requireAdmin();
+    if (adminUser) loadSettings();
   </script>
 </body>
 </html>

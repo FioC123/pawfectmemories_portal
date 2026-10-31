@@ -2,7 +2,6 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <script>if(!sessionStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
   <script>
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -107,6 +106,10 @@
         <i data-lucide="moon" class="w-5 h-5 shrink-0 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 shrink-0 hidden dark:block"></i>
         <span class="ml-4 whitespace-nowrap">主題切換 (Theme)</span>
       </button>
+      <button type="button" onclick="pmLogout()" class="flex items-center px-3.5 py-3 rounded-xl text-gray-400 hover:bg-gray-50 dark:hover:bg-pm-fill hover:text-gray-900 dark:text-gray-400 dark:hover:text-white pm-named w-full overflow-hidden">
+        <i data-lucide="log-out" class="w-5 h-5 shrink-0"></i>
+        <span class="ml-4 whitespace-nowrap">登出 (Log out)</span>
+      </button>
     </div>
   </aside>
 
@@ -115,6 +118,9 @@
     <header class="pm-pagehead shrink-0">
       <div class="pm-pagehead-row">
         <h1>財務中心</h1>
+        <button type="button" class="pm-iconbtn md:hidden" onclick="pmLogout()" aria-label="登出">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
         <button type="button" class="pm-iconbtn md:hidden" onclick="toggleDarkMode()" aria-label="切換主題">
           <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
           <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
@@ -194,15 +200,14 @@
   </nav>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { db } from "./firebase.js";
+    import { logoutAdmin, requireAdmin } from "./auth.js";
     import { renderPetAvatars, DENSE_AVATAR_LIMIT, escAttr } from "./pets-avatars.js";
     import { aggregateMonthlyIncome } from "./finance-income.js";
     import { proofSummary } from "./payment-times.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    window.pmLogout = () => logoutAdmin();
 
     lucide.createIcons();
     function updateIcons() { lucide.createIcons(); }
@@ -499,7 +504,8 @@
       }
     }
 
-    loadDashboard();
+    const adminUser = await requireAdmin();
+    if (adminUser) loadDashboard();
 
     // Excel 匯出邏輯 (附帶自動 Micro-Interaction 按鈕回饋)
     document.getElementById('btn-export-excel').addEventListener('click', () => {
