@@ -22,7 +22,7 @@
 firebase deploy --only firestore:rules,storage:rules --project pawfect-memories-2c8a0
 ```
 
-`firebase.json` 冇 hosting。唔好跑冇 `--only` 嘅 `firebase deploy`。
+`firebase.json` 的 Storage 用陣列，並寫明 bucket `pawfect-memories-2c8a0.firebasestorage.app`，規則檔係 `storage.rules`。唔好改回只有 `"rules"` 的物件格式，否則 CLI 會搵一個叫 `rules` 的 target 而失敗。呢個檔冇 hosting。唔好跑冇 `--only` 嘅 `firebase deploy`。
 
 部署之後：
 

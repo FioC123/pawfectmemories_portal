@@ -2,7 +2,10 @@
   "firestore": {
     "rules": "firestore.rules"
   },
-  "storage": {
-    "rules": "storage.rules"
-  }
+  "storage": [
+    {
+      "bucket": "pawfect-memories-2c8a0.firebasestorage.app",
+      "rules": "storage.rules"
+    }
+  ]
 }
