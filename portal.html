@@ -129,13 +129,10 @@
   </main>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { db } from "./firebase.js";
+    import { isPortalPhoneKey, normalizePhone } from "./phone.js";
     import { renderPetAvatars } from "./pets-avatars.js";
-
-    const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
 
     lucide.createIcons();
 
@@ -177,8 +174,8 @@
     submitBtn.addEventListener('click', async () => {
       debugMsg.classList.add('hidden');
       
-      const phoneVal = phoneInput.value.replace(/[\s-]/g, '');
-      if(!phoneVal) { showError("請輸入電話號碼"); return; }
+      const phoneVal = normalizePhone(phoneInput.value);
+      if(!isPortalPhoneKey(phoneVal)) { showError("請輸入電話號碼"); return; }
       
       submitBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> 搜尋中...`;
       submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
@@ -186,24 +183,18 @@
       lucide.createIcons();
 
       try {
-        const qClient = query(collection(db, "Clients"), where("phone", "==", phoneVal));
-        const clientSnap = await getDocs(qClient);
+        const portalSnap = await getDoc(doc(db, "portalByPhone", phoneVal));
 
-        if (clientSnap.empty) {
+        if (!portalSnap.exists()) {
           showError(`找不到號碼 "${phoneVal}"。請確認是否輸入正確，或聯絡攝影師。`);
           return;
         }
 
         sessionStorage.setItem('client_phone', phoneVal);
 
-        let orders = [];
-        let clientName = clientSnap.docs[0].data().name;
-
-        for (let cDoc of clientSnap.docs) {
-            const qOrders = query(collection(db, "Orders"), where("clientId", "==", cDoc.id));
-            const oSnap = await getDocs(qOrders);
-            oSnap.forEach(doc => { orders.push({ id: doc.id, ...doc.data() }); });
-        }
+        const portalData = portalSnap.data();
+        let clientName = portalData.clientName || "";
+        let orders = Object.values(portalData.orders || {});
 
         if (orders.length === 0) {
           showError("找到您的檔案，但目前沒有任何預約單紀錄。");
@@ -244,7 +235,7 @@
                 });
                 
                 return `
-                <div class="bg-white dark:bg-pm-dark-surface p-6 rounded-[20px] border border-gray-200/60 dark:border-white/5 hover:border-pm-oak/40 dark:hover:border-pm-oak/40 hover:shadow-taste dark:hover:shadow-taste-dark pm-named cursor-pointer relative overflow-hidden group" onclick="window.location.href='tracker.html?id=${order.id}'">
+                <div class="bg-white dark:bg-pm-dark-surface p-6 rounded-[20px] border border-gray-200/60 dark:border-white/5 hover:border-pm-oak/40 dark:hover:border-pm-oak/40 hover:shadow-taste dark:hover:shadow-taste-dark pm-named cursor-pointer relative overflow-hidden group" onclick="window.location.href='tracker.html?phone=${encodeURIComponent(phoneVal)}&id=${encodeURIComponent(order.id)}'">
                   
                   <div class="absolute right-5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gray-50 dark:bg-pm-fill flex items-center justify-center text-gray-400 group-hover:bg-pm-oak group-hover:text-pm-on pm-named transform group-hover:translate-x-1">
                     <i data-lucide="chevron-right" class="w-4 h-4"></i>

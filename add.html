@@ -2,7 +2,6 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <script>if(!sessionStorage.getItem('pm_admin_logged') && !localStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
   <script>
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -133,6 +132,10 @@
         <i data-lucide="moon" class="w-5 h-5 shrink-0 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 shrink-0 hidden dark:block"></i>
         <span class="ml-4 whitespace-nowrap font-medium">主題切換 (Theme)</span>
       </button>
+      <button type="button" onclick="pmLogout()" class="flex items-center px-3 py-3 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-pm-fill hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors w-full overflow-hidden">
+        <i data-lucide="log-out" class="w-5 h-5 shrink-0"></i>
+        <span class="ml-4 whitespace-nowrap font-medium">登出 (Log out)</span>
+      </button>
     </div>
   </aside>
 
@@ -142,6 +145,9 @@
       <div class="pm-pagehead-row">
         <button type="button" onclick="window.location.href='index.html';" class="pm-iconbtn" aria-label="返回工作區"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
         <h1 id="page-title" class="flex-1">建立全新預約檔案</h1>
+        <button type="button" class="pm-iconbtn md:hidden" onclick="pmLogout()" aria-label="登出">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
         <button type="button" class="pm-iconbtn md:hidden" onclick="toggleDarkMode()" aria-label="切換主題">
           <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
           <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
@@ -356,17 +362,16 @@
   <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+    import { doc, getDoc, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+    import { db, storage } from "./firebase.js";
+    import { logoutAdmin, requireAdmin } from "./auth.js";
     import { DEFAULT_PET_PHOTO, escAttr, petPreviewSrc } from "./pets-avatars.js";
     import { applySlipUpload, formatPaymentStamp, hkDateTimeLocalValue, hkWallToIso } from "./payment-times.js";
     import { extraStudioFromOrder, includedStudioLimit, packageOptionLabel, quoteBooking } from "./booking-finance.js";
+    import { movePortalOrder } from "./portal-mirror.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+    window.pmLogout = () => logoutAdmin();
 
     lucide.createIcons();
 
@@ -407,6 +412,8 @@
     let currentPets = [];
     let selectedTags = [];
     let originalClientId = "";
+    let originalPhone = "";
+    let loadedOrder = null;
     let suppressFinance = false;
 
     function selectedPackage() {
@@ -505,6 +512,7 @@
         if (snapOrder && snapOrder.exists()) {
           document.getElementById('page-title').innerText = "編輯預約檔案資料";
           const o = snapOrder.data();
+          loadedOrder = o;
           
           selectedTags = o.tags || [];
           
@@ -555,6 +563,7 @@
               document.getElementById('clientIg').value = cData.instagram || "";
               document.getElementById('clientEmail').value = cData.email || "";
               document.getElementById('clientAddress').value = cData.address || "";
+              originalPhone = cData.phone || "";
             }
           }
 
@@ -791,12 +800,33 @@
 
         if (!editId) { orderPayload.status = "col-new"; }
 
+        let savedId = editId;
         if (editId) {
           await updateDoc(doc(db, "Orders", editId), orderPayload);
           showToast("預約檔案更新成功");
         } else {
-          await addDoc(collection(db, "Orders"), orderPayload);
+          const created = await addDoc(collection(db, "Orders"), orderPayload);
+          savedId = created.id;
           showToast("全新預約檔案已成功建立");
+        }
+
+        try {
+          const mirrored = {
+            ...(loadedOrder || {}),
+            ...orderPayload,
+            status: (orderPayload.status || (loadedOrder && loadedOrder.status) || "col-new"),
+            galleryUrl: (loadedOrder && loadedOrder.galleryUrl) || ""
+          };
+          await movePortalOrder(db, {
+            fromPhone: originalPhone,
+            toPhone: phone,
+            clientName: name,
+            orderId: savedId,
+            order: mirrored
+          });
+        } catch (mirrorError) {
+          console.error(mirrorError);
+          showToast("預約已儲存，客人查詢索引未更新", "error");
         }
 
         setTimeout(() => { window.location.href = 'index.html'; }, 1000);
@@ -811,7 +841,8 @@
 
     document.getElementById('btn-submit-main').onclick = submitData;
 
-    initPage();
+    const adminUser = await requireAdmin();
+    if (adminUser) initPage();
   </script>
 </body>
 </html>

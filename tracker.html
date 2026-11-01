@@ -259,19 +259,18 @@
   <div id="toast-container" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    import { DEFAULT_PET_PHOTO, DENSE_AVATAR_LIMIT, escAttr, petPhotoSrc, renderPetAvatars } from "./pets-avatars.js";
-    
-    const app = initializeApp({ apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" });
-    const db = getFirestore(app); 
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { db } from "./firebase.js";
+    import { isPortalPhoneKey, normalizePhone } from "./phone.js";
+    import { DEFAULT_PET_PHOTO, DENSE_AVATAR_LIMIT, escAttr, petPhotoSrc, renderPetAvatars } from "./pets-avatars.js"; 
     const stepMap = { "col-new": 1, "col-basic-edit": 2, "col-pick-photos": 3, "col-final-retouch": 4, "col-completed": 5 };
     const statusMap = { "col-new": "新預約", "col-basic-edit": "基本修輯", "col-pick-photos": "揀相", "col-final-retouch": "精修", "col-completed": "已完成" };
 
     lucide.createIcons();
 
-    let multipleFoundOrders = []; 
-    let currentClientName = "客戶"; 
+    let multipleFoundOrders = [];
+    let currentClientName = "客戶";
+    let currentPortal = null; 
 
     window.showToast = function(msg, type='success') {
       const container = document.getElementById('toast-container');
@@ -301,12 +300,10 @@
     const targetOrderId = urlParams.get('id');
     const targetPhone = urlParams.get('phone'); 
 
-    if (!targetOrderId && !targetPhone) { 
+    if (targetPhone) {
+        findOrdersByPhone(targetPhone, targetOrderId);
+    } else {
         document.getElementById('login-box').classList.remove('hidden');
-    } else if (targetOrderId) { 
-        loadOrderData(targetOrderId); 
-    } else if (targetPhone) { 
-        findOrdersByPhone(targetPhone); 
     }
 
     window.handleHeaderBack = () => {
@@ -320,43 +317,31 @@
     };
 
     document.getElementById('btn-track').onclick = () => {
-      const phone = document.getElementById('phone').value.trim(); 
-      if(phone.length < 8) return showToast("請輸入正確嘅 8 位數字號碼", "error");
+      const phone = normalizePhone(document.getElementById('phone').value);
+      if(!isPortalPhoneKey(phone)) return showToast("請輸入正確嘅 8 位數字號碼", "error");
       
       const btnText = document.getElementById('btn-track-text');
       btnText.innerText = "正在安全配對中...";
-      findOrdersByPhone(phone);
+      findOrdersByPhone(phone, targetOrderId);
     };
 
-    async function findOrdersByPhone(phoneNum) {
+    async function findOrdersByPhone(phoneNum, preferId) {
       try {
-        const [ordersSnap, clientsSnap] = await Promise.all([
-          getDocs(collection(db, "Orders")),
-          getDocs(collection(db, "Clients"))
-        ]);
-
-        const matchedClientIds = [];
-        clientsSnap.forEach(cDoc => {
-          const cData = cDoc.data();
-          if (cData.phone && cData.phone.trim() === phoneNum.trim()) {
-            matchedClientIds.push(cDoc.id);
-            if(cData.name) currentClientName = cData.name; 
-          }
-        });
-
-        if (matchedClientIds.length === 0) {
+        const phoneKey = normalizePhone(phoneNum);
+        if (!isPortalPhoneKey(phoneKey)) {
+          showToast("請輸入正確嘅 8 位數字號碼", "error");
+          resetButton();
+          return;
+        }
+        const portalSnap = await getDoc(doc(db, "portalByPhone", phoneKey));
+        if (!portalSnap.exists()) {
           showToast("找不到對應登記電話的預約紀錄！", "error");
           resetButton();
           return;
         }
-
-        multipleFoundOrders = [];
-        ordersSnap.forEach(oDoc => {
-          const oData = oDoc.data();
-          if (matchedClientIds.includes(oData.clientId)) {
-              multipleFoundOrders.push({ id: oDoc.id, ...oData });
-          }
-        });
+        currentPortal = portalSnap.data();
+        if (currentPortal.clientName) currentClientName = currentPortal.clientName;
+        multipleFoundOrders = Object.values(currentPortal.orders || {});
 
         if (multipleFoundOrders.length === 0) {
           showToast("該電話已登記，但目前無任何關聯訂單！", "error");
@@ -367,7 +352,9 @@
         document.getElementById('login-box').classList.add('hidden');
         resetButton();
 
-        if (multipleFoundOrders.length === 1) {
+        if (preferId && currentPortal.orders && currentPortal.orders[preferId]) {
+            loadOrderData(preferId);
+        } else if (multipleFoundOrders.length === 1) {
             loadOrderData(multipleFoundOrders[0].id);
         } else {
             renderMultiOrdersSelection();
@@ -421,14 +408,12 @@
 
     async function loadOrderData(orderId) {
       try {
-        const snap = await getDoc(doc(db, "Orders", orderId));
-        if(!snap.exists()) { 
+        const d = currentPortal && currentPortal.orders ? currentPortal.orders[orderId] : null;
+        if(!d) { 
             showToast("找不到對應的預約檔案項目！", "error"); 
             setTimeout(() => window.location.href = 'tracker.html', 1500); 
             return; 
         }
-        
-        const d = snap.data();
         let pets = d.pets || [];
         if (pets.length === 0 && d.petName) { pets = [{ name: d.petName, breed: d.petBreed || '', photoUrl: d.photoUrl }]; }
         

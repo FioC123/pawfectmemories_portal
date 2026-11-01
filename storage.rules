@@ -1,0 +1,32 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == "admin@pawfect-portal.invalid"
+        && request.auth.token.firebase.sign_in_provider == "password";
+    }
+
+    function isStaffImage() {
+      return isAdmin()
+        && request.resource.size < 8 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    match /receipts/{fileName} {
+      allow read: if isAdmin();
+      allow create, update: if isStaffImage();
+      allow delete: if isAdmin();
+    }
+
+    match /avatars/{fileName} {
+      allow read: if isAdmin();
+      allow create, update: if isStaffImage();
+      allow delete: if isAdmin();
+    }
+  }
+}

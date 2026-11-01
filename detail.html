@@ -2,7 +2,6 @@
 <html lang="zh-Hant" class="light">
 <head>
   <meta charset="utf-8">
-  <script>if(!sessionStorage.getItem('pm_admin_logged')){window.location.href='login.html';}</script>
   <script>
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
@@ -269,6 +268,10 @@
         <i data-lucide="moon" class="w-5 h-5 shrink-0 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 shrink-0 hidden dark:block"></i>
         <span class="ml-4 whitespace-nowrap font-medium">切換主題 (Theme)</span>
       </button>
+      <button type="button" onclick="pmLogout()" class="flex items-center px-3 py-3 rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-pm-fill hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors w-full overflow-hidden">
+        <i data-lucide="log-out" class="w-5 h-5 shrink-0"></i>
+        <span class="ml-4 whitespace-nowrap font-medium">登出 (Log out)</span>
+      </button>
     </div>
   </aside>
 
@@ -283,6 +286,9 @@
       <div class="pm-pagehead-row">
         <button type="button" onclick="window.location.href='index.html';" class="pm-iconbtn" aria-label="返回工作區"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
         <h1 class="flex-1">預約詳情 <span id="detail-id" class="text-gray-400 font-sans font-normal">#------</span></h1>
+        <button type="button" class="pm-iconbtn md:hidden" onclick="pmLogout()" aria-label="登出">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
         <button type="button" class="pm-iconbtn md:hidden" onclick="toggleDarkMode()" aria-label="切換主題">
           <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
           <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
@@ -584,15 +590,15 @@
   <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { db } from "./firebase.js";
+    import { logoutAdmin, requireAdmin } from "./auth.js";
     import { escAttr, petPhotoSrc } from "./pets-avatars.js";
     import { formatPaymentStamp } from "./payment-times.js";
     import { includedStudioLimit, studioTopUpForReceipt } from "./booking-finance.js";
+    import { patchPortalOrder, removePortalOrder } from "./portal-mirror.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyBhFUkCP0WslzdB2WY93hp6L-Z5g8vo40E", authDomain: "pawfect-memories-2c8a0.firebaseapp.com", projectId: "pawfect-memories-2c8a0", storageBucket: "pawfect-memories-2c8a0.firebasestorage.app", messagingSenderId: "860879002502", appId: "1:860879002502:web:eeaa936317b1fefc33aa07" };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    window.pmLogout = () => logoutAdmin();
 
     lucide.createIcons();
     function updateIcons() { lucide.createIcons(); }
@@ -779,12 +785,14 @@
       } catch (err) { console.error(err); }
     }
 
-    fetchTemplates(); loadDetailData();
+    const adminUser = await requireAdmin();
+    if (adminUser) { fetchTemplates(); loadDetailData(); }
 
     document.getElementById('body-status-select').addEventListener('change', async (e) => {
       if(!orderId) return;
       try { 
-          await updateDoc(doc(db, "Orders", orderId), { status: e.target.value }); 
+          await updateDoc(doc(db, "Orders", orderId), { status: e.target.value });
+          await patchPortalOrder(db, loadedClientPhone, orderId, { status: e.target.value }); 
           const msg = document.getElementById('status-msg'); msg.classList.remove('opacity-0'); setTimeout(() => msg.classList.add('opacity-0'), 2000); 
       } catch (err) { showToast("進度更新失敗", "error"); }
     });
@@ -792,7 +800,9 @@
     document.getElementById('detail-gallery-url').addEventListener('change', async (e) => {
       if(!orderId) return;
       try { 
-          await updateDoc(doc(db, "Orders", orderId), { galleryUrl: e.target.value.trim() }); 
+          const galleryUrl = e.target.value.trim();
+          await updateDoc(doc(db, "Orders", orderId), { galleryUrl });
+          await patchPortalOrder(db, loadedClientPhone, orderId, { galleryUrl }); 
           const msg = document.getElementById('link-save-msg'); msg.classList.remove('opacity-0'); setTimeout(() => msg.classList.add('opacity-0'), 2000); 
       } catch(err) { showToast("連結儲存失敗", "error"); }
     });
@@ -862,7 +872,11 @@
       setTimeout(() => delModal.classList.add('hidden'), 180);
     });
     document.getElementById('modal-confirm-btn').addEventListener('click', async () => {
-      try { await deleteDoc(doc(db, "Orders", orderId)); window.location.href = 'index.html'; } catch(e) { showToast("刪除預約單失敗", "error"); }
+      try {
+        await deleteDoc(doc(db, "Orders", orderId));
+        await removePortalOrder(db, loadedClientPhone, orderId);
+        window.location.href = 'index.html';
+      } catch(e) { showToast("刪除預約單失敗", "error"); }
     });
   </script>
 </body>
