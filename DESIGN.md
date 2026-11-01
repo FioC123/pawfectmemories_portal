@@ -23,14 +23,14 @@ Tokens live on `:root` and `html.dark` in `pm.css`. Tailwind colors (`pm-oak`, `
 | `--elevated` | `#FFFCF8` | `#2C2926` | raised inputs, search |
 | `--ink` | `#2C2825` | `#F3EEE7` | primary text |
 | `--ink-secondary` | `#6B645C` | `#B5ADA3` | secondary text, idle nav |
-| `--ink-muted` | `#9A9288` | `#7A736B` | hints, placeholders |
+| `--ink-muted` | `#736E66` | `#7A736B` | hints, placeholders |
 | `--line` | `#E5DFD6` | `#3A3530` | borders, dividers |
 | `--fill` | `#EDE7DE` | `#3A3530` | muted fills, active nav well |
 | `--primary` | `#8F735A` | `#C4A484` | CTA, active nav, key highlight |
 | `--primary-hover` | `#7A614C` | `#D4B896` | CTA hover |
 | `--on-primary` | `#FFFCF8` | `#1A1816` | label on a primary button |
 | `--success` | `#6B8F71` | `#8FAF94` | paid, saved, delivered |
-| `--warning` | `#C4A35A` | `#D4B86A` | deposit still owing |
+| `--warning` | `#C4A35A` | `#D4B86A` | deposit still owing. Text uses `#816C3B` in light mode so it stays readable; the swatch itself stays gold. |
 | `--danger` | `#B56B5C` | `#D4897A` | unpaid, destructive |
 | `--info` | `#7A8B9A` | `#9AABBA` | new booking |
 | `--focus` | `--primary` | `--primary` | `:focus-visible` ring |

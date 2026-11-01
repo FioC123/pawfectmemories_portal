@@ -10,18 +10,30 @@ export function escAttr(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
 
+export function safeHttpUrl(value) {
+  const url = String(value ?? "").trim();
+  if (!/^https?:\/\//i.test(url)) return "";
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return "";
+    return url;
+  } catch {
+    return "";
+  }
+}
+
 export function petPhotoSrc(pet) {
   const url = pet && typeof pet.photoUrl === "string" ? pet.photoUrl.trim() : "";
-  return url || DEFAULT_PET_PHOTO;
+  return safeHttpUrl(url) || DEFAULT_PET_PHOTO;
 }
 
 export function petPreviewSrc(url) {
-  const clean = typeof url === "string" ? url.trim() : "";
-  return clean || DEFAULT_PET_PHOTO;
+  return safeHttpUrl(url) || DEFAULT_PET_PHOTO;
 }
 
 // maxVisible omitted or 0 shows every pet. A positive cap adds a +K badge after the first faces.
