@@ -597,6 +597,9 @@
     import { formatPaymentStamp } from "./payment-times.js";
     import { includedStudioLimit, studioTopUpForReceipt } from "./booking-finance.js";
     import { patchPortalOrder, removePortalOrder } from "./portal-mirror.js";
+    import { isPortalPhoneKey, normalizePhone } from "./phone.js";
+    import { balanceDue } from "./order-money.js";
+    import { resolveWhatsAppTemplates } from "./whatsapp-templates.js";
 
     window.pmLogout = () => logoutAdmin();
 
@@ -644,18 +647,24 @@
     };
 
     window.copyTrackerLink = () => {
+      const phone = normalizePhone(loadedClientPhone);
+      if (!orderId || !isPortalPhoneKey(phone)) {
+        showToast("未有電話，未能複製呢張單嘅連結", "error");
+        return;
+      }
       const baseUrl = window.location.href.split('?')[0];
       const dirUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/'));
-      const portalUrl = dirUrl + "/portal.html";
-      navigator.clipboard.writeText(portalUrl).then(() => { showToast("已複製客戶查詢連結"); }).catch(() => { showToast("複製連結失敗", "error"); });
+      const trackerUrl = `${dirUrl}/tracker.html?phone=${encodeURIComponent(phone)}&id=${encodeURIComponent(orderId)}`;
+      navigator.clipboard.writeText(trackerUrl).then(() => { showToast("已複製呢張單嘅進度連結"); }).catch(() => { showToast("複製連結失敗", "error"); });
     };
 
     async function fetchTemplates() {
       try { 
-          const snap = await getDoc(doc(db, "Settings", "whatsapp_templates")); 
-          if (snap.exists()) waTemplates = snap.data(); 
-          else waTemplates = { reminder: "哈囉 {name}！聽日見！", balance: "哈囉 {name}！尾數 HK$ {balance} 未收。" }; 
-      } catch (err) {}
+          const snap = await getDoc(doc(db, "Settings", "whatsapp_templates"));
+          waTemplates = resolveWhatsAppTemplates(snap.exists() ? snap.data() : null);
+      } catch (err) {
+          waTemplates = resolveWhatsAppTemplates(null);
+      }
     }
 
     function showProofTimes(prefix, slipUploadedAt, legacyDate, receivedAt) {
@@ -810,7 +819,7 @@
     document.getElementById('btn-whatsapp').addEventListener('click', () => {
       if(!loadedClientPhone) return alert("此客戶沒有提供電話號碼！");
       let phone = loadedClientPhone.replace(/\D/g, ''); if (phone.length === 8) phone = "852" + phone;
-      const bal = Number(rawData.price || 0) - Number(rawData.depositAmount || 0);
+      const bal = balanceDue(rawData);
       const templateKey = document.getElementById('wa-template-select').value;
       let msg = (waTemplates[templateKey] || "").replace(/{name}/g, loadedClientName || "").replace(/{pets}/g, loadedPetsString || "").replace(/{date}/g, orderShootDate || "待定").replace(/{location}/g, orderLocation || "待定").replace(/{link}/g, document.getElementById('detail-gallery-url').value.trim() || "[未提供連結]").replace(/{balance}/g, bal || "0");
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -825,7 +834,7 @@
       const shootBits = [orderShootDate, rawData.shootTime, orderLocation].filter(Boolean);
       document.getElementById('pdf-shoot').innerText = shootBits.join(' · ');
       document.getElementById('pdf-invoice-id').innerText = orderId;
-      document.getElementById('pdf-invoice-date').innerText = new Date().toLocaleDateString('zh-HK', { year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('pdf-invoice-date').innerText = new Date().toLocaleDateString('zh-HK', { timeZone: 'Asia/Hong_Kong', year: 'numeric', month: 'long', day: 'numeric' });
 
       const grandTotal = Number(rawData.price || 0); const dep = Number(rawData.depositAmount || 0);
       const extraPaxCost = Number(rawData.extraPaxCount || 0) * 300; const manualOtherFee = Number(rawData.manualOtherFee || 0);
@@ -854,6 +863,9 @@
       setTimeout(() => {
         html2pdf().set({ margin: 0, filename: `Invoice_${orderId}.pdf`, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(element).save().then(() => {
           btn.innerHTML = originalHTML; btn.classList.remove('opacity-70', 'cursor-not-allowed'); updateIcons();
+        }).catch(() => {
+          btn.innerHTML = originalHTML; btn.classList.remove('opacity-70', 'cursor-not-allowed'); updateIcons();
+          showToast("產生發票失敗", "error");
         });
       }, 500);
     });

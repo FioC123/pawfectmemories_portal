@@ -212,6 +212,8 @@
     import { db } from "./firebase.js";
     import { logoutAdmin, requireAdmin } from "./auth.js";
     import { renderPetAvatars, renderPetLines, escAttr, petPhotoSrc, DENSE_AVATAR_LIMIT } from "./pets-avatars.js";
+    import { balanceDue, paymentStatus } from "./order-money.js";
+    import { patchPortalOrder } from "./portal-mirror.js";
 
     window.pmLogout = () => logoutAdmin();
 
@@ -272,10 +274,11 @@
       document.getElementById('drawer-btn-edit').onclick = () => window.location.href = `add.html?editId=${orderId}`;
       document.getElementById('drawer-btn-detail').onclick = () => window.location.href = `detail.html?id=${orderId}`;
 
-      const bal = data.price - (data.depositAmount || Math.floor(data.price/2));
-      const payBadge = data.paymentStatus === 'full' 
+      const bal = balanceDue(data);
+      const payState = paymentStatus(data);
+      const payBadge = payState === 'full' 
         ? `<span class="bg-pm-success/10 text-pm-success px-2 py-0.5 rounded-md text-[10px] font-bold">全數已付</span>`
-        : (data.paymentStatus === 'deposit' ? `<span class="bg-pm-warning/10 text-pm-warning px-2 py-0.5 rounded-md text-[10px] font-bold">欠 HK$${bal.toLocaleString()}</span>` : `<span class="bg-red-50 text-red-500 px-2 py-0.5 rounded-md text-[10px] font-bold">未付款</span>`);
+        : (payState === 'deposit' ? `<span class="bg-pm-warning/10 text-pm-warning px-2 py-0.5 rounded-md text-[10px] font-bold">欠 HK$${bal.toLocaleString()}</span>` : `<span class="bg-red-50 text-red-500 px-2 py-0.5 rounded-md text-[10px] font-bold">未付款</span>`);
 
       document.getElementById('drawer-content').innerHTML = `
         <div class="flex items-center gap-4 mb-2">
@@ -319,7 +322,54 @@
     };
 
     // [SKILL: Code Review & Superpowers] TDD defensive parallel asynchronous strategy
+    function applyWorkspaceSearch() {
+      const input = document.getElementById('global-search');
+      const term = (input.value || "").toLowerCase();
+      document.querySelectorAll(".kanban-card, tr[data-search]").forEach((el) => {
+        const hay = el.getAttribute("data-search") || "";
+        el.style.display = hay.includes(term) ? "" : "none";
+      });
+    }
+
+    const searchInput = document.getElementById("global-search");
+    if (searchInput && searchInput.dataset.bound !== "1") {
+      searchInput.dataset.bound = "1";
+      searchInput.addEventListener("input", applyWorkspaceSearch);
+    }
+
+    let kanbanBound = false;
+    function bindKanban() {
+      if (kanbanBound) return;
+      const columns = ["col-new", "col-basic-edit", "col-pick-photos", "col-final-retouch", "col-completed"];
+      if (!columns.every((id) => document.getElementById(id))) return;
+      kanbanBound = true;
+      columns.forEach((colId) => {
+        const el = document.getElementById(colId);
+        new Sortable(el, {
+          group: "kanban", animation: 220, dragClass: "sortable-drag", delay: window.innerWidth < 768 ? 200 : 0, delayOnTouchOnly: true,
+          onEnd: async function(evt) {
+            const itemEl = evt.item;
+            const targetColId = evt.to.id;
+            const orderId = itemEl.getAttribute("data-order-id");
+            if (orderId && evt.from.id !== evt.to.id) {
+              try {
+                await updateDoc(doc(db, "Orders", orderId), { status: targetColId });
+                const moved = allOrdersData.find((order) => order.id === orderId);
+                if (moved) moved.status = targetColId;
+                await patchPortalOrder(db, moved && moved.clientPhone, orderId, { status: targetColId });
+                setTimeout(() => loadOrders(), 400);
+              } catch (e) {
+                evt.from.appendChild(itemEl);
+              }
+            }
+          }
+        });
+      });
+    }
+
+    let loadTicket = 0;
     async function loadOrders() {
+      const ticket = ++loadTicket;
       const colIds = ['col-new', 'col-basic-edit', 'col-pick-photos', 'col-final-retouch', 'col-completed'];
       colIds.forEach(id => document.getElementById(id).innerHTML = `<div class="h-20 bg-white dark:bg-pm-dark-surface rounded-2xl border border-gray-100 dark:border-pm-dark-border animate-pulse"></div>`);
       const counts = { 'col-new': 0, 'col-basic-edit': 0, 'col-pick-photos': 0, 'col-final-retouch': 0, 'col-completed': 0 };
@@ -330,6 +380,7 @@
           getDocs(collection(db, "Orders")),
           getDocs(collection(db, "Clients"))
         ]);
+        if (ticket !== loadTicket) return;
 
         // Build a fast indexed memory cache for client records
         const clientCache = {};
@@ -355,16 +406,18 @@
           let petsStr = pets.length > 0 ? pets.map(p => p.name).join(' & ') : "Unknown Pet";
           const petLines = renderPetLines(pets, { maxVisible: DENSE_AVATAR_LIMIT });
 
-          const colId = d.status || 'col-new';
-          if(counts[colId] !== undefined) counts[colId]++;
+          const requestedCol = d.status || 'col-new';
+          const colId = counts[requestedCol] !== undefined ? requestedCol : 'col-new';
+          counts[colId]++;
 
           allOrdersData.push({ id, ...d, clientName, clientPhone, petsStr, pets });
 
-          const kanbanContainer = document.getElementById(colId) || document.getElementById('col-new');
+          const kanbanContainer = document.getElementById(colId);
           const searchStr = `${clientName} ${petsStr} ${d.package || ''}`.toLowerCase();
           
-          let paymentBadge = d.paymentStatus === 'full' ? `<span class="bg-pm-success/10 text-pm-success px-1.5 py-0.5 rounded text-[9px] font-bold">已付</span>` : 
-                             (d.paymentStatus === 'deposit' ? `<span class="bg-pm-warning/10 text-pm-warning px-1.5 py-0.5 rounded text-[9px] font-bold">訂金</span>` : `<span class="bg-red-50 dark:bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded text-[9px] font-bold">未付</span>`);
+          const payState = paymentStatus(d);
+          let paymentBadge = payState === 'full' ? `<span class="bg-pm-success/10 text-pm-success px-1.5 py-0.5 rounded text-[9px] font-bold">已付</span>` : 
+                             (payState === 'deposit' ? `<span class="bg-pm-warning/10 text-pm-warning px-1.5 py-0.5 rounded text-[9px] font-bold">訂金</span>` : `<span class="bg-red-50 dark:bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded text-[9px] font-bold">未付</span>`);
 
           kanbanContainer.insertAdjacentHTML('beforeend', `
             <div data-order-id="${id}" data-search="${searchStr}" class="kanban-card active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/50 dark:border-white/5 p-4 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark pm-named mb-3" onclick="openDrawer('${id}')">
@@ -381,12 +434,12 @@
 
           const statusMap = { "col-new": "新預約", "col-basic-edit": "基本修輯", "col-pick-photos": "揀相", "col-final-retouch": "精修", "col-completed": "已完成" };
           const statusTone = { "col-new": "text-pm-info", "col-basic-edit": "text-pm-sage", "col-pick-photos": "text-pm-oak", "col-final-retouch": "text-pm-clay", "col-completed": "text-pm-success" };
-          const bal = Number(d.price||0) - (Number(d.depositAmount) || Math.floor(Number(d.price||0)/2));
-          const balText = d.paymentStatus === 'full' ? '-' : `HK$ ${bal.toLocaleString()}`;
-          const balClass = d.paymentStatus === 'full' ? 'text-gray-400' : 'text-red-500 font-bold';
+          const bal = balanceDue(d);
+          const balText = payState === 'full' ? '-' : `HK$ ${bal.toLocaleString()}`;
+          const balClass = payState === 'full' ? 'text-gray-400' : 'text-red-500 font-bold';
 
           tableRows += `
-            <tr class="hover:bg-gray-50/80 dark:hover:bg-pm-fill/70 border-b border-gray-100 dark:border-pm-dark-border/40 transition-colors cursor-pointer" onclick="openDrawer('${id}')">
+            <tr data-search="${searchStr}" class="hover:bg-gray-50/80 dark:hover:bg-pm-fill/70 border-b border-gray-100 dark:border-pm-dark-border/40 transition-colors cursor-pointer" onclick="openDrawer('${id}')">
               <td class="px-6 py-3.5">
                 ${petLines}
                 <div class="pm-pet-note"><p class="pm-pet-client">${clientName}</p></div>
@@ -406,31 +459,8 @@
 
         document.getElementById('table-body').innerHTML = tableRows;
         lucide.createIcons();
-
-        colIds.forEach(colId => {
-          const el = document.getElementById(colId);
-          if (el) {
-            new Sortable(el, {
-              group: 'kanban', animation: 220, dragClass: 'sortable-drag', delay: window.innerWidth < 768 ? 200 : 0, delayOnTouchOnly: true,
-              onEnd: async function(evt) {
-                const itemEl = evt.item; const targetColId = evt.to.id; const orderId = itemEl.getAttribute('data-order-id');
-                if (orderId && evt.from.id !== evt.to.id) {
-                  try { 
-                      await updateDoc(doc(db, "Orders", orderId), { status: targetColId }); 
-                      setTimeout(() => loadOrders(), 400);
-                  } catch(e) { evt.from.appendChild(itemEl); }
-                }
-              }
-            });
-          }
-        });
-
-        document.getElementById('global-search').addEventListener('input', (e) => {
-          const term = e.target.value.toLowerCase();
-          document.querySelectorAll('.kanban-card').forEach(card => {
-            card.style.display = (card.getAttribute('data-search').includes(term)) ? 'block' : 'none';
-          });
-        });
+        bindKanban();
+        applyWorkspaceSearch();
 
       } catch (err) { 
         // [SKILL: Code Review] Graceful degradation safety UI anchor

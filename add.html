@@ -362,7 +362,7 @@
   <div id="toast-container" class="fixed bottom-8 right-8 z-[100] flex flex-col gap-3 pointer-events-none"></div>
 
   <script type="module">
-    import { doc, getDoc, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { doc, getDoc, getDocs, updateDoc, collection, addDoc, query, where, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
     import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
     import { db, storage } from "./firebase.js";
     import { logoutAdmin, requireAdmin } from "./auth.js";
@@ -370,6 +370,7 @@
     import { applySlipUpload, formatPaymentStamp, hkDateTimeLocalValue, hkWallToIso } from "./payment-times.js";
     import { extraStudioFromOrder, includedStudioLimit, packageOptionLabel, quoteBooking } from "./booking-finance.js";
     import { movePortalOrder } from "./portal-mirror.js";
+    import { isPortalPhoneKey, normalizePhone } from "./phone.js";
 
     window.pmLogout = () => logoutAdmin();
 
@@ -411,6 +412,7 @@
     let availableTags = [];
     let currentPets = [];
     let selectedTags = [];
+    let savingOrder = false;
     let originalClientId = "";
     let originalPhone = "";
     let loadedOrder = null;
@@ -615,9 +617,22 @@
     };
 
     // Firebase Storage 上傳
+    const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+    function imageProblem(file) {
+        if (!file || !/^image\/(jpeg|png|webp|gif)$/.test(file.type || "")) return "請上傳 JPG、PNG、WEBP 或 GIF";
+        if (file.size > MAX_IMAGE_BYTES) return "圖片須少於 8MB";
+        return "";
+    }
+    function friendlyUploadError(err) {
+        const known = ["請上傳 JPG、PNG、WEBP 或 GIF", "圖片須少於 8MB"];
+        return known.includes(err && err.message) ? err.message : "上傳失敗";
+    }
     async function uploadImageToStorage(file, path) {
-        const storageRef = ref(storage, path);
-        await uploadBytes(storageRef, file);
+        const problem = imageProblem(file);
+        if (problem) throw new Error(problem);
+        const safeName = String(file.name || "image").replace(/[^\w.\-]+/g, "_").slice(-80);
+        const storageRef = ref(storage, `${path}_${Date.now()}_${safeName}`);
+        await uploadBytes(storageRef, file, { contentType: file.type });
         return await getDownloadURL(storageRef);
     }
 
@@ -654,36 +669,36 @@
         const file = e.target.files[0]; if(!file) return;
         const loadingToast = showToast("正在上傳訂金入數紙...", "loading");
         try {
-            const url = await uploadImageToStorage(file, `receipts/dep_${Date.now()}_${file.name}`);
+            const url = await uploadImageToStorage(file, "receipts/dep");
             document.getElementById('depositReceiptUrl').value = url;
             markSlipUploaded("deposit");
             loadingToast.remove();
             showToast("訂金入數紙上傳成功！");
-        } catch(err) { loadingToast.remove(); showToast("上傳失敗", "error"); }
+        } catch(err) { loadingToast.remove(); showToast(friendlyUploadError(err), "error"); }
     });
 
     document.getElementById('balanceReceiptFile').addEventListener('change', async (e) => {
         const file = e.target.files[0]; if(!file) return;
         const loadingToast = showToast("正在上傳尾數入數紙...", "loading");
         try {
-            const url = await uploadImageToStorage(file, `receipts/bal_${Date.now()}_${file.name}`);
+            const url = await uploadImageToStorage(file, "receipts/bal");
             document.getElementById('balanceReceiptUrl').value = url;
             markSlipUploaded("balance");
             loadingToast.remove();
             showToast("尾數入數紙上傳成功！");
-        } catch(err) { loadingToast.remove(); showToast("上傳失敗", "error"); }
+        } catch(err) { loadingToast.remove(); showToast(friendlyUploadError(err), "error"); }
     });
 
     window.uploadPetImage = async (i, inputEl) => {
         const file = inputEl.files[0]; if(!file) return;
         const loadingToast = showToast("正在上傳大頭照...", "loading");
         try {
-            const url = await uploadImageToStorage(file, `avatars/pet_${Date.now()}_${file.name}`);
+            const url = await uploadImageToStorage(file, "avatars/pet");
             updatePetField(i, 'photoUrl', url);
             document.getElementById(`pet-url-${i}`).value = url;
             loadingToast.remove();
             showToast("大頭照上傳成功！");
-        } catch(e) { loadingToast.remove(); showToast("大頭照上傳失敗", "error"); }
+        } catch(e) { loadingToast.remove(); showToast(friendlyUploadError(e), "error"); }
     }
 
     function renderPetsForm() {
@@ -737,12 +752,29 @@
       renderPetsForm();
     };
 
+    async function findClientByPhone(phoneKey, rawPhone) {
+      const variants = [phoneKey];
+      const raw = String(rawPhone || "").trim();
+      if (raw && !variants.includes(raw)) variants.push(raw);
+      if (phoneKey.length === 8) variants.push(`852${phoneKey}`);
+      for (const value of variants) {
+        const snap = await getDocs(query(collection(db, "Clients"), where("phone", "==", value), limit(1)));
+        if (!snap.empty) return snap.docs[0];
+      }
+      return null;
+    }
+
     async function submitData() {
+      if (savingOrder) return;
       const name = document.getElementById('clientName').value.trim();
-      const phone = document.getElementById('clientPhone').value.trim();
-      if(!name || !phone) return showToast("請完整填寫必填欄位 (*)", "error");
+      const rawPhone = document.getElementById('clientPhone').value.trim();
+      const phone = normalizePhone(rawPhone);
+      if(!name || !rawPhone) return showToast("請完整填寫必填欄位 (*)", "error");
+      if(!isPortalPhoneKey(phone)) return showToast("請輸入有效電話號碼", "error");
 
       const btn = document.getElementById('btn-submit-main');
+      savingOrder = true;
+      btn.disabled = true;
       btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> 正在儲存...`;
       btn.classList.add('opacity-70', 'cursor-not-allowed');
       lucide.createIcons();
@@ -753,12 +785,16 @@
         const address = document.getElementById('clientAddress').value.trim();
 
         let clientId = originalClientId;
-        const clientsRef = collection(db, "Clients");
-        
-        if (editId && clientId) {
-            await updateDoc(doc(db, "Clients", clientId), { name, phone, instagram, email, address });
+        const matched = await findClientByPhone(phone, rawPhone);
+        const profile = { name, phone, instagram, email, address };
+
+        if (matched && (!clientId || matched.id !== clientId)) {
+            clientId = matched.id;
+            await updateDoc(matched.ref, profile);
+        } else if (clientId) {
+            await updateDoc(doc(db, "Clients", clientId), profile);
         } else {
-            const cSnap = await addDoc(clientsRef, { name, phone, instagram, email, address });
+            const cSnap = await addDoc(collection(db, "Clients"), profile);
             clientId = cSnap.id;
         }
 
@@ -798,7 +834,10 @@
           balanceReceivedAt: hkWallToIso(document.getElementById('balanceReceivedAt').value)
         };
 
-        if (!editId) { orderPayload.status = "col-new"; }
+        if (!editId) {
+          orderPayload.status = "col-new";
+          orderPayload.createdAt = new Date().toISOString();
+        }
 
         let savedId = editId;
         if (editId) {
@@ -832,7 +871,9 @@
         setTimeout(() => { window.location.href = 'index.html'; }, 1000);
 
       } catch (err) {
+        savingOrder = false;
         showToast("資料庫安全儲存事務卡死", "error");
+        btn.disabled = false;
         btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> 儲存預約檔案`;
         btn.classList.remove('opacity-70', 'cursor-not-allowed');
         lucide.createIcons();
