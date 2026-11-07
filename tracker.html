@@ -261,8 +261,9 @@
 
   <script type="module">
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    import { db } from "./firebase.js";
+    import { db, firebaseConfig } from "./firebase.js";
     import { isPortalPhoneKey, normalizePhone } from "./phone.js";
+    import { lookupPortalByPhone, portalResultFromSnapshot } from "./portal-lookup.js";
     import { balanceDue, paymentStatus, recordedDeposit } from "./order-money.js";
     import { DEFAULT_PET_PHOTO, DENSE_AVATAR_LIMIT, escAttr, petPhotoSrc, renderPetAvatars, safeHttpUrl } from "./pets-avatars.js"; 
     const stepMap = { "col-new": 1, "col-basic-edit": 2, "col-pick-photos": 3, "col-final-retouch": 4, "col-completed": 5 };
@@ -338,13 +339,16 @@
           resetButton();
           return;
         }
-        const portalSnap = await getDoc(doc(db, "portalByPhone", phoneKey));
-        if (!portalSnap.exists()) {
+        const found = await lookupPortalByPhone(phoneKey, {
+          projectId: firebaseConfig.projectId,
+          readSdk: (phone) => getDoc(doc(db, "portalByPhone", phone)).then(portalResultFromSnapshot)
+        });
+        if (!found.exists) {
           showToast("找不到對應登記電話的預約紀錄！", "error");
           resetButton();
           return;
         }
-        currentPortal = portalSnap.data();
+        currentPortal = found.data;
         if (currentPortal.clientName) currentClientName = currentPortal.clientName;
         multipleFoundOrders = Object.values(currentPortal.orders || {});
 
