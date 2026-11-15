@@ -862,11 +862,13 @@
         }
 
         try {
+          const freshSnap = await getDoc(doc(db, "Orders", savedId));
+          const serverOrder = freshSnap.exists() ? freshSnap.data() : (loadedOrder || {});
           const mirrored = {
-            ...(loadedOrder || {}),
+            ...serverOrder,
             ...orderPayload,
-            status: (orderPayload.status || (loadedOrder && loadedOrder.status) || "col-new"),
-            galleryUrl: (loadedOrder && loadedOrder.galleryUrl) || ""
+            status: (orderPayload.status || serverOrder.status || (loadedOrder && loadedOrder.status) || "col-new"),
+            galleryUrl: serverOrder.galleryUrl || ""
           };
           await movePortalOrder(db, {
             fromPhone: originalPhone,

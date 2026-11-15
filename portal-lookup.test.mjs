@@ -27,6 +27,8 @@ test("decodes the portal document shape the guest pages already read", () => {
             mapValue: {
               fields: {
                 id: { stringValue: "order1" },
+                status: { stringValue: "col-new" },
+                galleryUrl: { stringValue: "https://drive.google.com/drive/folders/abc?usp=sharing" },
                 price: { integerValue: "1500" },
                 depositAmount: { nullValue: null },
                 depositPaid: { booleanValue: false },
@@ -47,6 +49,8 @@ test("decodes the portal document shape the guest pages already read", () => {
 
   assert.equal(data.clientName, "Ada");
   assert.equal(data.orders.order1.price, 1500);
+  assert.equal(data.orders.order1.status, "col-new");
+  assert.equal(data.orders.order1.galleryUrl, "https://drive.google.com/drive/folders/abc?usp=sharing");
   assert.equal(data.orders.order1.depositAmount, null);
   assert.equal(data.orders.order1.depositPaid, false);
   assert.equal(data.orders.order1.pets[0].name, "Mochi");

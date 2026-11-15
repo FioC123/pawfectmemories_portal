@@ -638,6 +638,7 @@
     const orderId = urlParams.get('id') || urlParams.get('editId'); 
 
     let rawData = {}; let loadedClientName = ""; let loadedClientPhone = ""; let loadedPetsString = ""; let orderShootDate = ""; let orderLocation = ""; let waTemplates = {}; let loadedPackages = [];
+    let detailReady = Promise.resolve();
 
     function showReceiptThumb(id, url) {
         const host = document.getElementById(id);
@@ -835,15 +836,36 @@
       } catch (err) { console.error(err); }
     }
 
+    async function phoneForPortal() {
+      const ready = normalizePhone(loadedClientPhone);
+      if (isPortalPhoneKey(ready)) return ready;
+      const clientId = rawData && rawData.clientId;
+      if (!clientId) return "";
+      const clientSnap = await getDoc(doc(db, "Clients", clientId));
+      if (!clientSnap.exists()) return "";
+      const client = clientSnap.data();
+      if (!loadedClientName) loadedClientName = client.name || "";
+      loadedClientPhone = client.phone || "";
+      return normalizePhone(loadedClientPhone);
+    }
+
+    function markSaved(id) {
+      const msg = document.getElementById(id);
+      msg.classList.remove('opacity-0');
+      setTimeout(() => msg.classList.add('opacity-0'), 2000);
+    }
+
     const adminUser = await requireAdmin();
-    if (adminUser) { fetchTemplates(); loadDetailData(); }
+    if (adminUser) { fetchTemplates(); detailReady = loadDetailData(); }
 
     document.getElementById('body-status-select').addEventListener('change', async (e) => {
       if(!orderId) return;
       try { 
           await updateDoc(doc(db, "Orders", orderId), { status: e.target.value });
-          await patchPortalOrder(db, loadedClientPhone, orderId, { status: e.target.value }); 
-          const msg = document.getElementById('status-msg'); msg.classList.remove('opacity-0'); setTimeout(() => msg.classList.add('opacity-0'), 2000); 
+          await detailReady;
+          const mirrored = await patchPortalOrder(db, await phoneForPortal(), orderId, { status: e.target.value });
+          if (!mirrored) { showToast("進度已寫入訂單，但客人查詢頁未更新", "error"); return; }
+          markSaved('status-msg');
       } catch (err) { showToast("進度更新失敗", "error"); }
     });
 
@@ -852,8 +874,10 @@
       try { 
           const galleryUrl = e.target.value.trim();
           await updateDoc(doc(db, "Orders", orderId), { galleryUrl });
-          await patchPortalOrder(db, loadedClientPhone, orderId, { galleryUrl }); 
-          const msg = document.getElementById('link-save-msg'); msg.classList.remove('opacity-0'); setTimeout(() => msg.classList.add('opacity-0'), 2000); 
+          await detailReady;
+          const mirrored = await patchPortalOrder(db, await phoneForPortal(), orderId, { galleryUrl });
+          if (!mirrored) { showToast("已寫入訂單，但客人查詢頁未更新", "error"); return; }
+          markSaved('link-save-msg');
       } catch(err) { showToast("連結儲存失敗", "error"); }
     });
 
