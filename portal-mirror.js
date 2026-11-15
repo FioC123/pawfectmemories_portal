@@ -6,8 +6,8 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
   getDocs,
+  runTransaction,
   setDoc,
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -58,34 +58,43 @@ function portalRef(db, phone) {
   return { key, ref: doc(db, "portalByPhone", key) };
 }
 
+function portalDocument(clientName, orders) {
+  return {
+    clientName,
+    orders,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+// The guest page reads this one document. Status and the album URL are
+// separate saves, and each used to read-then-replace the whole document, so
+// the slower save dropped the other field. A transaction retries on that race.
 export async function upsertPortalOrder(db, { phone, clientName, orderId, order }) {
   const target = portalRef(db, phone);
   if (!target || !orderId) return;
-  const snap = await getDoc(target.ref);
-  const prev = snap.exists() ? (snap.data().orders || {}) : {};
-  const orders = { ...prev, [orderId]: publicOrderView(orderId, order) };
-  await setDoc(target.ref, {
-    clientName: text(clientName) || (snap.exists() ? text(snap.data().clientName) : ""),
-    orders,
-    updatedAt: new Date().toISOString()
+  const view = publicOrderView(orderId, order);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(target.ref);
+    const prev = snap.exists() ? (snap.data().orders || {}) : {};
+    const orders = { ...prev, [orderId]: view };
+    const name = text(clientName) || (snap.exists() ? text(snap.data().clientName) : "");
+    tx.set(target.ref, portalDocument(name, orders));
   });
 }
 
 export async function removePortalOrder(db, phone, orderId) {
   const target = portalRef(db, phone);
   if (!target || !orderId) return;
-  const snap = await getDoc(target.ref);
-  if (!snap.exists()) return;
-  const orders = { ...(snap.data().orders || {}) };
-  delete orders[orderId];
-  if (Object.keys(orders).length === 0) {
-    await deleteDoc(target.ref);
-    return;
-  }
-  await setDoc(target.ref, {
-    clientName: text(snap.data().clientName),
-    orders,
-    updatedAt: new Date().toISOString()
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(target.ref);
+    if (!snap.exists()) return;
+    const orders = { ...(snap.data().orders || {}) };
+    delete orders[orderId];
+    if (Object.keys(orders).length === 0) {
+      tx.delete(target.ref);
+      return;
+    }
+    tx.set(target.ref, portalDocument(text(snap.data().clientName), orders));
   });
 }
 
@@ -98,16 +107,15 @@ export async function movePortalOrder(db, { fromPhone, toPhone, clientName, orde
 
 export async function patchPortalOrder(db, phone, orderId, partial) {
   const target = portalRef(db, phone);
-  if (!target || !orderId) return;
-  const snap = await getDoc(target.ref);
-  if (!snap.exists()) return;
-  const orders = { ...(snap.data().orders || {}) };
-  if (!orders[orderId]) return;
-  orders[orderId] = { ...orders[orderId], ...partial };
-  await setDoc(target.ref, {
-    clientName: text(snap.data().clientName),
-    orders,
-    updatedAt: new Date().toISOString()
+  if (!target || !orderId || !partial) return false;
+  return runTransaction(db, async (tx) => {
+    const snap = await tx.get(target.ref);
+    if (!snap.exists()) return false;
+    const orders = { ...(snap.data().orders || {}) };
+    if (!orders[orderId]) return false;
+    orders[orderId] = { ...orders[orderId], ...partial };
+    tx.set(target.ref, portalDocument(text(snap.data().clientName), orders));
+    return true;
   });
 }
 

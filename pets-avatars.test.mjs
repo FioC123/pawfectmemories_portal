@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { petPhotoSrc, renderPetLines, safeHttpUrl } from "./pets-avatars.js";
+import { clientGalleryHref, clientGalleryLink, petPhotoSrc, renderPetLines, safeHttpUrl } from "./pets-avatars.js";
 
 function names(html) {
   return [...html.matchAll(/class="pm-pet-name">([^<]*)</g)].map((match) => match[1]);
@@ -47,6 +47,23 @@ test("photo urls only allow http and https", () => {
   assert.equal(safeHttpUrl("javascript:alert(1)"), "");
   assert.equal(safeHttpUrl("https://example.com/a.jpg"), "https://example.com/a.jpg");
   assert.match(petPhotoSrc({ photoUrl: "javascript:alert(1)" }), /^https:\/\//);
+});
+
+test("a drive link shows from pick-photos onward and stays hidden before that", () => {
+  const drive = "https://drive.google.com/drive/folders/abc?usp=sharing&resourcekey=k";
+  assert.equal(clientGalleryHref({ status: "col-pick-photos", galleryUrl: `\u200b${drive}` }), drive);
+  assert.equal(clientGalleryHref({ status: "col-final-retouch", galleryUrl: drive }), drive);
+  assert.equal(clientGalleryHref({ status: "col-completed", galleryUrl: drive }), drive);
+  assert.equal(clientGalleryHref({ status: "col-new", galleryUrl: drive }), "");
+  assert.equal(clientGalleryHref({ status: "col-basic-edit", galleryUrl: drive }), "");
+  assert.equal(clientGalleryHref({ status: "col-completed", galleryUrl: "javascript:alert(1)" }), "");
+  assert.equal(clientGalleryHref({ status: "col-completed", galleryUrl: "drive.google.com/drive/folders/abc" }), "");
+  assert.equal(clientGalleryHref({ status: "col-completed", galleryUrl: "" }), "");
+  const html = clientGalleryLink({ status: "col-completed", galleryUrl: drive }, "album");
+  assert.match(html, /href="https:\/\/drive\.google\.com\/drive\/folders\/abc\?usp=sharing&amp;resourcekey=k"/);
+  assert.match(html, /target="_blank"/);
+  assert.match(html, /rel="noopener noreferrer"/);
+  assert.equal(clientGalleryLink({ status: "col-new", galleryUrl: drive }, "album"), "");
 });
 
 test("a booking with no pets still renders one aligned row", () => {

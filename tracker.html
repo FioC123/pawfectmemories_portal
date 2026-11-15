@@ -265,7 +265,7 @@
     import { isPortalPhoneKey, normalizePhone } from "./phone.js";
     import { lookupPortalByPhone, portalResultFromSnapshot } from "./portal-lookup.js";
     import { balanceDue, paymentStatus, recordedDeposit } from "./order-money.js";
-    import { DEFAULT_PET_PHOTO, DENSE_AVATAR_LIMIT, escAttr, petPhotoSrc, renderPetAvatars, safeHttpUrl } from "./pets-avatars.js"; 
+    import { DEFAULT_PET_PHOTO, DENSE_AVATAR_LIMIT, clientGalleryHref, clientGalleryLink, escAttr, petPhotoSrc, renderPetAvatars } from "./pets-avatars.js"; 
     const stepMap = { "col-new": 1, "col-basic-edit": 2, "col-pick-photos": 3, "col-final-retouch": 4, "col-completed": 5 };
     const statusMap = { "col-new": "新預約", "col-basic-edit": "基本修輯", "col-pick-photos": "揀相", "col-final-retouch": "精修", "col-completed": "已完成" };
 
@@ -388,6 +388,7 @@
             let pets = order.pets || [];
             if (pets.length === 0 && order.petName) pets = [{ name: order.petName, photoUrl: order.photoUrl || "" }];
             let petNames = pets.length > 0 ? pets.map(p=>p.name).join(' & ') : '未知毛孩';
+            const galleryLink = clientGalleryLink(order, "mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-pm-oak");
             
             return `
               <div data-order-id="${escAttr(order.id)}" class="pm-order-choice active-glow bg-white dark:bg-pm-dark-surface border border-gray-200/60 dark:border-white/5 p-5 rounded-2xl cursor-pointer shadow-taste dark:shadow-taste-dark flex items-center justify-between group pm-named">
@@ -396,6 +397,7 @@
                     <div class="overflow-hidden">
                        <h4 class="font-bold text-xs text-gray-900 dark:text-white truncate mb-0.5">${escAttr(currentClientName)} 的預約檔案：${escAttr(petNames)}</h4>
                        <p class="text-[10px] text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wider">套餐: ${escAttr(order.package || '未定')} | 拍攝日期: ${escAttr(order.shootDate || '待定')}</p>
+                       ${galleryLink}
                     </div>
                  </div>
                  <div class="text-right shrink-0 flex items-center gap-1.5">
@@ -411,6 +413,7 @@
         if (listContainer.dataset.bound !== "1") {
           listContainer.dataset.bound = "1";
           listContainer.addEventListener("click", (event) => {
+            if (event.target.closest("a")) return;
             const card = event.target.closest("[data-order-id]");
             if (!card) return;
             window.selectActiveOrder(card.getAttribute("data-order-id"));
@@ -501,9 +504,9 @@
           }
         });
 
-        const gallery = safeHttpUrl(d.galleryUrl);
+        const gallery = clientGalleryHref(d);
         const galleryBox = document.getElementById('gallery-box');
-        if(cLv >= 3 && gallery) {
+        if (gallery) {
             galleryBox.classList.remove('hidden');
             const galleryLink = document.getElementById('gallery-link');
             galleryLink.href = gallery;

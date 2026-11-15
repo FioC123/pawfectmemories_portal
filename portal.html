@@ -134,7 +134,7 @@
     import { db, firebaseConfig } from "./firebase.js";
     import { isPortalPhoneKey, normalizePhone } from "./phone.js";
     import { lookupPortalByPhone, portalResultFromSnapshot } from "./portal-lookup.js";
-    import { escAttr, renderPetAvatars } from "./pets-avatars.js";
+    import { clientGalleryLink, escAttr, renderPetAvatars } from "./pets-avatars.js";
 
     lucide.createIcons();
 
@@ -238,6 +238,7 @@
                 let petsStr = pets.length > 0 ? pets.map(p => p.name).join(' & ') : '未知寵物';
                 const orderHref = `tracker.html?phone=${encodeURIComponent(phoneVal)}&id=${encodeURIComponent(order.id || "")}`;
                 let statusInfo = statusMap[order.status] || { text: "處理中", color: "text-gray-400", icon: "activity" };
+                const galleryLink = clientGalleryLink(order, "mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-pm-oak");
                 
                 const avatarsHTML = renderPetAvatars(pets, {
                     sizeClass: "w-14 h-14 bg-gray-50 dark:bg-pm-dark-surface",
@@ -263,6 +264,7 @@
                     <div class="overflow-hidden">
                       <h3 class="text-xl font-serif font-bold text-gray-900 dark:text-white mb-1.5 truncate leading-none">${escAttr(petsStr)}</h3>
                       <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${escAttr(order.shootDate || '日期未定')} ${escAttr(order.shootTime || '')}</p>
+                      ${galleryLink}
                     </div>
                   </div>
                 </div>`;
@@ -272,6 +274,7 @@
             if (container.dataset.bound !== "1") {
               container.dataset.bound = "1";
               container.addEventListener("click", (event) => {
+                if (event.target.closest("a")) return;
                 const card = event.target.closest("[data-href]");
                 if (!card) return;
                 window.location.href = card.getAttribute("data-href");

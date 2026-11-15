@@ -27,6 +27,22 @@ export function safeHttpUrl(value) {
   }
 }
 
+// Same gate the tracker has used since the first progress page: the album
+// opens at 揀相, 精修, and 完成交付. Invisible characters from a chat paste
+// are ignored. Anything that is not an http(s) URL stays hidden.
+const CLIENT_GALLERY_STATUSES = new Set(["col-pick-photos", "col-final-retouch", "col-completed"]);
+
+export function clientGalleryHref(order) {
+  if (!order || typeof order !== "object" || !CLIENT_GALLERY_STATUSES.has(order.status)) return "";
+  return safeHttpUrl(String(order.galleryUrl ?? "").replace(/[\u200B-\u200D\uFEFF]/g, ""));
+}
+
+export function clientGalleryLink(order, className) {
+  const href = clientGalleryHref(order);
+  if (!href) return "";
+  return `<a href="${escAttr(href)}" target="_blank" rel="noopener noreferrer" class="${className}"><i data-lucide="cloud-download" class="w-3.5 h-3.5"></i> 即刻瀏覽雲端相簿</a>`;
+}
+
 export function petPhotoSrc(pet) {
   const url = pet && typeof pet.photoUrl === "string" ? pet.photoUrl.trim() : "";
   return safeHttpUrl(url) || DEFAULT_PET_PHOTO;
